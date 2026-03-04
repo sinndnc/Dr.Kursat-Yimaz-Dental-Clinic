@@ -6,6 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		997AD4F72F5853E1007AC84B /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 997AD4F62F5853E1007AC84B /* FirebaseAuth */; };
+		997AD4F92F5853E1007AC84B /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 997AD4F82F5853E1007AC84B /* FirebaseFirestore */; };
+		99F4E6FE2F58A78500FEC6AA /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 99F4E6FD2F58A78500FEC6AA /* FirebaseMessaging */; };
+		99F4E7002F58A7ED00FEC6AA /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 99F4E6FF2F58A7ED00FEC6AA /* FirebaseStorage */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		997AD4CB2F585224007AC84B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -35,14 +42,14 @@
 			path = "Dr. Kürşat Yılmaz Dental Clinic";
 			sourceTree = "<group>";
 		};
-		997AD4CD2F585224007AC84B /* Dr. Kürşat Yılmaz Dental ClinicTests */ = {
+		997AD4CD2F585224007AC84B /* Tests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "Dr. Kürşat Yılmaz Dental ClinicTests";
+			path = Tests;
 			sourceTree = "<group>";
 		};
-		997AD4D72F585224007AC84B /* Dr. Kürşat Yılmaz Dental ClinicUITests */ = {
+		997AD4D72F585224007AC84B /* UITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "Dr. Kürşat Yılmaz Dental ClinicUITests";
+			path = UITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -52,6 +59,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				99F4E6FE2F58A78500FEC6AA /* FirebaseMessaging in Frameworks */,
+				99F4E7002F58A7ED00FEC6AA /* FirebaseStorage in Frameworks */,
+				997AD4F72F5853E1007AC84B /* FirebaseAuth in Frameworks */,
+				997AD4F92F5853E1007AC84B /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -76,8 +87,9 @@
 			isa = PBXGroup;
 			children = (
 				997AD4BF2F585222007AC84B /* Dr. Kürşat Yılmaz Dental Clinic */,
-				997AD4CD2F585224007AC84B /* Dr. Kürşat Yılmaz Dental ClinicTests */,
-				997AD4D72F585224007AC84B /* Dr. Kürşat Yılmaz Dental ClinicUITests */,
+				997AD4CD2F585224007AC84B /* Tests */,
+				997AD4D72F585224007AC84B /* UITests */,
+				99F4E6FC2F58A78500FEC6AA /* Frameworks */,
 				997AD4BE2F585222007AC84B /* Products */,
 			);
 			sourceTree = "<group>";
@@ -90,6 +102,13 @@
 				997AD4D42F585224007AC84B /* Dr. Kürşat Yılmaz Dental ClinicUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		99F4E6FC2F58A78500FEC6AA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -112,6 +131,10 @@
 			);
 			name = "Dr. Kürşat Yılmaz Dental Clinic";
 			packageProductDependencies = (
+				997AD4F62F5853E1007AC84B /* FirebaseAuth */,
+				997AD4F82F5853E1007AC84B /* FirebaseFirestore */,
+				99F4E6FD2F58A78500FEC6AA /* FirebaseMessaging */,
+				99F4E6FF2F58A7ED00FEC6AA /* FirebaseStorage */,
 			);
 			productName = "Dr. Kürşat Yılmaz Dental Clinic";
 			productReference = 997AD4BD2F585222007AC84B /* Dr. Kürşat Yılmaz Dental Clinic.app */;
@@ -131,7 +154,7 @@
 				997AD4CC2F585224007AC84B /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				997AD4CD2F585224007AC84B /* Dr. Kürşat Yılmaz Dental ClinicTests */,
+				997AD4CD2F585224007AC84B /* Tests */,
 			);
 			name = "Dr. Kürşat Yılmaz Dental ClinicTests";
 			packageProductDependencies = (
@@ -154,7 +177,7 @@
 				997AD4D62F585224007AC84B /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				997AD4D72F585224007AC84B /* Dr. Kürşat Yılmaz Dental ClinicUITests */,
+				997AD4D72F585224007AC84B /* UITests */,
 			);
 			name = "Dr. Kürşat Yılmaz Dental ClinicUITests";
 			packageProductDependencies = (
@@ -195,6 +218,9 @@
 			);
 			mainGroup = 997AD4B42F585222007AC84B;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				997AD4F52F5853E1007AC84B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 997AD4BE2F585222007AC84B /* Products */;
 			projectDirPath = "";
@@ -400,6 +426,7 @@
 				DEVELOPMENT_TEAM = A5PNFW5LM9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Dr-Kursat-Yilmaz-Dental-Clinic-Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -410,7 +437,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.vision.apple.Dr--Ku-rs-at-Y-lmaz-Dental-Clinic";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.vision.apple.Dr-Kursat-Yilmaz-Dental-Clinic";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -432,6 +459,7 @@
 				DEVELOPMENT_TEAM = A5PNFW5LM9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Dr-Kursat-Yilmaz-Dental-Clinic-Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -442,7 +470,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.vision.apple.Dr--Ku-rs-at-Y-lmaz-Dental-Clinic";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.vision.apple.Dr-Kursat-Yilmaz-Dental-Clinic";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -578,6 +606,40 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		997AD4F52F5853E1007AC84B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.10.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		997AD4F62F5853E1007AC84B /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 997AD4F52F5853E1007AC84B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		997AD4F82F5853E1007AC84B /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 997AD4F52F5853E1007AC84B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		99F4E6FD2F58A78500FEC6AA /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 997AD4F52F5853E1007AC84B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
+		};
+		99F4E6FF2F58A7ED00FEC6AA /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 997AD4F52F5853E1007AC84B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 997AD4B52F585222007AC84B /* Project object */;
 }
