@@ -13,6 +13,6 @@ struct AuthView: View {
                     .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading)))
             }
         }
-        .animation(.easeInOut(duration: 0.35), value: showLogin)
+        .animation(.easeInOut(duration: 0.3), value: showLogin)
     }
 }
