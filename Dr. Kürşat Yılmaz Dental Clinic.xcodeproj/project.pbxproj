@@ -1,0 +1,583 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXContainerItemProxy section */
+		997AD4CB2F585224007AC84B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 997AD4B52F585222007AC84B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 997AD4BC2F585222007AC84B;
+			remoteInfo = "Dr. Kürşat Yılmaz Dental Clinic";
+		};
+		997AD4D52F585224007AC84B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 997AD4B52F585222007AC84B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 997AD4BC2F585222007AC84B;
+			remoteInfo = "Dr. Kürşat Yılmaz Dental Clinic";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		997AD4BD2F585222007AC84B /* Dr. Kürşat Yılmaz Dental Clinic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Dr. Kürşat Yılmaz Dental Clinic.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		997AD4CA2F585224007AC84B /* Dr. Kürşat Yılmaz Dental ClinicTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Dr. Kürşat Yılmaz Dental ClinicTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		997AD4D42F585224007AC84B /* Dr. Kürşat Yılmaz Dental ClinicUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Dr. Kürşat Yılmaz Dental ClinicUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		997AD4BF2F585222007AC84B /* Dr. Kürşat Yılmaz Dental Clinic */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Dr. Kürşat Yılmaz Dental Clinic";
+			sourceTree = "<group>";
+		};
+		997AD4CD2F585224007AC84B /* Dr. Kürşat Yılmaz Dental ClinicTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Dr. Kürşat Yılmaz Dental ClinicTests";
+			sourceTree = "<group>";
+		};
+		997AD4D72F585224007AC84B /* Dr. Kürşat Yılmaz Dental ClinicUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Dr. Kürşat Yılmaz Dental ClinicUITests";
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		997AD4BA2F585222007AC84B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		997AD4C72F585224007AC84B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		997AD4D12F585224007AC84B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		997AD4B42F585222007AC84B = {
+			isa = PBXGroup;
+			children = (
+				997AD4BF2F585222007AC84B /* Dr. Kürşat Yılmaz Dental Clinic */,
+				997AD4CD2F585224007AC84B /* Dr. Kürşat Yılmaz Dental ClinicTests */,
+				997AD4D72F585224007AC84B /* Dr. Kürşat Yılmaz Dental ClinicUITests */,
+				997AD4BE2F585222007AC84B /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		997AD4BE2F585222007AC84B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				997AD4BD2F585222007AC84B /* Dr. Kürşat Yılmaz Dental Clinic.app */,
+				997AD4CA2F585224007AC84B /* Dr. Kürşat Yılmaz Dental ClinicTests.xctest */,
+				997AD4D42F585224007AC84B /* Dr. Kürşat Yılmaz Dental ClinicUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		997AD4BC2F585222007AC84B /* Dr. Kürşat Yılmaz Dental Clinic */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 997AD4DE2F585224007AC84B /* Build configuration list for PBXNativeTarget "Dr. Kürşat Yılmaz Dental Clinic" */;
+			buildPhases = (
+				997AD4B92F585222007AC84B /* Sources */,
+				997AD4BA2F585222007AC84B /* Frameworks */,
+				997AD4BB2F585222007AC84B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				997AD4BF2F585222007AC84B /* Dr. Kürşat Yılmaz Dental Clinic */,
+			);
+			name = "Dr. Kürşat Yılmaz Dental Clinic";
+			packageProductDependencies = (
+			);
+			productName = "Dr. Kürşat Yılmaz Dental Clinic";
+			productReference = 997AD4BD2F585222007AC84B /* Dr. Kürşat Yılmaz Dental Clinic.app */;
+			productType = "com.apple.product-type.application";
+		};
+		997AD4C92F585224007AC84B /* Dr. Kürşat Yılmaz Dental ClinicTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 997AD4E12F585224007AC84B /* Build configuration list for PBXNativeTarget "Dr. Kürşat Yılmaz Dental ClinicTests" */;
+			buildPhases = (
+				997AD4C62F585224007AC84B /* Sources */,
+				997AD4C72F585224007AC84B /* Frameworks */,
+				997AD4C82F585224007AC84B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				997AD4CC2F585224007AC84B /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				997AD4CD2F585224007AC84B /* Dr. Kürşat Yılmaz Dental ClinicTests */,
+			);
+			name = "Dr. Kürşat Yılmaz Dental ClinicTests";
+			packageProductDependencies = (
+			);
+			productName = "Dr. Kürşat Yılmaz Dental ClinicTests";
+			productReference = 997AD4CA2F585224007AC84B /* Dr. Kürşat Yılmaz Dental ClinicTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		997AD4D32F585224007AC84B /* Dr. Kürşat Yılmaz Dental ClinicUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 997AD4E42F585224007AC84B /* Build configuration list for PBXNativeTarget "Dr. Kürşat Yılmaz Dental ClinicUITests" */;
+			buildPhases = (
+				997AD4D02F585224007AC84B /* Sources */,
+				997AD4D12F585224007AC84B /* Frameworks */,
+				997AD4D22F585224007AC84B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				997AD4D62F585224007AC84B /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				997AD4D72F585224007AC84B /* Dr. Kürşat Yılmaz Dental ClinicUITests */,
+			);
+			name = "Dr. Kürşat Yılmaz Dental ClinicUITests";
+			packageProductDependencies = (
+			);
+			productName = "Dr. Kürşat Yılmaz Dental ClinicUITests";
+			productReference = 997AD4D42F585224007AC84B /* Dr. Kürşat Yılmaz Dental ClinicUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		997AD4B52F585222007AC84B /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2630;
+				LastUpgradeCheck = 2630;
+				TargetAttributes = {
+					997AD4BC2F585222007AC84B = {
+						CreatedOnToolsVersion = 26.3;
+					};
+					997AD4C92F585224007AC84B = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = 997AD4BC2F585222007AC84B;
+					};
+					997AD4D32F585224007AC84B = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = 997AD4BC2F585222007AC84B;
+					};
+				};
+			};
+			buildConfigurationList = 997AD4B82F585222007AC84B /* Build configuration list for PBXProject "Dr. Kürşat Yılmaz Dental Clinic" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 997AD4B42F585222007AC84B;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 997AD4BE2F585222007AC84B /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				997AD4BC2F585222007AC84B /* Dr. Kürşat Yılmaz Dental Clinic */,
+				997AD4C92F585224007AC84B /* Dr. Kürşat Yılmaz Dental ClinicTests */,
+				997AD4D32F585224007AC84B /* Dr. Kürşat Yılmaz Dental ClinicUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		997AD4BB2F585222007AC84B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		997AD4C82F585224007AC84B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		997AD4D22F585224007AC84B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		997AD4B92F585222007AC84B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		997AD4C62F585224007AC84B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		997AD4D02F585224007AC84B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		997AD4CC2F585224007AC84B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 997AD4BC2F585222007AC84B /* Dr. Kürşat Yılmaz Dental Clinic */;
+			targetProxy = 997AD4CB2F585224007AC84B /* PBXContainerItemProxy */;
+		};
+		997AD4D62F585224007AC84B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 997AD4BC2F585222007AC84B /* Dr. Kürşat Yılmaz Dental Clinic */;
+			targetProxy = 997AD4D52F585224007AC84B /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		997AD4DC2F585224007AC84B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = A5PNFW5LM9;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		997AD4DD2F585224007AC84B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = A5PNFW5LM9;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		997AD4DF2F585224007AC84B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = A5PNFW5LM9;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.vision.apple.Dr--Ku-rs-at-Y-lmaz-Dental-Clinic";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		997AD4E02F585224007AC84B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = A5PNFW5LM9;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.vision.apple.Dr--Ku-rs-at-Y-lmaz-Dental-Clinic";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		997AD4E22F585224007AC84B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = A5PNFW5LM9;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.vision.apple.Dr--Ku-rs-at-Y-lmaz-Dental-ClinicTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Dr. Kürşat Yılmaz Dental Clinic.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Dr. Kürşat Yılmaz Dental Clinic";
+			};
+			name = Debug;
+		};
+		997AD4E32F585224007AC84B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = A5PNFW5LM9;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.vision.apple.Dr--Ku-rs-at-Y-lmaz-Dental-ClinicTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Dr. Kürşat Yılmaz Dental Clinic.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Dr. Kürşat Yılmaz Dental Clinic";
+			};
+			name = Release;
+		};
+		997AD4E52F585224007AC84B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = A5PNFW5LM9;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.vision.apple.Dr--Ku-rs-at-Y-lmaz-Dental-ClinicUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "Dr. Kürşat Yılmaz Dental Clinic";
+			};
+			name = Debug;
+		};
+		997AD4E62F585224007AC84B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = A5PNFW5LM9;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.vision.apple.Dr--Ku-rs-at-Y-lmaz-Dental-ClinicUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "Dr. Kürşat Yılmaz Dental Clinic";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		997AD4B82F585222007AC84B /* Build configuration list for PBXProject "Dr. Kürşat Yılmaz Dental Clinic" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				997AD4DC2F585224007AC84B /* Debug */,
+				997AD4DD2F585224007AC84B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		997AD4DE2F585224007AC84B /* Build configuration list for PBXNativeTarget "Dr. Kürşat Yılmaz Dental Clinic" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				997AD4DF2F585224007AC84B /* Debug */,
+				997AD4E02F585224007AC84B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		997AD4E12F585224007AC84B /* Build configuration list for PBXNativeTarget "Dr. Kürşat Yılmaz Dental ClinicTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				997AD4E22F585224007AC84B /* Debug */,
+				997AD4E32F585224007AC84B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		997AD4E42F585224007AC84B /* Build configuration list for PBXNativeTarget "Dr. Kürşat Yılmaz Dental ClinicUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				997AD4E52F585224007AC84B /* Debug */,
+				997AD4E62F585224007AC84B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 997AD4B52F585222007AC84B /* Project object */;
+}
