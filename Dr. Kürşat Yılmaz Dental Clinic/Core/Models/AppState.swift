@@ -61,11 +61,10 @@ class AppState: ObservableObject {
             // Hizmetleri çek
             services = try await firestoreService.fetchServices()
             if services.isEmpty {
-                services = DentalService.sampleData
+                services = []
             }
             
             // İlk kurulumda örnek verileri seed et
-            try await firestoreService.seedDoctorsIfNeeded()
             
         } catch {
             globalError = error.localizedDescription
@@ -80,9 +79,9 @@ class AppState: ObservableObject {
         }
         
         // Doktorlar
-        doctorListener = firestoreService.listenDoctors { [weak self] items in
-            self?.doctors = items.isEmpty ? Doctor.sampleData : items
-        }
+//        doctorListener = firestoreService.listenDoctors { [weak self] items in
+//            self?.doctors = items.isEmpty ? Doctor.sampleData : items
+//        }
         
         // Bildirimler
         notificationListener = firestoreService.listenNotifications(uid: uid) { [weak self] items in

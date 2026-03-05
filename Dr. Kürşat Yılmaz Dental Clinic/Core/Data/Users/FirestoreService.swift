@@ -125,20 +125,6 @@ class FirestoreService: ObservableObject {
         try await batch.commit()
     }
     
-    // MARK: ─── SEED (İlk kurulum için) ───────────────────
-    
-    /// Firestore'a başlangıç verilerini yükler (bir kez çalıştır)
-    func seedDoctorsIfNeeded() async throws {
-        let snapshot = try await db.collection("doctors").limit(to: 1).getDocuments()
-        guard snapshot.isEmpty else { return }   // Zaten var, tekrar ekleme
-        
-        for doctor in Doctor.sampleData {
-            try db.collection("doctors").addDocument(from: doctor)
-        }
-        for service in DentalService.sampleData {
-            try db.collection("services").addDocument(from: service)
-        }
-    }
 }
 
 // MARK: - Custom Errors

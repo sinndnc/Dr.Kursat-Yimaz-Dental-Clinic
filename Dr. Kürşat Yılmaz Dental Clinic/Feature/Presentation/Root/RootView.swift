@@ -8,21 +8,19 @@
 import SwiftUI
 
 struct RootView: View {
-    
     @EnvironmentObject var appState: AppState
     @EnvironmentObject var authService: AuthService
     
     @State private var isCheckingUser = true
     
     var body: some View {
-        Group {
-            if authService.isLoggedIn {
-                MainTabView()
-            }else{
-                if isCheckingUser {
+        ZStack{
+            Color.kyBackground.ignoresSafeArea()
+            Group{
+                if authService.isLoggedIn {
+                    MainTabView()
+                }else{
                     ProgressView()
-                } else {
-                    AuthView()
                 }
             }
         }

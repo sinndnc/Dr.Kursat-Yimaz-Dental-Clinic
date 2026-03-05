@@ -53,7 +53,7 @@ struct Appointment: Identifiable, Codable {
         }
     }
     
-    enum AppointmentStatus: String, Codable {
+    enum AppointmentStatus: String, Codable ,CaseIterable{
         case upcoming = "Yaklaşan"
         case completed = "Tamamlandı"
         case cancelled = "İptal"
