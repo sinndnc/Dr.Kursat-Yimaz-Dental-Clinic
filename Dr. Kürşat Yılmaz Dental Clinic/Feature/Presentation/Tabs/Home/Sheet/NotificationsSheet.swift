@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct NotificationsView: View {
+struct NotificationsSheet: View {
     @EnvironmentObject var appState: AppState
     private let primaryBlue = Color(red: 0.15, green: 0.45, blue: 0.95)
     

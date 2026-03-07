@@ -9,8 +9,8 @@ import FirebaseFirestore
 import Foundation
 import SwiftUI
 
-struct DentalService: Identifiable ,Codable {
-    let id = UUID()
+struct DentalService: Identifiable ,Codable ,Hashable{
+    var id = UUID()
     let category: ServiceCategory
     let title: String
     let subtitle: String
@@ -35,8 +35,8 @@ struct DentalService: Identifiable ,Codable {
     }
 }
 
-struct ServiceDetail: Identifiable , Codable{
-    let id = UUID()
+struct ServiceDetail: Identifiable , Codable,Hashable{
+    var id = UUID()
     let heading: String
     let bullets: [String]
 }

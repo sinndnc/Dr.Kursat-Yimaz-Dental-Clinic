@@ -4,5 +4,12 @@
 <dict>
 	<key>FirebaseAppDelegateProxyEnabled</key>
 	<false/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>comgooglemaps</string>
+		<string>yandexmaps</string>
+		<string>yandexnavi</string>
+		<string>waze</string>
+	</array>
 </dict>
 </plist>

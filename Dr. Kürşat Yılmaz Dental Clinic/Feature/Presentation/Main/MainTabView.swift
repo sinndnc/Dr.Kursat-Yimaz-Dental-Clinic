@@ -2,49 +2,51 @@ import SwiftUI
 
 struct MainTabView: View {
     
-    @State private var selectedTab = 0
     @EnvironmentObject var appState: AppState
+    
+    @StateObject private var navState = AppNavigationState()
     
     private let primaryBlue = Color(red: 0.15, green: 0.45, blue: 0.95)
     
     var body: some View {
         GeometryReader { geometry in
-            TabView(selection: $selectedTab) {
+            TabView(selection: $navState.selectedTab) {
                 HomeView()
                     .tabItem {
-                        Image(systemName: selectedTab == 0 ? "house.fill" : "house")
+                        Image(systemName: navState.selectedTab == .home ? "house.fill" : "house")
                         Text("Ana Sayfa")
                     }
-                    .tag(0)
+                    .tag(AppTab.home)
                 
                 AppointmentsView()
                     .tabItem {
-                        Image(systemName: selectedTab == 1 ? "calendar.circle.fill" : "calendar.circle")
+                        Image(systemName: navState.selectedTab == .appointments ? "calendar.circle.fill" : "calendar.circle")
                         Text("Randevular")
                     }
-                    .tag(1)
+                    .tag(AppTab.appointments)
                 
                 ServicesView()
                     .tabItem {
-                        Image(systemName: selectedTab == 2 ? "cross.circle.fill" : "cross.circle")
+                        Image(systemName: navState.selectedTab == .services ? "cross.circle.fill" : "cross.circle")
                         Text("Hizmetler")
                     }
-                    .tag(2)
+                    .tag(AppTab.services)
                 
                 DoctorsView()
                     .tabItem {
-                        Image(systemName: selectedTab == 3 ? "person.2.fill" : "person.2")
+                        Image(systemName: navState.selectedTab == .doctors ? "person.2.fill" : "person.2")
                         Text("Doktorlar")
                     }
-                    .tag(3)
+                    .tag(AppTab.doctors)
                 
                 ProfileView()
                     .tabItem {
-                        Image(systemName: selectedTab == 4 ? "person.fill" : "person")
+                        Image(systemName: navState.selectedTab == .profile ? "person.fill" : "person")
                         Text("Profil")
                     }
-                    .tag(4)
+                    .tag(AppTab.profile)
             }
+            .environmentObject(navState)
         }
         .task {
             if let uid = appState.authService.uid {

@@ -1,6 +1,6 @@
 import SwiftUI
-import SwiftUI
-
+import AVKit
+import MapKit
 
 struct QuickAction: Identifiable {
     let id = UUID()
@@ -41,27 +41,30 @@ private let techItems: [TechItem] = [
     TechItem(name: "3D Yazıcı",      description: "Aynı gün kişisel restorasyon üretimi",       icon: "cube.transparent.fill",          badge: "Yakında"),
 ]
 
-private let featuredServices: [(String, String, Color)] = [
-    ("Lamina Kaplama",     "seal.fill",                    Color.kyAccent),
-    ("Dental İmplant",     "bolt.shield.fill",             Color(red: 0.3, green: 0.6, blue: 0.9)),
-    ("Aligner Tedavisi",   "mouth.fill",                   Color(red: 0.85, green: 0.4, blue: 0.5)),
-    ("EMS Temizlik",       "wind",                         Color(red: 0.25, green: 0.7, blue: 0.85)),
-    ("Kompozit Tasarım",   "wand.and.stars",               Color(red: 0.4, green: 0.75, blue: 0.65)),
-]
-
 
 struct HomeView: View {
     
     @EnvironmentObject private var appState: AppState
+    @EnvironmentObject private var navState: AppNavigationState
     
+    @State private var heroScale: CGFloat = 0.97
     @State private var currentTestimonialIndex = 0
     @State private var greetingOpacity: Double = 0
-    @State private var heroScale: CGFloat = 0.97
+    
+    @State private var showMap = false
+    @State private var showNotifications: Bool = false
+    @State private var showNewAppointment = false
     @State private var showAppointmentBadge = true
-    @State private var isPresented : Bool = false
+    @State private var showClinicVideo: Bool = false
+    @State private var selectedAppointment: Appointment? = nil
+    
+    let phoneNumber = "905342345758"
+    let destinationName = "Dr. Kürşat Yılmaz"
+    let message = "Merhaba, bilgi almak istiyorum."
+    let destinationCoordinate = CLLocationCoordinate2D(latitude: 41.085185, longitude: 29.027958)
     
     var body: some View {
-        NavigationStack{
+        NavigationStack(path: $navState.homeNavPath) {
             ZStack(alignment: .top) {
                 Color.kyBackground.ignoresSafeArea()
                 
@@ -85,8 +88,17 @@ struct HomeView: View {
                     heroScale = 1.0
                 }
             }
-            .fullScreenCover(isPresented:$isPresented){
-                TemyMainView()
+            .sheet(isPresented: $showNotifications){
+                NotificationsSheet()
+            }
+            .sheet(isPresented: $showNewAppointment){
+                NewAppointmentSheet()
+            }
+            .fullScreenCover(isPresented: $showClinicVideo){
+                VideoPlayerView()
+            }
+            .sheet(item: $selectedAppointment) { appointment in
+                AppointmentDetailSheet(appointment: appointment)
             }
         }
         .ignoresSafeArea()
@@ -104,7 +116,7 @@ struct HomeView: View {
                     endRadius: 300
                 )
                 .ignoresSafeArea()
-             
+                
             }
             .frame(height: 350)
             
@@ -128,43 +140,30 @@ struct HomeView: View {
                     
                     Spacer()
                     
-                    Button {
-                        isPresented.toggle()
-                    } label: {
-                        Image("Temy")
-                            .resizable()
-                            .scaledToFit()
-                            .background(Color.kyCard)
-                            .frame(width: 50,height: 50)
-                            .clipShape(Circle())
-                            .overlay(
-                                Circle().strokeBorder(Color.kyBorder, lineWidth: 1)
-                            )
+                    //                     Notification bell
+                    ZStack(alignment: .topTrailing) {
+                        Button { showNotifications.toggle() } label: {
+                            Image(systemName: "bell.fill")
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundColor(Color.kySubtext)
+                                .padding(12)
+                                .background(Color.kyCard)
+                                .clipShape(Circle())
+                                .overlay(
+                                    Circle().strokeBorder(Color.kyBorder, lineWidth: 1)
+                                )
+                        }
+                        if showAppointmentBadge {
+                            Circle()
+                                .fill(Color.kyAccent)
+                                .frame(width: 9, height: 9)
+                                .offset(x: 2, y: -1)
+                        }
                     }
-                    // Notification bell
-//                    ZStack(alignment: .topTrailing) {
-//                        Button {} label: {
-//                            Image(systemName: "bell.fill")
-//                                .font(.system(size: 16, weight: .medium))
-//                                .foregroundColor(Color.kySubtext)
-//                                .padding(12)
-//                                .background(Color.kyCard)
-//                                .clipShape(Circle())
-//                                .overlay(
-//                                    Circle().strokeBorder(Color.kyBorder, lineWidth: 1)
-//                                )
-//                        }
-//                        if showAppointmentBadge {
-//                            Circle()
-//                                .fill(Color.kyAccent)
-//                                .frame(width: 9, height: 9)
-//                                .offset(x: 2, y: -1)
-//                        }
-//                    }
                 }
                 .padding(.horizontal, 24)
                 .padding(.top, 60)
-
+                
                 // Hero text
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Yeni Nesil\nGülüş Tasarımı")
@@ -173,15 +172,15 @@ struct HomeView: View {
                         .lineSpacing(3)
                         .opacity(greetingOpacity)
                         .scaleEffect(heroScale, anchor: .leading)
-
+                    
                     Text("Dijital planlama · Minimal invaziv · Kişiye özel")
                         .font(.system(size: 13, weight: .regular))
                         .foregroundColor(Color.kySubtext)
                         .opacity(greetingOpacity)
-
+                    
                     // CTA Row
                     HStack(spacing: 12) {
-                        Button {} label: {
+                        Button { showNewAppointment.toggle() } label: {
                             HStack(spacing: 8) {
                                 Text("Randevu Al")
                                     .font(.system(size: 14, weight: .bold))
@@ -200,8 +199,10 @@ struct HomeView: View {
                             )
                             .clipShape(Capsule())
                         }
-
-                        Button {} label: {
+                        
+                        Button {
+                            showClinicVideo.toggle()
+                        } label: {
                             HStack(spacing: 6) {
                                 Image(systemName: "play.circle.fill")
                                     .font(.system(size: 14))
@@ -225,13 +226,13 @@ struct HomeView: View {
             }
         }
     }
-
+    
     // MARK: - Quick Actions
-
+    
     private var quickActionsSection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            sectionHeader(title: "Hızlı Erişim", subtitle: nil)
-
+            sectionHeader(title: "Hızlı Erişim", subtitle: nil){}
+            
             HStack(spacing: 12) {
                 ForEach(quickActions) { action in
                     QuickActionButton(action: action)
@@ -241,16 +242,22 @@ struct HomeView: View {
         }
         .padding(.top, 28)
     }
-
+    
     // MARK: - Upcoming Appointment Card
-
+    
     private var appointmentCardSection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            sectionHeader(title: "Yaklaşan Randevu", subtitle: "Takvimde görüntüle →")
+            sectionHeader(title: "Yaklaşan Randevu", subtitle: "Takvimde görüntüle →"){
+                navState.navigateToTab(.appointments)
+            }
             
             if let appointment = appState.nextAppointment{
-                AppointmentCard(appointment: appointment)
-                    .padding(.horizontal, 20)
+                Button {
+                    selectedAppointment = appointment
+                } label: {
+                    AppointmentCard(appointment: appointment)
+                        .padding(.horizontal, 20)
+                }
             }
         }
         .padding(.top, 32)
@@ -260,12 +267,23 @@ struct HomeView: View {
     
     private var featuredServicesSection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            sectionHeader(title: "Öne Çıkan Tedaviler", subtitle: "Tümünü gör →")
+            sectionHeader(title: "Öne Çıkan Tedaviler", subtitle: "Tümünü gör →"){
+                navState.navigateToTab(.services)
+            }
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
-                    ForEach(featuredServices, id: \.0) { name, icon, color in
-                        FeaturedServicePill(name: name, icon: icon, color: color)
+                    ForEach(DentalService.all, id: \.self) { service in
+                        Button {
+                            navState.navigateToService(service: service)
+                        } label: {
+                            FeaturedServicePill(
+                                name: service.title,
+                                icon: service.sfSymbol,
+                                color: service.accentColor
+                            )
+                        }
+                        .buttonStyle(ScaleButtonStyle())
                     }
                 }
                 .padding(.horizontal, 20)
@@ -274,13 +292,13 @@ struct HomeView: View {
         }
         .padding(.top, 32)
     }
-
+    
     // MARK: - Stats Section
-
+    
     private var statsSection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            sectionHeader(title: "Rakamlarla KY Clinic", subtitle: nil)
-
+            sectionHeader(title: "Rakamlarla KY Clinic", subtitle: nil){}
+            
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
                 StatCard(value: "2.500+", label: "Mutlu Hasta",      icon: "person.2.fill",        color: Color.kyAccent)
                 StatCard(value: "8+",     label: "Yıl Deneyim",      icon: "clock.fill",           color: Color(red: 0.4, green: 0.75, blue: 0.65))
@@ -291,13 +309,15 @@ struct HomeView: View {
         }
         .padding(.top, 32)
     }
-
+    
     // MARK: - Technology Section
-
+    
     private var technologySection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            sectionHeader(title: "Teknoloji Altyapısı", subtitle: nil)
-
+            sectionHeader(title: "Teknoloji Altyapısı", subtitle: nil){
+                
+            }
+            
             VStack(spacing: 10) {
                 ForEach(techItems) { item in
                     TechRow(item: item)
@@ -307,13 +327,15 @@ struct HomeView: View {
         }
         .padding(.top, 32)
     }
-
+    
     // MARK: - Testimonials
-
+    
     private var testimonialsSection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            sectionHeader(title: "Hasta Deneyimleri", subtitle: nil)
-
+            sectionHeader(title: "Hasta Deneyimleri", subtitle: nil){
+                
+            }
+            
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(alignment: .top, spacing: 14) {
                     ForEach(FirestoreMockService.testimonials) { item in
@@ -326,9 +348,8 @@ struct HomeView: View {
         }
         .padding(.top, 32)
     }
-
-    // MARK: - Footer CTA
-
+    
+    
     private var footerCTA: some View {
         VStack(spacing: 20) {
             // Divider line
@@ -336,7 +357,7 @@ struct HomeView: View {
                 .fill(Color.kyBorder)
                 .frame(height: 1)
                 .padding(.horizontal, 20)
-
+            
             VStack(spacing: 6) {
                 Text("Dönüşümünüz Bir Adım Uzağınızda")
                     .font(.system(size: 22, weight: .bold, design: .serif))
@@ -349,15 +370,54 @@ struct HomeView: View {
                     .lineSpacing(3)
             }
             .padding(.horizontal, 32)
-
+            
             // Contact buttons
             HStack(spacing: 12) {
-                ContactButton(label: "Ara",       icon: "phone.fill",    isPrimary: true)
-                ContactButton(label: "WhatsApp",  icon: "message.fill",  isPrimary: false)
-                ContactButton(label: "Harita",    icon: "map.fill",      isPrimary: false)
+                ContactButton(label: "Ara",       icon: "phone.fill",    isPrimary: true){
+                    
+                }
+                ContactButton(label: "WhatsApp",  icon: "message.fill",  isPrimary: false){
+                    sendWhatsAppMessage()
+                }
+                ContactButton(label: "Harita",    icon: "map.fill",      isPrimary: false){
+                    showMap.toggle()
+                }
+                .confirmationDialog(
+                    "Choose a Map App",
+                    isPresented: $showMap,
+                    titleVisibility: .visible
+                ) {
+                    Button("Apple Maps") {
+                        openInAppleMaps()
+                    }
+                    
+                    // Google Maps yüklüyse göster
+                    if UIApplication.shared.canOpenURL(URL(string: "comgooglemaps://")!) {
+                        Button("Google Maps") {
+                            openInGoogleMaps()
+                        }
+                    }
+                    
+                    // Yandex Maps / Navi yüklüyse göster (Türkiye'de çok yaygın)
+                    if UIApplication.shared.canOpenURL(URL(string: "yandexmaps://")!) ||
+                        UIApplication.shared.canOpenURL(URL(string: "yandexnavi://")!) {
+                        Button("Yandex Maps / Navi") {
+                            openInYandex()
+                        }
+                    }
+                    
+                    // İsterseniz Waze de eklenebilir
+                    if UIApplication.shared.canOpenURL(URL(string: "waze://")!) {
+                        Button("Waze") {
+                            openInWaze()
+                        }
+                    }
+                    
+                    Button("İptal", role: .cancel) {}
+                }
             }
             .padding(.horizontal, 20)
-
+            
             // Footer note
             VStack(spacing: 4) {
                 Text("Etiler, Çamlık Yolu Sk. No: 1/2  ·  Beşiktaş, İstanbul")
@@ -374,372 +434,90 @@ struct HomeView: View {
     }
     
     // MARK: - Section Header Helper
-
-    private func sectionHeader(title: String, subtitle: String?) -> some View {
+    
+    private func sectionHeader(title: String, subtitle: String?,action: @escaping () -> Void) -> some View {
         HStack(alignment: .bottom) {
             Text(title)
                 .font(.system(size: 18, weight: .bold, design: .serif))
                 .foregroundColor(Color.kyText)
             Spacer()
             if let sub = subtitle {
-                Text(sub)
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundColor(Color.kyAccent)
+                Button(action: action){
+                    Text(sub)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(Color.kyAccent)
+                }
             }
         }
         .padding(.horizontal, 20)
     }
-}
-
-// MARK: - Quick Action Button
-
-struct QuickActionButton: View {
-    let action: QuickAction
-    @State private var pressed = false
-
-    var body: some View {
-        Button {} label: {
-            VStack(spacing: 10) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .fill(action.color.opacity(0.14))
-                        .frame(width: 50, height: 50)
-                    Image(systemName: action.icon)
-                        .font(.system(size: 20, weight: .medium))
-                        .foregroundColor(action.color)
-                }
-                Text(action.title)
-                    .font(.system(size: 10, weight: .semibold))
-                    .foregroundColor(Color.kySubtext)
-                    .multilineTextAlignment(.center)
-                    .lineLimit(2)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .frame(maxWidth: .infinity)
-        }
-        .buttonStyle(ScaleButtonStyle())
-    }
-}
-
-// MARK: - Appointment Card
-
-struct AppointmentCard: View {
-    let appointment: Appointment
-
-    var body: some View {
-        HStack(spacing: 16) {
-            // Date badge
-            VStack(spacing: 2) {
-                Text("MAR")
-                    .font(.system(size: 9, weight: .bold, design: .monospaced))
-                    .tracking(1)
-                    .foregroundColor(Color.kyAccent)
-                Text("12")
-                    .font(.system(size: 28, weight: .bold, design: .serif))
-                    .foregroundColor(Color.kyText)
-                Text(appointment.time)
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(Color.kySubtext)
-            }
-            .frame(width: 58)
-            .padding(.vertical, 14)
-            .background(Color.kyAccent.opacity(0.08))
-            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-
-            VStack(alignment: .leading, spacing: 5) {
-                Text(appointment.type.rawValue)
-                    .font(.system(size: 15, weight: .bold, design: .serif))
-                    .foregroundColor(Color.kyText)
-                HStack(spacing: 5) {
-                    Image(systemName: "person.fill")
-                        .font(.system(size: 10))
-                        .foregroundColor(Color.kySubtext)
-                    Text(appointment.doctorName)
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundColor(Color.kySubtext)
-                }
-                HStack(spacing: 5) {
-                    Image(systemName: "mappin.circle.fill")
-                        .font(.system(size: 10))
-                        .foregroundColor(Color.kyAccent.opacity(0.7))
-                    Text("KY Clinic · Etiler")
-                        .font(.system(size: 11))
-                        .foregroundColor(Color.kySubtext.opacity(0.7))
-                }
-            }
-
-            Spacer()
-
-            VStack(spacing: 8) {
-                // Status dot
-                HStack(spacing: 4) {
-                    Circle()
-                        .fill(Color(red: 0.4, green: 0.78, blue: 0.5))
-                        .frame(width: 6, height: 6)
-                    Text("Onaylı")
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundColor(Color(red: 0.4, green: 0.78, blue: 0.5))
-                }
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
-                .background(Color(red: 0.4, green: 0.78, blue: 0.5).opacity(0.1))
-                .clipShape(Capsule())
-
-                Button {} label: {
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundColor(Color.kySubtext)
+    
+    func sendWhatsAppMessage() {
+        // Mesajı URL için kodla (boşluklar, Türkçe karakterler)
+        let escapedMessage = message.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let urlString = "whatsapp://send?phone=\(phoneNumber)&text=\(escapedMessage)"
+        
+        if let whatsappURL = URL(string: urlString) {
+            if UIApplication.shared.canOpenURL(whatsappURL) {
+                UIApplication.shared.open(whatsappURL)
+            } else {
+                // WhatsApp yüklü değilse alternatif işlem (örneğin Safari ile açma)
+                let webURLString = "https://wa.me/\(phoneNumber)?text=\(escapedMessage)"
+                if let webURL = URL(string: webURLString) {
+                    UIApplication.shared.open(webURL)
                 }
             }
         }
-        .padding(16)
-        .background(Color.kyCard)
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .strokeBorder(Color.kyAccent.opacity(0.15), lineWidth: 1)
-        )
     }
-}
-
-// MARK: - Featured Service Pill
-
-struct FeaturedServicePill: View {
-    let name: String
-    let icon: String
-    let color: Color
-
-    var body: some View {
-        Button {} label: {
-            VStack(alignment: .leading, spacing: 28) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .fill(color.opacity(0.15))
-                        .frame(width: 44, height: 44)
-                    Image(systemName: icon)
-                        .font(.system(size: 18, weight: .medium))
-                        .foregroundColor(color)
-                }
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(name)
-                        .font(.system(size: 13, weight: .bold, design: .serif))
-                        .foregroundColor(Color.kyText)
-                        .lineLimit(2)
-                        .fixedSize(horizontal: false, vertical: true)
-                    HStack(spacing: 3) {
-                        Text("Detaylar")
-                            .font(.system(size: 10, weight: .medium))
-                            .foregroundColor(color.opacity(0.85))
-                        Image(systemName: "arrow.right")
-                            .font(.system(size: 8, weight: .bold))
-                            .foregroundColor(color.opacity(0.85))
-                    }
-                }
-            }
-            .padding(16)
-            .frame(width: 140, alignment: .leading)
-            .background(Color.kyCard)
-            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .strokeBorder(Color.kyBorder, lineWidth: 1)
-            )
+    
+    private func openInAppleMaps() {
+        let placemark = MKPlacemark(coordinate: destinationCoordinate)
+        let mapItem = MKMapItem(placemark: placemark)
+        mapItem.name = destinationName
+        
+        mapItem.openInMaps(launchOptions: [
+            MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeDriving
+            // isterseniz .Walking, .Transit vs.
+        ])
+    }
+    
+    // MARK: - Google Maps
+    private func openInGoogleMaps() {
+        let urlString = "comgooglemaps://?daddr=\(destinationCoordinate.latitude),\(destinationCoordinate.longitude)&directionsmode=driving"
+        
+        if let url = URL(string: urlString) {
+            UIApplication.shared.open(url)
         }
-        .buttonStyle(ScaleButtonStyle())
     }
-}
-
-// MARK: - Stat Card
-
-struct StatCard: View {
-    let value: String
-    let label: String
-    let icon: String
-    let color: Color
-
-    var body: some View {
-        HStack(spacing: 14) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(color.opacity(0.12))
-                    .frame(width: 42, height: 42)
-                Image(systemName: icon)
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(color)
+    
+    // MARK: - Yandex Maps / Navi
+    private func openInYandex() {
+        // Yandex Navi öncelikli (navigasyon odaklı)
+        let naviURL = "yandexnavi://build_route_on_map?lat_to=\(destinationCoordinate.latitude)&lon_to=\(destinationCoordinate.longitude)"
+        
+        let mapsURL = "yandexmaps://maps.yandex.ru/?pt=\(destinationCoordinate.longitude),\(destinationCoordinate.latitude)&z=16&name=\(destinationName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")"
+        
+        // Navi yüklüyse Navi'yi tercih et, yoksa Maps
+        if UIApplication.shared.canOpenURL(URL(string: "yandexnavi://")!) {
+            if let url = URL(string: naviURL) {
+                UIApplication.shared.open(url)
             }
-            VStack(alignment: .leading, spacing: 2) {
-                Text(value)
-                    .font(.system(size: 20, weight: .bold, design: .serif))
-                    .foregroundColor(Color.kyText)
-                Text(label)
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(Color.kySubtext)
-            }
-            Spacer()
+        } else if let url = URL(string: mapsURL) {
+            UIApplication.shared.open(url)
         }
-        .padding(14)
-        .background(Color.kyCard)
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .strokeBorder(Color.kyBorder, lineWidth: 1)
-        )
     }
-}
-
-// MARK: - Tech Row
-
-struct TechRow: View {
-    let item: TechItem
-
-    var body: some View {
-        HStack(spacing: 14) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(Color.kyAccent.opacity(0.10))
-                    .frame(width: 44, height: 44)
-                Image(systemName: item.icon)
-                    .font(.system(size: 17, weight: .medium))
-                    .foregroundColor(Color.kyAccent)
-            }
-
-            VStack(alignment: .leading, spacing: 2) {
-                HStack(spacing: 8) {
-                    Text(item.name)
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundColor(Color.kyText)
-                    if let badge = item.badge {
-                        Text(badge)
-                            .font(.system(size: 9, weight: .bold))
-                            .tracking(0.3)
-                            .foregroundColor(Color(red: 0.55, green: 0.45, blue: 0.85))
-                            .padding(.horizontal, 7)
-                            .padding(.vertical, 3)
-                            .background(Color(red: 0.55, green: 0.45, blue: 0.85).opacity(0.12))
-                            .clipShape(Capsule())
-                    }
-                }
-                Text(item.description)
-                    .font(.system(size: 12))
-                    .foregroundColor(Color.kySubtext)
-            }
-
-            Spacer()
-
-            Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 14))
-                .foregroundColor(Color.kyAccent.opacity(item.badge == nil ? 0.8 : 0.25))
+    
+    // MARK: - Waze (opsiyonel)
+    private func openInWaze() {
+        let urlString = "waze://?ll=\(destinationCoordinate.latitude),\(destinationCoordinate.longitude)&navigate=yes"
+        
+        if let url = URL(string: urlString) {
+            UIApplication.shared.open(url)
         }
-        .padding(14)
-        .background(Color.kyCard)
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .strokeBorder(Color.kyBorder, lineWidth: 1)
-        )
     }
+
 }
 
-// MARK: - Testimonial Card
-
-struct TestimonialCard: View {
-    let testimonial: Testimonial
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            // Stars
-            HStack(spacing: 3) {
-                ForEach(0..<testimonial.rating, id: \.self) { _ in
-                    Image(systemName: "star.fill")
-                        .font(.system(size: 10))
-                        .foregroundColor(Color.kyAccent)
-                }
-            }
-            Text("\(testimonial.text)")
-                .font(.system(size: 13, weight: .regular, design: .serif))
-                .foregroundColor(Color.kyText.opacity(0.9))
-                .lineSpacing(4)
-                .fixedSize(horizontal: false, vertical: true)
-
-            Spacer(minLength: 0)
-
-            // Footer
-            HStack(spacing: 10) {
-                ZStack {
-                    Circle()
-                        .fill(testimonial.avatarColor.opacity(0.2))
-                        .frame(width: 34, height: 34)
-                    Text(testimonial.initials)
-                        .font(.system(size: 11, weight: .bold))
-                        .foregroundColor(testimonial.avatarColor)
-                }
-                VStack(alignment: .leading, spacing: 1) {
-                    Text(testimonial.name)
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundColor(Color.kyText)
-                    Text(testimonial.treatment)
-                        .font(.system(size: 10))
-                        .foregroundColor(Color.kySubtext)
-                }
-            }
-        }
-        .padding(18)
-        .frame(width: 240, alignment: .leading)
-        .background(Color.kyCard)
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .strokeBorder(Color.kyBorder, lineWidth: 1)
-        )
-    }
-}
-
-// MARK: - Contact Button
-
-struct ContactButton: View {
-    let label: String
-    let icon: String
-    let isPrimary: Bool
-
-    var body: some View {
-        Button {} label: {
-            HStack(spacing: 8) {
-                Image(systemName: icon)
-                    .font(.system(size: 13, weight: .semibold))
-                Text(label)
-                    .font(.system(size: 14, weight: .bold))
-            }
-            .foregroundColor(isPrimary ? Color.kyBackground : Color.kyText)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 14)
-            .background(
-                isPrimary
-                ? AnyView(LinearGradient(colors: [Color.kyAccent, Color.kyAccentDark], startPoint: .leading, endPoint: .trailing))
-                : AnyView(Color.kyCard)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-            .overlay(
-                isPrimary ? nil :
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .strokeBorder(Color.kyBorder, lineWidth: 1)
-            )
-        }
-        .buttonStyle(ScaleButtonStyle())
-    }
-}
-
-// MARK: - Scale Button Style
-
-struct ScaleButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .scaleEffect(configuration.isPressed ? 0.96 : 1.0)
-            .animation(.spring(response: 0.25, dampingFraction: 0.7), value: configuration.isPressed)
-    }
-}
-
-// MARK: - Preview
 
 #Preview {
     HomeView()

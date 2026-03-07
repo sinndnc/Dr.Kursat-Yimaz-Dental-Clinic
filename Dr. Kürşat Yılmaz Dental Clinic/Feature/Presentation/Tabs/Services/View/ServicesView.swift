@@ -5,17 +5,18 @@ struct ServicesView: View {
     
     @Namespace private var categoryNamespace
     
+    @EnvironmentObject private var navState: AppNavigationState
+    
     @State private var showDetail = false
-    @State private var selectedService: DentalService? = nil
-    @State private var selectedCategory: ServiceCategory = .restorative
     @State private var headerAppeared = false
+    @State private var selectedCategory: ServiceCategory = .restorative
     
     private var filteredServices: [DentalService] {
         DentalService.all.filter { $0.category == selectedCategory }
     }
     
     var body: some View {
-        NavigationStack{
+        NavigationStack(path: $navState.servicesNavPath){
             ZStack {
                 Color.kyBackground.ignoresSafeArea()
                 ScrollView(showsIndicators: false) {
@@ -24,22 +25,23 @@ struct ServicesView: View {
                         headerSection
                         // MARK: Category Picker
                         categoryPicker
-                            .padding(.bottom, 4)
+                            .padding(.vertical)
                         
                         // MARK: Service Cards
                         LazyVStack(spacing: 16) {
                             ForEach(Array(filteredServices.enumerated()), id: \.element.id) { index, service in
-                                ServiceCard(service: service)
-                                    .onTapGesture {
-                                        selectedService = service
-                                        withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
-                                            showDetail = true
-                                        }
+                                Button{
+                                    navState.navigateToService(service: service)
+                                    withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
+                                        showDetail = true
                                     }
-                                    .transition(.asymmetric(
-                                        insertion: .move(edge: .bottom).combined(with: .opacity),
-                                        removal: .opacity
-                                    ))
+                                } label: {
+                                    ServiceCard(service: service)
+                                }
+                                .transition(.asymmetric(
+                                    insertion: .move(edge: .bottom).combined(with: .opacity),
+                                    removal: .opacity
+                                ))
                             }
                         }
                         .padding(.horizontal, 20)
@@ -57,11 +59,20 @@ struct ServicesView: View {
                 
             }
             .ignoresSafeArea()
-            .sheet(item: $selectedService) { service in
-                ServiceDetailSheet(service: service)
-            }
             .onAppear {
                 withAnimation(.easeOut(duration: 0.7)) { headerAppeared = true }
+            }
+            .navigationDestination(for: ServicesDestination.self) { destination in
+                switch destination {
+                case .serviceDetail(let service):
+                    ServiceDetailView(service: service)
+                case .serviceCategory(let category):
+                    Text("\(category.id)")
+//                    ServiceCategoryView(category: category)
+                case .bookService(let id):
+                    Text("\(id)")
+//                    BookServiceView(id: id)
+                }
             }
         }
         
@@ -181,297 +192,6 @@ struct ServicesView: View {
     }
 }
 
-// MARK: - Service Card
-
-struct ServiceCard: View {
-    let service: DentalService
-    @State private var isPressed = false
-    
-    var body: some View {
-        ZStack(alignment: .topTrailing) {
-            HStack(alignment: .top, spacing: 16) {
-                // Icon
-                ZStack {
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .fill(service.accentColor.opacity(0.12))
-                        .frame(width: 52, height: 52)
-                    Image(systemName: service.sfSymbol)
-                        .font(.system(size: 22, weight: .medium))
-                        .foregroundColor(service.accentColor)
-                }
-
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(service.title)
-                        .font(.system(size: 16, weight: .bold, design: .serif))
-                        .foregroundColor(Color.kyText)
-
-                    Text(service.subtitle)
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundColor(service.accentColor)
-
-                    Text(service.description)
-                        .font(.system(size: 13, weight: .regular))
-                        .foregroundColor(Color.kySubtext)
-                        .lineSpacing(3)
-                        .lineLimit(3)
-                        .padding(.top, 2)
-
-                    // Tags
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 6) {
-                            ForEach(service.tags, id: \.self) { tag in
-                                Text(tag)
-                                    .font(.system(size: 10, weight: .semibold))
-                                    .tracking(0.3)
-                                    .foregroundColor(service.accentColor.opacity(0.9))
-                                    .padding(.horizontal, 8)
-                                    .padding(.vertical, 4)
-                                    .background(service.accentColor.opacity(0.1))
-                                    .clipShape(Capsule())
-                            }
-                        }
-                    }
-                    .padding(.top, 4)
-                }
-
-                Spacer(minLength: 0)
-            }
-            .padding(18)
-            .background(Color.kyCard)
-            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .strokeBorder(Color.kyBorder, lineWidth: 1)
-            )
-            .scaleEffect(isPressed ? 0.97 : 1.0)
-            .animation(.spring(response: 0.25, dampingFraction: 0.7), value: isPressed)
-
-            // Badge
-            if let badge = service.badgeText {
-                Text(badge)
-                    .font(.system(size: 9, weight: .bold))
-                    .tracking(0.5)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(service.accentColor)
-                    .clipShape(Capsule())
-                    .padding(.top, 14)
-                    .padding(.trailing, 14)
-            }
-        }
-        .onLongPressGesture(minimumDuration: 0, maximumDistance: .infinity, pressing: { pressing in
-            withAnimation { isPressed = pressing }
-        }, perform: {})
-    }
-}
-
-// MARK: - Service Detail Sheet
-
-struct ServiceDetailSheet: View {
-    let service: DentalService
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        ZStack(alignment: .top) {
-            Color.kyBackground.ignoresSafeArea()
-
-            ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 0) {
-                    // Hero area
-                    ZStack(alignment: .bottomLeading) {
-                        // Gradient background
-                        service.accentColor
-                            .opacity(0.12)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 200)
-                            .overlay(
-                                LinearGradient(
-                                    colors: [Color.clear, Color.kyBackground],
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                )
-                            )
-
-                        VStack(alignment: .leading, spacing: 8) {
-                            // Icon large
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                    .fill(service.accentColor.opacity(0.18))
-                                    .frame(width: 68, height: 68)
-                                Image(systemName: service.sfSymbol)
-                                    .font(.system(size: 30, weight: .medium))
-                                    .foregroundColor(service.accentColor)
-                            }
-
-                            Text(service.category.rawValue.uppercased())
-                                .font(.system(size: 10, weight: .bold, design: .monospaced))
-                                .tracking(2.5)
-                                .foregroundColor(service.accentColor)
-
-                            Text(service.title)
-                                .font(.system(size: 28, weight: .bold, design: .serif))
-                                .foregroundColor(Color.kyText)
-
-                            Text(service.subtitle)
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(Color.kySubtext)
-                        }
-                        .padding(.horizontal, 24)
-                        .padding(.bottom, 24)
-                    }
-
-                    VStack(alignment: .leading, spacing: 24) {
-                        // Description
-                        Text(service.description)
-                            .font(.system(size: 15, weight: .regular))
-                            .foregroundColor(Color.kySubtext)
-                            .lineSpacing(5)
-
-                        Divider()
-                            .background(Color.kyBorder)
-
-                        // Details
-                        ForEach(service.details) { detail in
-                            VStack(alignment: .leading, spacing: 12) {
-                                Text(detail.heading)
-                                    .font(.system(size: 13, weight: .bold, design: .monospaced))
-                                    .tracking(0.5)
-                                    .foregroundColor(service.accentColor)
-
-                                VStack(alignment: .leading, spacing: 10) {
-                                    ForEach(detail.bullets, id: \.self) { bullet in
-                                        HStack(alignment: .top, spacing: 10) {
-                                            Circle()
-                                                .fill(service.accentColor)
-                                                .frame(width: 5, height: 5)
-                                                .padding(.top, 6)
-                                            Text(bullet)
-                                                .font(.system(size: 14, weight: .regular))
-                                                .foregroundColor(Color.kyText.opacity(0.85))
-                                                .lineSpacing(3)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        // Tags
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text("Etiketler")
-                                .font(.system(size: 12, weight: .bold, design: .monospaced))
-                                .tracking(1)
-                                .foregroundColor(Color.kySubtext)
-                            FlowLayout(tags: service.tags, accentColor: service.accentColor)
-                        }
-
-                        // CTA Button
-                        Button {
-                            // Navigate to appointment
-                        } label: {
-                            HStack {
-                                Spacer()
-                                Text("Randevu Al")
-                                    .font(.system(size: 16, weight: .bold))
-                                    .foregroundColor(Color.kyBackground)
-                                Image(systemName: "arrow.right")
-                                    .font(.system(size: 14, weight: .bold))
-                                    .foregroundColor(Color.kyBackground)
-                                Spacer()
-                            }
-                            .padding(.vertical, 16)
-                            .background(
-                                LinearGradient(
-                                    colors: [Color.kyAccent, Color(red: 0.75, green: 0.6, blue: 0.35)],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                        }
-                        .padding(.top, 8)
-                    }
-                    .padding(.horizontal, 24)
-                    .padding(.bottom, 48)
-                }
-            }
-
-            // Dismiss handle
-            VStack {
-                HStack {
-                    Spacer()
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundColor(Color.kySubtext)
-                            .padding(10)
-                            .background(Color.kySurface)
-                            .clipShape(Circle())
-                    }
-                    .padding(.trailing, 20)
-                    .padding(.top, 16)
-                }
-                Spacer()
-            }
-        }
-        .presentationDetents([.large])
-        .presentationDragIndicator(.visible)
-        .presentationBackground(Color.kyBackground)
-    }
-}
-
-// MARK: - Flow Layout for Tags
-
-struct FlowLayout: View {
-    let tags: [String]
-    let accentColor: Color
-
-    var body: some View {
-        // Simple wrapping tag layout
-        var width = CGFloat.zero
-        var height = CGFloat.zero
-
-        return GeometryReader { geo in
-            ZStack(alignment: .topLeading) {
-                ForEach(tags, id: \.self) { tag in
-                    tagView(tag)
-                        .alignmentGuide(.leading) { d in
-                            if abs(width - d.width) > geo.size.width {
-                                width = 0
-                                height -= d.height + 8
-                            }
-                            let result = width
-                            if tag == tags.last {
-                                width = 0
-                            } else {
-                                width -= d.width + 8
-                            }
-                            return result
-                        }
-                        .alignmentGuide(.top) { _ in
-                            let result = height
-                            if tag == tags.last { height = 0 }
-                            return result
-                        }
-                }
-            }
-        }
-        .frame(height: CGFloat(((tags.count - 1) / 3 + 1)) * 34)
-    }
-
-    @ViewBuilder
-    private func tagView(_ text: String) -> some View {
-        Text(text)
-            .font(.system(size: 11, weight: .semibold))
-            .foregroundColor(accentColor)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
-            .background(accentColor.opacity(0.1))
-            .clipShape(Capsule())
-    }
-}
 
 // MARK: - Preview
 
