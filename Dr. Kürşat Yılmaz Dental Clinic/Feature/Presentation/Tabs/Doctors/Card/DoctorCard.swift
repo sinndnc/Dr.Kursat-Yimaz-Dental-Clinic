@@ -18,26 +18,26 @@ struct DoctorCard: View {
                 // Avatar
                 ZStack {
                     Circle()
+                        .fill(Color.kyBackground)
+                        .strokeBorder(.gray.opacity(0.3), lineWidth: 2)
                         .frame(width: 62, height: 62)
                     Text(doctor.avatarInitials)
                         .font(.system(size: 22, weight: .bold))
                         .foregroundColor(.white)
                 }
-                .overlay(
-                    Circle()
-                        .strokeBorder(doctor.color.opacity(0.3), lineWidth: 2)
-                )
                 
                 VStack(alignment: .leading, spacing: 3) {
                     Text(doctor.name)
                         .font(.system(size: 16, weight: .bold, design: .serif))
                         .foregroundColor(Color.kyText)
-                    Text(doctor.title)
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(doctor.color)
-                    Text(doctor.specialty)
-                        .font(.system(size: 12))
-                        .foregroundColor(Color.kySubtext)
+                    HStack{
+                        Text(doctor.title)
+                            .font(.system(size: 11, weight: .semibold))
+                        //                        .foregroundColor(doctor.color)
+                        Text(doctor.specialty)
+                            .font(.system(size: 12))
+                            .foregroundColor(Color.kySubtext)
+                    }
                 }
                 Spacer()
                 
@@ -61,11 +61,11 @@ struct DoctorCard: View {
             
             // Stats
             HStack(spacing: 0) {
-                DoctorStat(value: doctor.experience,       label: "Deneyim",    color: doctor.color)
-                Divider().frame(height: 30).background(Color.kyBorder)
-                DoctorStat(value: doctor.patientCount,    label: "Hasta",       color: doctor.color)
-                Divider().frame(height: 30).background(Color.kyBorder)
-                DoctorStat(value: doctor.satisfactionRate, label: "Memnuniyet", color: doctor.color)
+//                DoctorStat(value: doctor.experience,       label: "Deneyim",    color: doctor.color)
+//                Divider().frame(height: 30).background(Color.kyBorder)
+//                DoctorStat(value: doctor.patientCount,    label: "Hasta",       color: doctor.color)
+//                Divider().frame(height: 30).background(Color.kyBorder)
+//                DoctorStat(value: doctor.satisfactionRate, label: "Memnuniyet", color: doctor.color)
             }
             
             // Expertise pills
@@ -98,10 +98,10 @@ struct DoctorCard: View {
                     ForEach(days, id: \.self) { day in
                         Text(day)
                             .font(.system(size: 9, weight: .bold))
-                            .foregroundColor(true ? doctor.color : Color.kySubtext.opacity(0.3))
+//                            .foregroundColor(true ? doctor.color : Color.kySubtext.opacity(0.3))
                             .frame(width: 28)
                             .padding(.vertical, 4)
-                            .background(true ? doctor.color.opacity(0.10) : Color.clear)
+//                            .background(true ? doctor.color.opacity(0.10) : Color.clear)
                             .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
                     }
                 }

@@ -8,50 +8,50 @@
 import SwiftUI
 
 struct NotificationsSheet: View {
-    @EnvironmentObject var appState: AppState
+    
     private let primaryBlue = Color(red: 0.15, green: 0.45, blue: 0.95)
     
     var body: some View {
         ZStack{
             Color.kyBackground.ignoresSafeArea()
             Group {
-                if appState.notifications.isEmpty {
-                    VStack(spacing: 16) {
-                        Spacer()
-                        Image(systemName: "bell.slash").font(.system(size: 50)).foregroundColor(.secondary.opacity(0.4))
-                        Text("Bildirim yok").font(.system(size: 18, weight: .semibold)).foregroundColor(.secondary)
-                        Spacer()
-                    }
-                } else {
-                    List {
-                        ForEach(appState.notifications) { notif in
-                            notificationRow(notif: notif)
-                                .listRowBackground(notif.isRead ? Color.white : primaryBlue.opacity(0.04))
-                                .listRowSeparator(.hidden)
-                                .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
-                                .onTapGesture {
-                                    if !notif.isRead { Task { await appState.markNotificationRead(notif) } }
-                                }
-                        }
-                    }
-                    .listStyle(.plain)
-                }
+//                if appState.notifications.isEmpty {
+//                    VStack(spacing: 16) {
+//                        Spacer()
+//                        Image(systemName: "bell.slash").font(.system(size: 50)).foregroundColor(.secondary.opacity(0.4))
+//                        Text("Bildirim yok").font(.system(size: 18, weight: .semibold)).foregroundColor(.secondary)
+//                        Spacer()
+//                    }
+//                } else {
+//                    List {
+//                        ForEach(appState.notifications) { notif in
+//                            notificationRow(notif: notif)
+//                                .listRowBackground(notif.isRead ? Color.white : primaryBlue.opacity(0.04))
+//                                .listRowSeparator(.hidden)
+//                                .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+//                                .onTapGesture {
+//                                    if !notif.isRead { Task { await appState.markNotificationRead(notif) } }
+//                                }
+//                        }
+//                    }
+//                    .listStyle(.plain)
+//                }
             }
         }
         .navigationTitle("Bildirimler").navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                if appState.unreadNotificationCount > 0 {
-                    Button("Tümünü Okundu Yap") {
-                        Task {
-                            if let uid = appState.authService.uid {
-                                try? await appState.firestoreService.markAllNotificationsRead(uid: uid)
-                            }
-                        }
-                    }
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(primaryBlue)
-                }
+//                if appState.unreadNotificationCount > 0 {
+//                    Button("Tümünü Okundu Yap") {
+//                        Task {
+//                            if let uid = appState.authService.uid {
+////                                try? await appState.firestoreService.markAllNotificationsRead(uid: uid)
+//                            }
+//                        }
+//                    }
+//                    .font(.system(size: 13, weight: .semibold))
+//                    .foregroundColor(primaryBlue)
+//                }
             }
         }
     }

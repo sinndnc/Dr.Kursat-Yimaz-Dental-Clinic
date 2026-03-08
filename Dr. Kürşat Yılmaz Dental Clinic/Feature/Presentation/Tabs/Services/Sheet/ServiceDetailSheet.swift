@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ServiceDetailSheet: View {
-    let service: DentalService
+    let service: Service
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {

@@ -149,7 +149,7 @@ struct LoginView: View {
     func performLogin() {
         focusedField = nil
         Task {
-            try? await authService.login(email: email, password: password)
+//            try? await authService.login(email: email, password: password)
         }
     }
     

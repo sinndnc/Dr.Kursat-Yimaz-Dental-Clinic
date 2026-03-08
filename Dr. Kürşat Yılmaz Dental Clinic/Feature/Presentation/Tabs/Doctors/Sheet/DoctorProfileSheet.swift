@@ -23,12 +23,13 @@ struct DoctorProfileSheet: View {
                         HStack(spacing: 16) {
                             ZStack {
                                 Circle()
+                                    .fill(Color.gray)
                                     .frame(width: 80, height: 80)
                                 Text(doctor.avatarInitials)
                                     .font(.system(size: 28, weight: .bold))
                                     .foregroundColor(.white)
                             }
-                            .overlay(Circle().strokeBorder(doctor.color.opacity(0.4), lineWidth: 2.5))
+//                            .overlay(Circle().strokeBorder(doctor.color.opacity(0.4), lineWidth: 2.5))
                             
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(doctor.name)
@@ -36,7 +37,7 @@ struct DoctorProfileSheet: View {
                                     .foregroundColor(Color.kyText)
                                 Text(doctor.title)
                                     .font(.system(size: 12, weight: .semibold))
-                                    .foregroundColor(doctor.color)
+//                                    .foregroundColor(doctor.color)
                                 Text(doctor.specialty)
                                     .font(.system(size: 12))
                                     .foregroundColor(Color.kySubtext)
@@ -62,11 +63,11 @@ struct DoctorProfileSheet: View {
 
                         // Stats row
                         HStack(spacing: 0) {
-                            DoctorStat(value: doctor.experience,        label: "Deneyim",    color: doctor.color)
-                            Divider().frame(height: 36).background(Color.kyBorder)
-                            DoctorStat(value: doctor.patientCount,      label: "Hasta",      color: doctor.color)
-                            Divider().frame(height: 36).background(Color.kyBorder)
-                            DoctorStat(value: doctor.satisfactionRate,  label: "Memnuniyet", color: doctor.color)
+//                            DoctorStat(value: doctor.experience,        label: "Deneyim",    color: doctor.color)
+//                            Divider().frame(height: 36).background(Color.kyBorder)
+//                            DoctorStat(value: doctor.patientCount,      label: "Hasta",      color: doctor.color)
+//                            Divider().frame(height: 36).background(Color.kyBorder)
+//                            DoctorStat(value: doctor.satisfactionRate,  label: "Memnuniyet", color: doctor.color)
                         }
                         .padding(16)
                         .background(Color.kyCard)
@@ -109,13 +110,13 @@ struct DoctorProfileSheet: View {
                                 }
                             }
                         }
-
+                        
                         // Education
                         VStack(alignment: .leading, spacing: 12) {
                             ProfileSectionTitle(text: "EĞİTİM")
                             VStack(spacing: 0) {
                                 ForEach(Array(doctor.education.enumerated()), id: \.element.id) { i, edu in
-                                    EducationRow(edu: edu, accentColor: doctor.color, isLast: i == doctor.education.count - 1)
+//                                    EducationRow(edu: edu, accentColor: doctor.color, isLast: i == doctor.education.count - 1)
                                 }
                             }
                         }
@@ -127,14 +128,14 @@ struct DoctorProfileSheet: View {
                                 ForEach(["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt"], id: \.self) { day in
                                     Text(day)
                                         .font(.system(size: 12, weight: .bold))
-                                        .foregroundColor(true ? doctor.color : Color.kySubtext.opacity(0.3))
+//                                        .foregroundColor(true ? doctor.color : Color.kySubtext.opacity(0.3))
                                         .frame(maxWidth: .infinity)
                                         .padding(.vertical, 10)
-                                        .background(true ? doctor.color.opacity(0.10) : Color.kyCard)
+                                        .background(Color.kyBackground)
                                         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                                         .overlay(
                                             RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                                .strokeBorder(true ? doctor.color.opacity(0.2) : Color.kyBorder, lineWidth: 1)
+//                                                .strokeBorder(true ? doctor.color.opacity(0.2) : Color.kyBorder, lineWidth: 1)
                                         )
                                 }
                             }
@@ -154,12 +155,12 @@ struct DoctorProfileSheet: View {
                             .padding(.vertical, 16)
                             .background(
                                 LinearGradient(
-                                    colors: [doctor.color, doctor.color.opacity(0.7)],
+                                    colors: [/*doctor.color, doctor.color.opacity(0.7)*/],
                                     startPoint: .leading, endPoint: .trailing
                                 )
                             )
                             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                            .shadow(color: doctor.color.opacity(0.3), radius: 12, x: 0, y: 5)
+//                            .shadow(color: doctor.color.opacity(0.3), radius: 12, x: 0, y: 5)
                         }
                         .buttonStyle(ScaleButtonStyle())
                         .padding(.bottom, 48)

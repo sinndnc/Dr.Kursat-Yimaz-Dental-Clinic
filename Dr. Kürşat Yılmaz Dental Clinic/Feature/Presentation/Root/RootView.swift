@@ -8,34 +8,36 @@
 import SwiftUI
 
 struct RootView: View {
-    @EnvironmentObject var appState: AppState
-    @EnvironmentObject var authService: AuthService
     
-    @State private var isCheckingUser = true
+    @EnvironmentObject private var auth: AuthService
+    
+    @EnvironmentObject private var fs: FirestoreService
+    @EnvironmentObject private var currentUser: CurrentUser
+    @EnvironmentObject private var navState: AppNavigationState
     
     var body: some View {
         ZStack{
             Color.kyBackground.ignoresSafeArea()
             Group{
-                if authService.isLoggedIn {
-                    MainTabView()
-                }else{
+                switch currentUser.authState {
+                case .loading:
                     ProgressView()
+                case .unauthenticated:
+                    LoginView(showLogin: .constant(true))
+                case .registrationPending:
+                    Text("Registiration Pending")
+//                    CompleteProfileView()   // e.g. collect missing patient info
+                case .authenticated:
+                    MainTabView()
+                        .onAppear {
+                            fs.startListeners(forClinicId: "A1B2C3D4-E5F6-7890-ABCD-EF1234567890")
+                        }
                 }
             }
         }
-        .task{
-            await appState.handleAuthChange()
-            isCheckingUser = false
-        }
-        .animation(.easeInOut(duration: 0.3), value: authService.isLoggedIn)
-        .overlay(alignment: .top) {
-            if let error = appState.globalError {
-                ErrorToast(message: error) { appState.globalError = nil }
-                    .padding(.top, 60)
-                    .transition(.move(edge: .top).combined(with: .opacity))
-                    .animation(.spring(), value: appState.globalError)
-            }
-        }
+        .animation(
+            .easeInOut(duration: 0.3),
+            value: currentUser.isAuthenticated
+        )
     }
 }

@@ -5,14 +5,16 @@ struct ServicesView: View {
     
     @Namespace private var categoryNamespace
     
+    @EnvironmentObject private var fs: FirestoreService
     @EnvironmentObject private var navState: AppNavigationState
     
     @State private var showDetail = false
     @State private var headerAppeared = false
+    @State private var showAppointment = false
     @State private var selectedCategory: ServiceCategory = .restorative
     
-    private var filteredServices: [DentalService] {
-        DentalService.all.filter { $0.category == selectedCategory }
+    private var filteredServices: [Service] {
+        fs.services.filter { $0.category == selectedCategory }
     }
     
     var body: some View {
@@ -49,18 +51,24 @@ struct ServicesView: View {
                         .animation(.spring(response: 0.45, dampingFraction: 0.82), value: selectedCategory)
                         
                         // MARK: CTA Banner
-                        appointmentBanner
-                            .padding(.horizontal, 20)
-                            .padding(.bottom, 100)
+                        Button{
+                            showAppointment.toggle()
+                        }label:{
+                            appointmentBanner
+                                .padding(.horizontal, 20)
+                                .padding(.bottom, 100)
+                        }
                     }
                     .safeAreaPadding(.vertical)
                 }
                 .ignoresSafeArea()
-                
             }
             .ignoresSafeArea()
             .onAppear {
                 withAnimation(.easeOut(duration: 0.7)) { headerAppeared = true }
+            }
+            .sheet(isPresented: $showAppointment){
+                BookingView()
             }
             .navigationDestination(for: ServicesDestination.self) { destination in
                 switch destination {
@@ -162,16 +170,18 @@ struct ServicesView: View {
         HStack(spacing: 16) {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Randevu Alın")
+                    .multilineTextAlignment(.leading)
                     .font(.system(size: 17, weight: .bold, design: .serif))
                     .foregroundColor(Color.kyBackground)
                 Text("Uzman değerlendirme için hemen iletişime geçin.")
+                    .multilineTextAlignment(.leading)
                     .font(.system(size: 12, weight: .regular))
                     .foregroundColor(Color.kyBackground.opacity(0.65))
                     .lineSpacing(2)
             }
-
+            
             Spacer()
-
+            
             Image(systemName: "arrow.right")
                 .font(.system(size: 18, weight: .bold))
                 .foregroundColor(Color.kyBackground)

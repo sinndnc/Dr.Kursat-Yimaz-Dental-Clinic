@@ -28,42 +28,42 @@ struct AppointmentsView: View {
 
     @Namespace private var filterNamespace
 
-    @EnvironmentObject private var appState: AppState
+    @EnvironmentObject private var fs: FirestoreService
     @EnvironmentObject private var navState: AppNavigationState
-
+    
     @State private var selectedFilter: AppointmentFilter = .all
     @State private var selectedAppointment: Appointment? = nil
     @State private var showNewAppointment = false
     @State private var headerAppeared = false
-
+    
     // Calendar states
     @State private var showCalendar = true
     @State private var currentMonth: Date = Date()
     @State private var selectedCalendarDate: Date? = nil
-
+    
     // Search states
     @State private var searchText: String = ""
     @State private var showSearch: Bool = false
-
+    
     enum AppointmentFilter: String, CaseIterable {
         case all = "Tümü"; case upcoming = "Yaklaşan"; case completed = "Geçmiş"
     }
-
+    
     // MARK: - Filtered Appointments
 
     var filteredAppointments: [Appointment] {
         var base: [Appointment]
         switch selectedFilter {
-        case .upcoming:  base = appState.appointments.filter { $0.status == .upcoming }
-        case .completed: base = appState.appointments.filter { $0.status == .completed }
-        case .all:       base = appState.appointments
+        case .upcoming:  base = fs.appointments.filter { $0.status == .upcoming }
+        case .completed: base = fs.appointments.filter { $0.status == .completed }
+        case .all:       base = fs.appointments
         }
-
+        
         // Calendar date filter
         if let date = selectedCalendarDate {
             base = base.filter { Calendar.current.isDate($0.date, inSameDayAs: date) }
         }
-
+        
         // Search filter
         if !searchText.isEmpty {
             base = base.filter {
@@ -78,7 +78,7 @@ struct AppointmentsView: View {
     var appointmentDatesInMonth: Set<String> {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
-        return Set(appState.appointments.map { formatter.string(from: $0.date) })
+        return Set(fs.appointments.map { formatter.string(from: $0.date) })
     }
 
     // MARK: - Body
@@ -133,7 +133,7 @@ struct AppointmentsView: View {
                 AppointmentDetailSheet(appointment: appt)
             }
             .sheet(isPresented: $showNewAppointment) {
-                NewAppointmentSheet()
+                BookingView()
             }
             .onAppear {
                 withAnimation(.easeOut(duration: 0.7)) { headerAppeared = true }

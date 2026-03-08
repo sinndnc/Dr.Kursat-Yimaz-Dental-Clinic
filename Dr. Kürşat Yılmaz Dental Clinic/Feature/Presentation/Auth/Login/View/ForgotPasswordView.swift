@@ -95,8 +95,8 @@ struct ForgotPasswordView: View {
     
     func sendReset() {
         Task {
-            try? await authService.resetPassword(email: email)
-            await MainActor.run { sent = true }
+//            try? await authService.resetPassword(email: email)
+//            await MainActor.run { sent = true }
         }
     }
 }

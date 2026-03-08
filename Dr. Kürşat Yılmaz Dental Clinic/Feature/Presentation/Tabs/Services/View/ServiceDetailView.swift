@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ServiceDetailView: View {
     
-    let service: DentalService
+    let service: Service
     @Environment(\.dismiss) private var dismiss
     @State private var selectedTab = 0
     @State private var appeared = false
@@ -31,7 +31,7 @@ struct ServiceDetailView: View {
                 Spacer()
                 badgeChip
             }
-            .safeAreaPadding()
+            .safeAreaPadding(.horizontal)
         }
         .navigationBarHidden(true)
         .onAppear {
@@ -40,7 +40,7 @@ struct ServiceDetailView: View {
             }
         }
     }
-
+    
     // MARK: - Hero
     private var heroSection: some View {
         ZStack(alignment: .bottomLeading) {
@@ -57,7 +57,7 @@ struct ServiceDetailView: View {
                         endPoint: .bottomTrailing
                     )
                 )
-                .frame(height: 300)
+                .frame(height: 325)
                 .overlay(
                     // Subtle mesh pattern
                     ZStack {
@@ -98,12 +98,12 @@ struct ServiceDetailView: View {
                         .font(.system(size: 11, weight: .semibold, design: .monospaced))
                         .foregroundColor(service.accentColor.opacity(0.8))
                         .tracking(2)
-
+                    
                     Text(service.title)
                         .font(.system(size: 28, weight: .bold, design: .rounded))
                         .foregroundColor(.kyText)
                         .lineLimit(2)
-
+                    
                     Text(service.subtitle)
                         .font(.system(size: 15, weight: .regular))
                         .foregroundColor(.kySubtext)

@@ -9,6 +9,7 @@ import Combine
 import SwiftUI
 
 class AppNavigationState: ObservableObject {
+    
     @Published var selectedTab: AppTab = .home
     
     @Published var homeNavPath = NavigationPath()
@@ -21,16 +22,20 @@ class AppNavigationState: ObservableObject {
         selectedTab = tab
     }
     
-    func navigateToService(service: DentalService) {
+    func navigateToService(service: Service) {
         selectedTab = .services
         servicesNavPath = NavigationPath()
         servicesNavPath.append(ServicesDestination.serviceDetail(service: service))
-    
     }
     
     func navigateToDoctor(id: String) {
         selectedTab = .doctors
         doctorsNavPath = NavigationPath()
         doctorsNavPath.append(DoctorsDestination.doctorDetail(id: id))
+    }
+    
+    func navigateToSectionFromProfile(destination: ProfileDestination){
+        profileNavPath = NavigationPath()
+        profileNavPath.append(destination)
     }
 }

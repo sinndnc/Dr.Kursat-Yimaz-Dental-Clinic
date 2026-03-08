@@ -22,7 +22,7 @@ struct ProfileMenuRow: View {
                         .font(.system(size: 13, weight: .medium))
                         .foregroundColor(item.isDestructive ? Color.kyDanger : item.color)
                 }
-
+                
                 VStack(alignment: .leading, spacing: 2) {
                     Text(item.title)
                         .font(.system(size: 14, weight: .semibold))
@@ -33,15 +33,14 @@ struct ProfileMenuRow: View {
                             .foregroundColor(Color.kySubtext)
                     }
                 }
-
+                
                 Spacer()
-
+                
                 if let trailing = item.trailingText {
                     Text(trailing)
                         .font(.system(size: 12, weight: .medium))
                         .foregroundColor(Color.kySubtext)
                 }
-
                 if item.hasChevron {
                     Image(systemName: "chevron.right")
                         .font(.system(size: 11, weight: .semibold))
@@ -50,6 +49,7 @@ struct ProfileMenuRow: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 13)
+            .contentShape(Rectangle())
         }
         .buttonStyle(ScaleButtonStyle())
     }

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ServiceCard: View {
-    let service: DentalService
+    let service: Service
     @State private var isPressed = false
     
     var body: some View {

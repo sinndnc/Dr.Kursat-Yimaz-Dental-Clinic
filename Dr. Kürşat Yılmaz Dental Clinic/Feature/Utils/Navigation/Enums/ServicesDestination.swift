@@ -7,7 +7,7 @@
 
 
 enum ServicesDestination: Hashable {
-    case serviceDetail(service: DentalService)
+    case serviceDetail(service: Service)
     case serviceCategory(category: ServiceCategory)
     case bookService(id: String)
 }

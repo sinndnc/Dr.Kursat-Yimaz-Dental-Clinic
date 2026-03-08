@@ -4,7 +4,7 @@
 //
 //  Created by Sinan Dinç on 3/8/26.
 //
-
+import Foundation
 
 enum ProfileDestination: Hashable {
     case editProfile

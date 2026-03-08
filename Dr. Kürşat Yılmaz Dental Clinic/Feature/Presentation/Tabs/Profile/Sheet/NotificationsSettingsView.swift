@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct NotificationsSettingsSheet: View {
+struct NotificationsSettingsView: View {
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {

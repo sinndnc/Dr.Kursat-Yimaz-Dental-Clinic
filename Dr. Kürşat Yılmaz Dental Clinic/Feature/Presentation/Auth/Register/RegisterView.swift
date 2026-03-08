@@ -127,7 +127,7 @@ struct RegisterView: View {
     func performRegister() {
         focusedField = nil
         Task {
-            try? await authService.register(name: name, email: email, phone: phone, password: password)
+//            try? await authService.register(name: name, email: email, phone: phone, password: password)
         }
     }
     

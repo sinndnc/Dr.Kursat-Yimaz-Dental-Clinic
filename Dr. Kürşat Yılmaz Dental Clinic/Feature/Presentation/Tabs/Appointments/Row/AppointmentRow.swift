@@ -31,11 +31,17 @@ struct AppointmentRow: View {
             
             // Info
             VStack(alignment: .leading, spacing: 5) {
-                Text(appointment.type.rawValue)
-                    .font(.system(size: 14, weight: .bold, design: .serif))
-                    .foregroundColor(Color.kyText)
-                    .lineLimit(2)
-                
+                HStack{
+                    Text(appointment.type.rawValue)
+                        .font(.system(size: 14, weight: .bold, design: .serif))
+                        .foregroundColor(Color.kyText)
+                        .lineLimit(2)
+                    
+                    Spacer()
+                    
+                    Text(appointment.status.rawValue)
+                        .font(.system(size: 10, weight: .semibold))
+                }
                 HStack(spacing: 5) {
                     Image(systemName: "person.fill")
                         .font(.system(size: 9))
@@ -45,25 +51,11 @@ struct AppointmentRow: View {
                         .foregroundColor(Color.kySubtext)
                 }
                 
-                HStack(spacing: 10) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "timer")
-                            .font(.system(size: 9))
-                            .foregroundColor(Color.kySubtext.opacity(0.7))
-                        Text(appointment.notes)
-                            .font(.system(size: 11))
-                            .foregroundColor(Color.kySubtext.opacity(0.7))
-                    }
-                    
-                    // Status pill
-                    HStack(spacing: 4) {
-                        Text(appointment.status.rawValue)
-                            .font(.system(size: 10, weight: .semibold))
-                    }
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 3)
-                    .clipShape(Capsule())
-                }
+                Text(appointment.notes)
+                    .font(.system(size: 11))
+                    .multilineTextAlignment(.leading)
+                    .foregroundColor(Color.kySubtext.opacity(0.7))
+                
             }
             
             Spacer(minLength: 0)

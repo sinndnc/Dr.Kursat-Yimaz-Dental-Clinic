@@ -9,10 +9,12 @@ import SwiftUI
 
 struct DoctorsView: View {
     
+    @EnvironmentObject private var fs: FirestoreService
     @EnvironmentObject private var navState: AppNavigationState
     
-    @State private var selectedDoctor: Doctor? = nil
     @State private var headerAppeared = false
+    @State private var showAppointment = false
+    @State private var selectedDoctor: Doctor? = nil
     
     var body: some View {
         NavigationStack(path: $navState.doctorsNavPath){
@@ -34,6 +36,9 @@ struct DoctorsView: View {
                     }
                 }
                 .ignoresSafeArea()
+            }
+            .sheet(isPresented: $showAppointment){
+                BookingView()
             }
             .sheet(item: $selectedDoctor) { doc in
                 DoctorProfileSheet(doctor: doc)
@@ -78,24 +83,9 @@ struct DoctorsView: View {
     }
     
     private var teamIntroSection: some View {
-        HStack() {
-            // Overlapping avatars
-            ZStack(alignment: .leading) {
-                ForEach(Array(Doctor.all.prefix(3).enumerated()), id: \.element.id) { i, doc in
-                    Circle()
-                        .frame(width: 40, height: 40)
-                        .overlay(
-                            Text(doc.avatarInitials)
-                                .font(.system(size: 13, weight: .bold))
-                                .foregroundColor(.white)
-                        )
-                        .overlay(Circle().strokeBorder(Color.kyBackground, lineWidth: 2.5))
-                        .offset(x: CGFloat(i) * 28)
-                }
-            }
-            
+        HStack{
             VStack(alignment: .leading, spacing: 2) {
-                Text("3 Uzman Hekim")
+                Text("Uzman Hekimler")
                     .font(.system(size: 14, weight: .bold, design: .serif))
                     .foregroundColor(Color.kyText)
                 Text("Dijital diş hekimliğinde öncü ekip")
@@ -105,9 +95,13 @@ struct DoctorsView: View {
             
             Spacer()
             
-            Text("Etiler, İstanbul")
-                .font(.system(size: 11, weight: .medium, design: .monospaced))
-                .foregroundColor(Color.kySubtext.opacity(0.6))
+            VStack{
+                Image(systemName: "map")
+                    .foregroundColor(Color.kySubtext.opacity(0.6))
+                Text("Etiler, İstanbul")
+                    .font(.system(size: 11, weight: .medium, design: .monospaced))
+                    .foregroundColor(Color.kySubtext.opacity(0.6))
+            }
         }
         .padding(16)
         .background(Color.kyCard)
@@ -123,7 +117,7 @@ struct DoctorsView: View {
 
     private var doctorCardsSection: some View {
         VStack(spacing: 16) {
-            ForEach(Doctor.all) { doc in
+            ForEach(fs.doctors) { doc in
                 DoctorCard(doctor: doc)
                     .onTapGesture { selectedDoctor = doc }
             }
@@ -142,7 +136,7 @@ struct DoctorsView: View {
                 Spacer()
             }
             .padding(.horizontal, 20)
-
+            
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
                     ForEach([
@@ -160,9 +154,8 @@ struct DoctorsView: View {
             }
         }
     }
-
+    
     // MARK: Bottom CTA
-
     private var bottomCTA: some View {
         VStack(spacing: 14) {
             Text("Hangi hekim size uygun?")
@@ -172,8 +165,10 @@ struct DoctorsView: View {
             Text("Ücretsiz konsültasyon için hemen ulaşın.")
                 .font(.system(size: 14))
                 .foregroundColor(Color.kySubtext)
-
-            Button {} label: {
+            
+            Button {
+                showAppointment.toggle()
+            } label: {
                 HStack(spacing: 8) {
                     Spacer()
                     Image(systemName: "calendar.badge.plus")

@@ -2,126 +2,153 @@
 //  Doctor.swift
 //  Dr. Kürşat Yılmaz Dental Clinic
 //
-//  Created by Sinan Dinç on 3/5/26.
+//  Created by Sinan Dinç on 3/8/26.
 //
-import FirebaseFirestore
+
 import Foundation
 import SwiftUI
+import FirebaseFirestore
 
-struct Doctor: Identifiable, Codable {
+struct Doctor: Identifiable, Codable, Hashable {
+
+    // MARK: Firestore document ID
     @DocumentID var id: String?
-    let name: String
-    let title: String
-    let specialty: String
-    let tagline: String
-    let bio: String
-    let experience: String
-    let patientCount: String
-    let satisfactionRate: String
-    let avatarInitials: String
-    let expertise: [DoctorExpertise]
-    let education: [DoctorEducation]
-    let languages: [String]
-    let availableDays: [String]
-    
-    var color: Color{
-        Color.kyAccent
+
+    var name: String
+    var title: String          // e.g. "Uzm. Dt."
+    var specialty: String
+    var tagline: String
+    var bio: String
+    var experience: String     // e.g. "12 Yıl"
+    var patientCount: String   // e.g. "3.500+"
+    var satisfactionRate: String // e.g. "%97"
+    var avatarInitials: String
+    var avatarColorName: String  // Stored as string, resolved to Color in UI
+    var expertise: [DoctorExpertise]
+    var education: [DoctorEducation]
+    var languages: [String]
+    var availableDays: [String]  // e.g. ["Pazartesi", "Salı"]
+    var clinicIds: [String]      // Clinics this doctor works at
+    var isActive: Bool
+
+    // MARK: UI-only helper (not Codable)
+    var accentColor: Color { Color(colorName: avatarColorName) }
+
+    // MARK: Init
+    init(
+        id: String? = nil,
+        name: String,
+        title: String,
+        specialty: String,
+        tagline: String = "",
+        bio: String = "",
+        experience: String = "",
+        patientCount: String = "",
+        satisfactionRate: String = "",
+        avatarInitials: String,
+        avatarColorName: String = "blue",
+        expertise: [DoctorExpertise] = [],
+        education: [DoctorEducation] = [],
+        languages: [String] = ["Türkçe"],
+        availableDays: [String] = [],
+        clinicIds: [String] = [],
+        isActive: Bool = true
+    ) {
+        self.id = id
+        self.name = name
+        self.title = title
+        self.specialty = specialty
+        self.tagline = tagline
+        self.bio = bio
+        self.experience = experience
+        self.patientCount = patientCount
+        self.satisfactionRate = satisfactionRate
+        self.avatarInitials = avatarInitials
+        self.avatarColorName = avatarColorName
+        self.expertise = expertise
+        self.education = education
+        self.languages = languages
+        self.availableDays = availableDays
+        self.clinicIds = clinicIds
+        self.isActive = isActive
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case name
+        case title
+        case specialty
+        case tagline
+        case bio
+        case experience
+        case patientCount        = "patient_count"
+        case satisfactionRate    = "satisfaction_rate"
+        case avatarInitials      = "avatar_initials"
+        case avatarColorName     = "avatar_color_name"
+        case expertise
+        case education
+        case languages
+        case availableDays       = "available_days"
+        case clinicIds           = "clinic_ids"
+        case isActive            = "is_active"
     }
 }
 
-struct DoctorExpertise: Identifiable ,Codable{
-    let id = UUID()
-    let title: String
-    let icon: String
-    
-    var color: Color{
-        Color.kyAccent
+// MARK: - DoctorExpertise
+struct DoctorExpertise: Identifiable, Codable, Hashable {
+
+    /// Use a stable string ID so Firestore round-trips are safe
+    var id: String
+    var title: String
+    var icon: String           // SF Symbol name
+    var colorName: String      // stored as string
+
+    var color: Color { Color(colorName: colorName) }
+
+    init(id: String = UUID().uuidString,
+         title: String,
+         icon: String,
+         colorName: String = "blue") {
+        self.id = id
+        self.title = title
+        self.icon = icon
+        self.colorName = colorName
     }
 }
 
-struct DoctorEducation: Identifiable , Codable{
-    let id = UUID()
-    let degree: String
-    let institution: String
-    let year: String
+// MARK: - DoctorEducation
+struct DoctorEducation: Identifiable, Codable, Hashable {
+
+    var id: String
+    var degree: String
+    var institution: String
+    var year: String
+
+    init(id: String = UUID().uuidString,
+         degree: String,
+         institution: String,
+         year: String) {
+        self.id = id
+        self.degree = degree
+        self.institution = institution
+        self.year = year
+    }
 }
 
-
-
-extension Doctor {
-    static let all: [Doctor] = [
-        Doctor(
-            name: "Dr. Kürşat Yılmaz",
-            title: "Diş Hekimi",
-            specialty: "Estetik & Restoratif Diş Hekimliği",
-            tagline: "Yeni nesil gülüş tasarımının öncüsü",
-            bio: "Dr. Kürşat Yılmaz, estetik ve restoratif diş hekimliği alanında 8 yılı aşkın deneyimiyle minimal invaziv tedavi felsefesini benimseyen bir klinisyendir. CAD/CAM teknolojileri, dijital gülüş tasarımı ve E.max lamina kaplama konularında uzmanlaşmış olup her tedaviyi kişiye özel dijital planlama ile yürütür.",
-            experience: "8+ Yıl",
-            patientCount: "2.500+",
-            satisfactionRate: "%99",
-            avatarInitials: "KY",
-            expertise: [
-                DoctorExpertise(title: "Lamina Kaplama",icon: "seal.fill"),
-                DoctorExpertise(title: "Dental İmplant",icon: "bolt.shield.fill"),
-                DoctorExpertise(title: "Kompozit Tasarım",icon: "wand.and.stars"),
-                DoctorExpertise(title: "CAD/CAM",icon: "cpu.fill"),
-                DoctorExpertise(title: "Aligner Tedavisi",icon: "mouth.fill"),
-                DoctorExpertise(title: "EMS Temizlik",icon: "wind"),
-            ],
-            education: [
-                DoctorEducation(degree: "Diş Hekimliği Fakültesi",institution: "Marmara Üniversitesi",year: "2014"),
-                DoctorEducation(degree: "Estetik Diş Hekimliği Sertifikası",institution: "European Academy of Esthetic Dentistry", year: "2017"),
-                DoctorEducation(degree: "İmplantoloji İleri Eğitim",institution: "Straumann Institute",year: "2019"),
-                DoctorEducation(degree: "Digital Smile Design (DSD)",institution: "DSD Barcelona",year: "2021"),
-            ],
-            languages: ["Türkçe", "İngilizce"],
-            availableDays: ["Pzt", "Sal", "Çar", "Per", "Cum"],
-        ),
-        Doctor(
-            name: "Dr. Elif Arslan",
-            title: "Uzman Diş Hekimi",
-            specialty: "Ortodonti & Şeffaf Plak",
-            tagline: "Görünmez ortodontinin uzmanı",
-            bio: "Dr. Elif Arslan, ortodonti ve şeffaf plak tedavilerinde uzmanlaşmış, dijital planlama yöntemlerini kullanan deneyimli bir diş hekimidir. Her hastaya özel hizalama protokolleri tasarlar.",
-            experience: "6 Yıl",
-            patientCount: "1.200+",
-            satisfactionRate: "%98",
-            avatarInitials: "EA",
-            expertise: [
-                DoctorExpertise(title: "Aligner",icon: "mouth.fill"),
-                DoctorExpertise(title: "Dijital Planlama",icon: "camera.metering.center.weighted"),
-                DoctorExpertise(title: "Retainer", icon: "checkmark.shield.fill"),
-            ],
-            education: [
-                DoctorEducation(degree: "Diş Hekimliği Fakültesi",  institution: "Hacettepe Üniversitesi", year: "2016"),
-                DoctorEducation(degree: "Ortodonti Uzmanlığı",      institution: "İstanbul Üniversitesi",  year: "2020"),
-                DoctorEducation(degree: "Invisalign Sertifikası",   institution: "Align Technology",       year: "2021"),
-            ],
-            languages: ["Türkçe", "İngilizce", "Almanca"],
-            availableDays: ["Sal", "Çar", "Per", "Cum", "Cmt"],
-        ),
-        Doctor(
-            name: "Dr. Burak Demir",
-            title: "Uzman Diş Hekimi",
-            specialty: "Endodonti & Restorasyon",
-            tagline: "Kanal tedavisinde hassas el sanatı",
-            bio: "Dr. Burak Demir, endodonti ve koruyucu diş hekimliği alanında uzmanlaşmış; kanal tedavisinden minimal invaziv restorasyonlara kadar geniş bir klinik yelpazede çalışmaktadır.",
-            experience: "5 Yıl",
-            patientCount: "900+",
-            satisfactionRate: "%97",
-            avatarInitials: "BD",
-            expertise: [
-                DoctorExpertise(title: "Endodonti",         icon: "cross.circle.fill"),
-                DoctorExpertise(title: "Kanal Tedavisi",    icon: "waveform.path.ecg"),
-                DoctorExpertise(title: "Onlay Restorasyon", icon: "puzzlepiece.fill"),
-            ],
-            education: [
-                DoctorEducation(degree: "Diş Hekimliği Fakültesi", institution: "İstanbul Üniversitesi", year: "2017"),
-                DoctorEducation(degree: "Endodonti Uzmanlığı",     institution: "Ege Üniversitesi",      year: "2022"),
-            ],
-            languages: ["Türkçe"],
-            availableDays: ["Pzt", "Çar", "Per"],
-        ),
-    ]
+// MARK: - Color name helper (shared extension)
+extension Color {
+    init(colorName: String) {
+        switch colorName.lowercased() {
+        case "cyan":   self = .cyan
+        case "yellow": self = .yellow
+        case "purple": self = .purple
+        case "orange": self = .orange
+        case "red":    self = .red
+        case "green":  self = .green
+        case "pink":   self = .pink
+        case "indigo": self = .indigo
+        case "teal":   self = .teal
+        default:       self = .blue
+        }
+    }
 }
-

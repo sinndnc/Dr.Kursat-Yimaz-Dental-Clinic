@@ -44,7 +44,7 @@ private let techItems: [TechItem] = [
 
 struct HomeView: View {
     
-    @EnvironmentObject private var appState: AppState
+    @EnvironmentObject private var fs: FirestoreService
     @EnvironmentObject private var navState: AppNavigationState
     
     @State private var heroScale: CGFloat = 0.97
@@ -92,7 +92,7 @@ struct HomeView: View {
                 NotificationsSheet()
             }
             .sheet(isPresented: $showNewAppointment){
-                NewAppointmentSheet()
+                BookingView()
             }
             .fullScreenCover(isPresented: $showClinicVideo){
                 VideoPlayerView()
@@ -118,7 +118,7 @@ struct HomeView: View {
                 .ignoresSafeArea()
                 
             }
-            .frame(height: 350)
+            .frame(height: 300)
             
             VStack(alignment: .leading, spacing: 0) {
                 // Top nav row
@@ -220,9 +220,8 @@ struct HomeView: View {
                     .padding(.top, 4)
                     .opacity(greetingOpacity)
                 }
-                .padding(.horizontal, 24)
-                .padding(.top, 20)
-                .padding(.bottom, 32)
+                .padding(.horizontal)
+                .safeAreaPadding(.top)
             }
         }
     }
@@ -251,14 +250,14 @@ struct HomeView: View {
                 navState.navigateToTab(.appointments)
             }
             
-            if let appointment = appState.nextAppointment{
-                Button {
-                    selectedAppointment = appointment
-                } label: {
-                    AppointmentCard(appointment: appointment)
-                        .padding(.horizontal, 20)
-                }
-            }
+//            if let appointment = appState.nextAppointment{
+//                Button {
+//                    selectedAppointment = appointment
+//                } label: {
+//                    AppointmentCard(appointment: appointment)
+//                        .padding(.horizontal, 20)
+//                }
+//            }
         }
         .padding(.top, 32)
     }
@@ -273,7 +272,7 @@ struct HomeView: View {
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
-                    ForEach(DentalService.all, id: \.self) { service in
+                    ForEach(fs.services, id: \.self) { service in
                         Button {
                             navState.navigateToService(service: service)
                         } label: {
@@ -338,9 +337,9 @@ struct HomeView: View {
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(alignment: .top, spacing: 14) {
-                    ForEach(FirestoreMockService.testimonials) { item in
-                        TestimonialCard(testimonial: item)
-                    }
+//                    ForEach(FirestoreMockService.testimonials) { item in
+//                        TestimonialCard(testimonial: item)
+//                    }
                 }
                 .padding(.horizontal, 20)
                 .padding(.vertical, 4)

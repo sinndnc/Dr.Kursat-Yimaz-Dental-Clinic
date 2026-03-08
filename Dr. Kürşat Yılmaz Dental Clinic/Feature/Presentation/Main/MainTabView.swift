@@ -2,9 +2,7 @@ import SwiftUI
 
 struct MainTabView: View {
     
-    @EnvironmentObject var appState: AppState
-    
-    @StateObject private var navState = AppNavigationState()
+    @EnvironmentObject private var navState: AppNavigationState
     
     private let primaryBlue = Color(red: 0.15, green: 0.45, blue: 0.95)
     
@@ -45,13 +43,6 @@ struct MainTabView: View {
                         Text("Profil")
                     }
                     .tag(AppTab.profile)
-            }
-            .environmentObject(navState)
-        }
-        .task {
-            if let uid = appState.authService.uid {
-                await appState.loadUserData(uid: uid)
-                appState.startListeners(uid: uid)
             }
         }
     }
