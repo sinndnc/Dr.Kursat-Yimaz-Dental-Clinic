@@ -17,6 +17,8 @@ struct ServiceDetailView: View {
     
     var body: some View {
         ZStack(alignment: .top) {
+            Color.kyBackground.ignoresSafeArea()
+            
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 0) {
                     heroSection
@@ -51,10 +53,11 @@ struct ServiceDetailView: View {
                         colors: [
                             service.accentColor.opacity(0.25),
                             service.accentColor.opacity(0.08),
+                            Color.kyBackground.opacity(0.4),
                             Color.kyBackground
                         ],
                         startPoint: .topLeading,
-                        endPoint: .bottomTrailing
+                        endPoint: .bottom
                     )
                 )
                 .frame(height: 325)

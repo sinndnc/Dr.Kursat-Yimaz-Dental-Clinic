@@ -10,6 +10,7 @@ import SwiftUI
 @main
 struct DrKursatYilmazDentalClinicApp: App {
     
+    @StateObject var sseder = MockDataSeeder()
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegateü
     
     @StateObject private var navState =  AppNavigationState()
@@ -17,6 +18,11 @@ struct DrKursatYilmazDentalClinicApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
+                .onAppear {
+                    Task{
+                        try await sseder.uploadPatients()
+                    }
+                }
                 .environmentObject(navState)
         }
         

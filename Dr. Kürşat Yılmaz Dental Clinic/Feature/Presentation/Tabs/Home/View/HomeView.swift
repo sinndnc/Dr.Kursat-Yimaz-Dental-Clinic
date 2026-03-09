@@ -1,3 +1,10 @@
+//
+//  HomeView.swift
+//  Dr. Kürşat Yılmaz Dental Clinic
+//
+//  Created by Sinan Dinç on 3/7/26.
+//
+
 import SwiftUI
 import AVKit
 import MapKit
@@ -21,11 +28,11 @@ struct HomeView: View {
     @State private var showAppointmentBadge: Bool = true
     @State private var selectedAppointment: Appointment? = nil
     
-    let phoneNumber = "905342345758"
+    let phoneNumber = "905366360880"
     let destinationName = "Dr. Kürşat Yılmaz"
     let message = "Merhaba, bilgi almak istiyorum."
     let destinationCoordinate = CLLocationCoordinate2D(latitude: 41.085185, longitude: 29.027958)
-    
+   
     var body: some View {
         NavigationStack(path: $navState.homeNavPath) {
             ZStack(alignment: .top) {
@@ -34,7 +41,6 @@ struct HomeView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 0) {
                         heroSection
-//                        quickActionsSection
                         appointmentCardSection
                         featuredServicesSection
                         statsSection
@@ -52,7 +58,7 @@ struct HomeView: View {
                 }
             }
             .sheet(isPresented: $showNotifications){
-                NotificationsSheet()
+                NotificationsView()
             }
             .sheet(isPresented: $showNewAppointment){
                 BookingView()
@@ -61,7 +67,7 @@ struct HomeView: View {
                 VideoPlayerView()
             }
             .sheet(item: $selectedAppointment) { appointment in
-                AppointmentDetailSheet(appointment: appointment)
+                AppointmentDetailView(appointment: appointment)
             }
         }
         .ignoresSafeArea()
@@ -72,10 +78,10 @@ struct HomeView: View {
             ZStack {
                 Color.kyBackground
                 RadialGradient(
-                    colors: [Color.kyAccent.opacity(0.18), Color.clear],
+                    colors: [Color.kyAccent.opacity(0.18), Color.kyBackground],
                     center: UnitPoint(x: 0.85, y: 0.1),
                     startRadius: 0,
-                    endRadius: 300
+                    endRadius: 275
                 )
                 .ignoresSafeArea()
             }
@@ -177,7 +183,6 @@ struct HomeView: View {
                             .overlay(Capsule().strokeBorder(Color.kyBorder, lineWidth: 1))
                         }
                     }
-                    .padding(.top, 4)
                     .opacity(greetingOpacity)
                 }
                 .padding(.bottom)
@@ -187,23 +192,6 @@ struct HomeView: View {
         }
     }
     
-    // MARK: - Quick Actions
-    
-    private var quickActionsSection: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            sectionHeader(title: "Hızlı Erişim", subtitle: nil){}
-            
-            HStack(spacing: 12) {
-                ForEach(QuickActionData.items) { action in
-                    QuickActionButton(action: action)
-                }
-            }
-            .padding(.horizontal, 20)
-        }
-        .padding(.top, 28)
-    }
-    
-    // MARK: - Upcoming Appointment Card
     
     private var appointmentCardSection: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -336,7 +324,7 @@ struct HomeView: View {
             // Contact buttons
             HStack(spacing: 12) {
                 ContactButton(label: "Ara",       icon: "phone.fill",    isPrimary: true){
-                    
+                    makePhoneCall()
                 }
                 ContactButton(label: "WhatsApp",  icon: "message.fill",  isPrimary: false){
                     sendWhatsAppMessage()
@@ -477,7 +465,15 @@ struct HomeView: View {
             UIApplication.shared.open(url)
         }
     }
-
+    
+    func makePhoneCall() {
+        if let url = URL(string: "tel://\(phoneNumber)") {
+            if UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            }
+        }
+    }
+    
 }
 
 

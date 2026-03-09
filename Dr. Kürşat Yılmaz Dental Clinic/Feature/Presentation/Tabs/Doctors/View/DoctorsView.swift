@@ -83,7 +83,7 @@ struct DoctorsView: View {
     }
     
     private var teamIntroSection: some View {
-        HStack{
+        HStack(alignment: .top){
             VStack(alignment: .leading, spacing: 2) {
                 Text("Uzman Hekimler")
                     .font(.system(size: 14, weight: .bold, design: .serif))
@@ -95,11 +95,12 @@ struct DoctorsView: View {
             
             Spacer()
             
-            VStack{
-                Image(systemName: "map")
-                    .foregroundColor(Color.kySubtext.opacity(0.6))
+            HStack(spacing: 2){
                 Text("Etiler, İstanbul")
                     .font(.system(size: 11, weight: .medium, design: .monospaced))
+                    .foregroundColor(Color.kySubtext.opacity(0.6))
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 10, weight: .medium, design: .monospaced))
                     .foregroundColor(Color.kySubtext.opacity(0.6))
             }
         }

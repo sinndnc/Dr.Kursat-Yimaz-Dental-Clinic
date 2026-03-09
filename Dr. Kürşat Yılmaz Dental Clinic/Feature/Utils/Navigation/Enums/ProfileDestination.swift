@@ -7,12 +7,23 @@
 import Foundation
 
 enum ProfileDestination: Hashable {
+    // Main tabs
+    case appointments
+    case treatments
+    case payments
+    case healthInfo
+    case documents
+    // Detail pages
+    case treatmentDetail(id: String)
+    case paymentDetail(id: String)
+    case documentDetail(id: String)
+    case appointmentDetail(appointment: Appointment)
     case editProfile
-    case settings
     case notifications
+    case allergiesDetail
+    case medicationsDetail
+    case emergencyContacts
+    case loyaltyPoints
     case privacyPolicy
     case helpSupport
-    case paymentMethods
-    case healthHistory
-    case logout
 }

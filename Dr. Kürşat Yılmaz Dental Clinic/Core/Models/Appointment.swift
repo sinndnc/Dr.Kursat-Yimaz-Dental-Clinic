@@ -30,12 +30,12 @@ struct Appointment: Identifiable, Codable, Hashable {
     var serviceId: String?        // linked DentalService
     var createdAt: Date
     var updatedAt: Date
-
-    // MARK: Computed helpers
+    
     var isUpcoming: Bool { status == .upcoming && date > Date() }
-    var isPast: Bool    { date < Date() }
-
-    // MARK: Init
+    var isPast: Bool { date < Date() }
+    var month: String { self.date.formatted(.dateTime.month(.wide)) }
+    var dayOfMonth: Int { Calendar.current.component(.day, from: self.date) }
+    
     init(
         id: String? = nil,
         patientId: String,
@@ -112,41 +112,10 @@ struct Appointment: Identifiable, Codable, Hashable {
             case .prosthetics:  return "indigo"
             }
         }
-
+        
         var color: Color { Color(colorName: colorName) }
     }
-
-    // MARK: - AppointmentStatus
-    enum AppointmentStatus: String, Codable, CaseIterable, Identifiable, Hashable {
-        case upcoming   = "Yaklaşan"
-        case inProgress = "Devam Ediyor"
-        case completed  = "Tamamlandı"
-        case cancelled  = "İptal"
-        case noShow     = "Gelmedi"
-
-        var id: String { rawValue }
-
-        var icon: String {
-            switch self {
-            case .upcoming:   return "clock"
-            case .inProgress: return "arrow.triangle.2.circlepath"
-            case .completed:  return "checkmark.circle.fill"
-            case .cancelled:  return "xmark.circle.fill"
-            case .noShow:     return "person.fill.xmark"
-            }
-        }
-
-        var color: Color {
-            switch self {
-            case .upcoming:   return .blue
-            case .inProgress: return .orange
-            case .completed:  return .green
-            case .cancelled:  return .red
-            case .noShow:     return .gray
-            }
-        }
-    }
-
+    
     // MARK: - CodingKeys
     enum CodingKeys: String, CodingKey {
         case id
@@ -166,6 +135,36 @@ struct Appointment: Identifiable, Codable, Hashable {
         case serviceId       = "service_id"
         case createdAt       = "created_at"
         case updatedAt       = "updated_at"
+    }
+}
+
+enum AppointmentStatus: String, Codable, CaseIterable, Identifiable, Hashable {
+    case upcoming   = "Yaklaşan"
+    case inProgress = "Devam Ediyor"
+    case completed  = "Tamamlandı"
+    case cancelled  = "İptal"
+    case noShow     = "Gelmedi"
+
+    var id: String { rawValue }
+
+    var icon: String {
+        switch self {
+        case .upcoming:   return "clock"
+        case .inProgress: return "arrow.triangle.2.circlepath"
+        case .completed:  return "checkmark.circle.fill"
+        case .cancelled:  return "xmark.circle.fill"
+        case .noShow:     return "person.fill.xmark"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .upcoming:   return .blue
+        case .inProgress: return .orange
+        case .completed:  return .green
+        case .cancelled:  return .red
+        case .noShow:     return .gray
+        }
     }
 }
 

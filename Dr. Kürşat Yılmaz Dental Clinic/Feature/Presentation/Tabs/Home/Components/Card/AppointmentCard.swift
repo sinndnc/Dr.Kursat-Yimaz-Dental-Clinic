@@ -14,11 +14,11 @@ struct AppointmentCard: View {
         HStack(spacing: 16) {
             // Date badge
             VStack(spacing: 2) {
-                Text("MAR")
+                Text(appointment.month)
                     .font(.system(size: 9, weight: .bold, design: .monospaced))
                     .tracking(1)
                     .foregroundColor(Color.kyAccent)
-                Text("12")
+                Text("\(appointment.dayOfMonth)")
                     .font(.system(size: 28, weight: .bold, design: .serif))
                     .foregroundColor(Color.kyText)
                 Text(appointment.time)

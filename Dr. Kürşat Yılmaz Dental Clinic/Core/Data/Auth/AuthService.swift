@@ -123,13 +123,13 @@ final class AuthService: AuthServiceProtocol {
     }
     
     func register(
-        email:     String,
-        password:  String,
+        email: String,
+        password: String,
         firstName: String,
-        lastName:  String,
-        phone:     String?         = nil,
+        lastName: String,
+        phone:String?         = nil,
         birthDate: Date?           = nil,
-        gender:    Patient.Gender? = nil
+        gender:Gender? = nil
     ) async throws {
         clearError()
         isLoading = true
@@ -144,16 +144,16 @@ final class AuthService: AuthServiceProtocol {
             errorMessage = message
             throw AuthError.registrationFailed(message)
         }
-
+        
         let uid = result.user.uid
-
+        
         // 2. Build Patient document (document ID == Firebase UID)
         let patient = Patient(
             id:        uid,
             firstName: firstName,
             lastName:  lastName,
-            birthDate: birthDate,
-            gender:    gender,
+            birthDate: birthDate ?? .now,
+            gender:    gender ?? .male,
             phone:     phone,
             email:     email,
             createdAt: Date(),

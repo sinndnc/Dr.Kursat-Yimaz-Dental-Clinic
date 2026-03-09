@@ -170,7 +170,7 @@ final class FirestoreService: FirestoreServiceProtocol {
         try await updateDocument(updated, collection: FSCollection.appointments, id: id)
     }
     
-    func updateAppointmentStatus(_ id: String, status: Appointment.AppointmentStatus) async throws {
+    func updateAppointmentStatus(_ id: String, status: AppointmentStatus) async throws {
         try await db.collection(FSCollection.appointments).document(id)
             .updateData(["status": status.rawValue, "updated_at": Timestamp(date: Date())])
     }
@@ -183,7 +183,7 @@ final class FirestoreService: FirestoreServiceProtocol {
     
     
     func batchUpdateAppointmentStatuses(
-        _ updates: [(id: String, status: Appointment.AppointmentStatus)]
+        _ updates: [(id: String, status: AppointmentStatus)]
     ) async throws {
         let batch = db.batch()
         let now   = Timestamp(date: Date())

@@ -1,4 +1,16 @@
+//
+//  AppointmentView.swift
+//  Dr. Kürşat Yılmaz Dental Clinic
+//
+//  Created by Sinan Dinç on 3/7/26.
+//
+
 import SwiftUI
+
+enum AppointmentFilter: String, CaseIterable {
+    case all = "Tümü"; case upcoming = "Yaklaşan"; case completed = "Geçmiş"
+}
+
 
 struct AppointmentsView: View {
 
@@ -13,17 +25,13 @@ struct AppointmentsView: View {
     @State private var headerAppeared = false
     
     // Calendar states
-    @State private var showCalendar = true
+    @State private var showCalendar = false
     @State private var currentMonth: Date = Date()
     @State private var selectedCalendarDate: Date? = nil
     
     // Search states
     @State private var searchText: String = ""
     @State private var showSearch: Bool = false
-    
-    enum AppointmentFilter: String, CaseIterable {
-        case all = "Tümü"; case upcoming = "Yaklaşan"; case completed = "Geçmiş"
-    }
     
     // MARK: - Filtered Appointments
     var filteredAppointments: [Appointment] {
@@ -92,7 +100,7 @@ struct AppointmentsView: View {
                                 .padding(.horizontal, 20)
                                 .transition(.scale.combined(with: .opacity))
                         }
-
+                        
                         appointmentsList
                             .padding(.top, 16)
                             .padding(.bottom, 100)
@@ -105,7 +113,7 @@ struct AppointmentsView: View {
                     .padding(.bottom, 32)
             }
             .sheet(item: $selectedAppointment) { appt in
-                AppointmentDetailSheet(appointment: appt)
+                AppointmentDetailView(appointment: appt)
             }
             .sheet(isPresented: $showNewAppointment) {
                 BookingView()
@@ -130,7 +138,7 @@ struct AppointmentsView: View {
             }
             .ignoresSafeArea()
             .frame(height: 200)
-
+            
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 5) {
                     Circle().fill(Color.kyAccent).frame(width: 5, height: 5)
@@ -148,10 +156,8 @@ struct AppointmentsView: View {
                     .font(.system(size: 14))
                     .foregroundColor(Color.kySubtext)
             }
-            .padding(.top, 25)
             .padding(.horizontal)
-
-            // Search icon top-right
+            
             HStack {
                 Spacer()
                 Button {
@@ -353,36 +359,13 @@ struct AppointmentsView: View {
     private var filterBar: some View {
         HStack(spacing: 8) {
             ForEach(AppointmentFilter.allCases, id: \.self.rawValue) { filter in
-                Button {
-                    withAnimation(.spring(response: 0.32, dampingFraction: 0.8)) {
-                        selectedFilter = filter
+                FilterChip(
+                    label: filter.rawValue,
+                    isSelected: selectedFilter == filter) {
+                        withAnimation(.spring(response: 0.32, dampingFraction: 0.8)) {
+                            selectedFilter = filter
+                        }
                     }
-                } label: {
-                    Text(filter.rawValue)
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(selectedFilter == filter ? Color.kyBackground : Color.kySubtext)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 9)
-                        .background(
-                            Group {
-                                if selectedFilter == filter {
-                                    LinearGradient(
-                                        colors: [Color.kyAccent, Color.kyAccentDark],
-                                        startPoint: .leading, endPoint: .trailing
-                                    )
-                                } else {
-                                    LinearGradient(colors: [Color.kyCard, Color.kyCard],
-                                                   startPoint: .leading, endPoint: .trailing)
-                                }
-                            }
-                        )
-                        .clipShape(Capsule())
-                        .overlay(
-                            selectedFilter == filter ? nil :
-                                Capsule().strokeBorder(Color.kyBorder, lineWidth: 1)
-                        )
-                }
-                .buttonStyle(ScaleButtonStyle())
             }
             Spacer()
         }

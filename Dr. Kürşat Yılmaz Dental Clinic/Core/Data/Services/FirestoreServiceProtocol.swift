@@ -52,7 +52,7 @@ protocol FirestoreServiceProtocol: AnyObject {
     func updateClinic(_ clinic: Clinic) async throws
     func updateService(_ service: Service) async throws
     func updateAppointment(_ appointment: Appointment) async throws
-    func updateAppointmentStatus(_ id: String, status: Appointment.AppointmentStatus) async throws
+    func updateAppointmentStatus(_ id: String, status: AppointmentStatus) async throws
 
     func deletePatient(id: String)     async throws
     func deleteDoctor(id: String)      async throws
@@ -61,7 +61,7 @@ protocol FirestoreServiceProtocol: AnyObject {
     func cancelAppointment(id: String) async throws
     
     func batchUpdateAppointmentStatuses(
-        _ updates: [(id: String, status: Appointment.AppointmentStatus)]
+        _ updates: [(id: String, status: AppointmentStatus)]
     ) async throws
     
 }

@@ -327,99 +327,59 @@ enum MockDoctors {
     static let all: [Doctor] = [yilmaz, demir, arslan, sahin]
 }
 
-// =========================================================================
-// MARK: - MockPatients
-// =========================================================================
-enum MockPatients {
+enum MockPatients{
+    
+    static let ahmet: Patient = Patient(
+            id: "PAQ6wtbFbkeGUHtq2Izfc3H2uDE3",
+            firstName: "Sinan",
+            lastName: "Dinç",
+            birthDate: Date(timeIntervalSince1970: 315532800), // 1980
+            gender: .male,
+            phone: "05551234567",
+            email: "ahmet.yilmaz@example.com",
+            loyaltyPoints: 120,
+            tcKimlikNo: "12345678901",
+            bloodType: .aPos,
+            toothSensitivityLevel: 2,
+            alcoholStatus: .occasional,
+            smokingStatus: .never
+        )
+        
+    static let ayşe: Patient = Patient(
+            id: "2",
+            firstName: "Ayşe",
+            lastName: "Demir",
+            birthDate: Date(timeIntervalSince1970: 504921600), // 1986
+            gender: .female,
+            phone: "05559876543",
+            email: "ayse.demir@example.com",
+            loyaltyPoints: 45,
+            tcKimlikNo: "98765432100",
+            bloodType: .aPos,
+            toothSensitivityLevel: 1,
+            alcoholStatus: .never,
+            smokingStatus: .former
+        )
+        
+    static let mehmet: Patient = Patient(
+            id: "3",
+            firstName: "Mehmet",
+            lastName: "Kaya",
+            birthDate: Date(timeIntervalSince1970: 662688000), // 1991
+            gender: .male,
+            phone: "05331234567",
+            email: "mehmet.kaya@example.com",
+            loyaltyPoints: 300,
+            tcKimlikNo: "11122233344",
+            bloodType: .aNeg,
+            toothSensitivityLevel: 3,
+            alcoholStatus: .occasional,
+            smokingStatus: .current
+        )
+    
+    static let all: [Patient] = [ahmet, ayşe, mehmet]
 
-    static let kaya = Patient(
-        id: MockID.patientSinan,
-        firstName: "Sinan",
-        lastName: "Dinç",
-        birthDate: .make(year: 2004, month: 1, day: 20),
-        gender: .male,
-        phone: "+90 536 636 08 80",
-        email: "sinandinc77@icloud.com",
-        address: "Ataşehir, İstanbul",
-        tcKimlikNo: "12345678901",
-        bloodType: .aPos,
-        allergies: ["Penisilin"],
-        chronicDiseases: ["Hipertansiyon"],
-        smoking: false,
-        notes: "Kan basıncı ilacı kullanıyor. Epinefrin içeren anesteziden kaçınılması önerilir."
-    )
-
-    static let celik = Patient(
-        id: MockID.patientCelik,
-        firstName: "Fatma",
-        lastName: "Çelik",
-        birthDate: .make(year: 1992, month: 3, day: 28),
-        gender: .female,
-        phone: "+90 505 333 44 55",
-        email: "fatma.celik@email.com",
-        address: "Kadıköy, İstanbul",
-        tcKimlikNo: "23456789012",
-        bloodType: .bPos,
-        allergies: [],
-        chronicDiseases: [],
-        smoking: false,
-        notes: "Diş hekimi fobisi var. Sakin ortam ve detaylı bilgilendirme gerekiyor."
-    )
-
-    static let aydin = Patient(
-        id: MockID.patientAydin,
-        firstName: "Mustafa",
-        lastName: "Aydın",
-        birthDate: .make(year: 1978, month: 11, day: 5),
-        gender: .male,
-        phone: "+90 542 777 88 99",
-        email: "mustafa.aydin@email.com",
-        address: "Beşiktaş, İstanbul",
-        tcKimlikNo: "34567890123",
-        bloodType: .abPos,
-        allergies: ["Latex", "İbuprofen"],
-        chronicDiseases: ["Tip 2 Diyabet"],
-        smoking: true,
-        notes: "Diyabetik hasta. Kan şekeri takibi önemli. Yara iyileşmesi yavaş olabilir."
-    )
-
-    static let ozturk = Patient(
-        id: MockID.patientOzturk,
-        firstName: "Zeynep",
-        lastName: "Öztürk",
-        birthDate: .make(year: 2001, month: 7, day: 19),
-        gender: .female,
-        phone: "+90 553 222 33 44",
-        email: "zeynep.ozturk@email.com",
-        address: "Üsküdar, İstanbul",
-        tcKimlikNo: "45678901234",
-        bloodType: .zeroPos,
-        allergies: [],
-        chronicDiseases: [],
-        smoking: false,
-        notes: nil
-    )
-
-    static let yildiz = Patient(
-        id: MockID.patientYildiz,
-        firstName: "Ali",
-        lastName: "Yıldız",
-        birthDate: .make(year: 1965, month: 2, day: 14),
-        gender: .male,
-        phone: "+90 531 444 55 66",
-        email: "ali.yildiz@email.com",
-        address: "Maltepe, İstanbul",
-        tcKimlikNo: "56789012345",
-        bloodType: .aNeg,
-        allergies: ["Aspirin"],
-        chronicDiseases: ["Kalp Hastalığı", "Kan Sulandırıcı Kullanıyor"],
-        smoking: false,
-        notes: "Warfarin kullanıyor. Cerrahi işlemler öncesi kardiyolog onayı alınmalıdır."
-    )
-
-    static let all: [Patient] = [kaya, celik, aydin, ozturk, yildiz]
 }
-
 
 enum MockServices {
 

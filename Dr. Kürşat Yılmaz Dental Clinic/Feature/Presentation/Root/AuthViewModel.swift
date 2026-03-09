@@ -72,7 +72,7 @@ final class AuthViewModel: ObservableObject {
         lastName:  String,
         phone:     String?         = nil,
         birthDate: Date?           = nil,
-        gender:    Patient.Gender? = nil
+        gender: Gender? = nil
     ) async {
         do {
             try await authService.register(
