@@ -12,20 +12,21 @@ import FirebaseFirestore
 
 @MainActor
 final class NotificationViewModel: ObservableObject {
-
+    
+    @Injected private var authService: AuthServiceProtocol
+    
     @Published private(set) var notifications: [AppNotification] = []
     @Published private(set) var unreadCount: Int = 0
     @Published private(set) var isLoading = false
     @Published var errorMessage: String?
-
+    
     private let db = Firestore.firestore()
     private var listener: ListenerRegistration?
-    private let authService = AuthService.shared
     private var cancellables = Set<AnyCancellable>()
-
+    
     init() {
-        authService.$firebaseUser
-            .compactMap { $0?.uid }
+        authService.currentPatientPublisher
+            .compactMap { $0?.id }
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] uid in self?.startListener(for: uid) }

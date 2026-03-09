@@ -9,7 +9,7 @@ import SwiftUI
 
 struct RegisterView: View {
     @Binding var showLogin: Bool
-    @EnvironmentObject var authService: AuthService
+    @Injected var authService: AuthServiceProtocol
     
     @State private var name = ""
     @State private var email = ""

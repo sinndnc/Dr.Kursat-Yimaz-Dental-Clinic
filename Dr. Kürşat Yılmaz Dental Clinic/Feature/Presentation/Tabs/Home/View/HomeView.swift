@@ -2,60 +2,23 @@ import SwiftUI
 import AVKit
 import MapKit
 
-struct QuickAction: Identifiable {
-    let id = UUID()
-    let title: String
-    let icon: String
-    let color: Color
-}
-
-struct Testimonial: Identifiable {
-    let id = UUID()
-    let name: String
-    let initials: String
-    let text: String
-    let rating: Int
-    let treatment: String
-    let avatarColor: Color
-}
-
-struct TechItem: Identifiable {
-    let id = UUID()
-    let name: String
-    let description: String
-    let icon: String
-    let badge: String?
-}
-
-private let quickActions: [QuickAction] = [
-    QuickAction(title: "Randevu\nAl",       icon: "calendar.badge.plus",        color: Color.kyAccent),
-    QuickAction(title: "Tedavi\nBilgisi",   icon: "cross.case.fill",             color: Color(red: 0.4, green: 0.75, blue: 0.65)),
-    QuickAction(title: "Galeri",            icon: "photo.stack.fill",            color: Color(red: 0.55, green: 0.45, blue: 0.85)),
-    QuickAction(title: "İletişim",          icon: "phone.fill",                  color: Color(red: 0.3, green: 0.60, blue: 0.90)),
-]
-
-private let techItems: [TechItem] = [
-    TechItem(name: "CAD/CAM",        description: "Dijital tarama ile hassas restorasyon",      icon: "cpu.fill",                       badge: nil),
-    TechItem(name: "EMS AirFlow",    description: "Biyofilm hedefli konforlu temizlik",         icon: "wind",                           badge: nil),
-    TechItem(name: "Straumann",      description: "Dünya standartlarında implant sistemi",      icon: "bolt.shield.fill",               badge: nil),
-    TechItem(name: "3D Yazıcı",      description: "Aynı gün kişisel restorasyon üretimi",       icon: "cube.transparent.fill",          badge: "Yakında"),
-]
-
 
 struct HomeView: View {
     
-    @EnvironmentObject private var fs: FirestoreService
+    @Injected private var fs: FirestoreServiceProtocol
+    
     @EnvironmentObject private var navState: AppNavigationState
+    @EnvironmentObject private var appointmentViewModel: AppointmentViewModel
     
     @State private var heroScale: CGFloat = 0.97
-    @State private var currentTestimonialIndex = 0
     @State private var greetingOpacity: Double = 0
+    @State private var currentTestimonialIndex = 0
     
-    @State private var showMap = false
-    @State private var showNotifications: Bool = false
-    @State private var showNewAppointment = false
-    @State private var showAppointmentBadge = true
+    @State private var showMap: Bool = false
     @State private var showClinicVideo: Bool = false
+    @State private var showNotifications: Bool = false
+    @State private var showNewAppointment: Bool = false
+    @State private var showAppointmentBadge: Bool = true
     @State private var selectedAppointment: Appointment? = nil
     
     let phoneNumber = "905342345758"
@@ -71,7 +34,7 @@ struct HomeView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 0) {
                         heroSection
-                        quickActionsSection
+//                        quickActionsSection
                         appointmentCardSection
                         featuredServicesSection
                         statsSection
@@ -106,7 +69,6 @@ struct HomeView: View {
     
     private var heroSection: some View {
         ZStack(alignment: .bottomLeading) {
-            // Background mesh gradient
             ZStack {
                 Color.kyBackground
                 RadialGradient(
@@ -116,12 +78,10 @@ struct HomeView: View {
                     endRadius: 300
                 )
                 .ignoresSafeArea()
-                
             }
             .frame(height: 300)
             
             VStack(alignment: .leading, spacing: 0) {
-                // Top nav row
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
                         HStack(spacing: 5) {
@@ -220,6 +180,7 @@ struct HomeView: View {
                     .padding(.top, 4)
                     .opacity(greetingOpacity)
                 }
+                .padding(.bottom)
                 .padding(.horizontal)
                 .safeAreaPadding(.top)
             }
@@ -233,7 +194,7 @@ struct HomeView: View {
             sectionHeader(title: "Hızlı Erişim", subtitle: nil){}
             
             HStack(spacing: 12) {
-                ForEach(quickActions) { action in
+                ForEach(QuickActionData.items) { action in
                     QuickActionButton(action: action)
                 }
             }
@@ -250,14 +211,16 @@ struct HomeView: View {
                 navState.navigateToTab(.appointments)
             }
             
-//            if let appointment = appState.nextAppointment{
-//                Button {
-//                    selectedAppointment = appointment
-//                } label: {
-//                    AppointmentCard(appointment: appointment)
-//                        .padding(.horizontal, 20)
-//                }
-//            }
+            if let appointment = fs.appointments.next{
+                Button {
+                    selectedAppointment = appointment
+                } label: {
+                    AppointmentCard(appointment: appointment)
+                        .padding(.horizontal, 20)
+                }
+            }else{
+                
+            }
         }
         .padding(.top, 32)
     }
@@ -318,7 +281,7 @@ struct HomeView: View {
             }
             
             VStack(spacing: 10) {
-                ForEach(techItems) { item in
+                ForEach(TechItemData.items) { item in
                     TechRow(item: item)
                 }
             }

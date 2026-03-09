@@ -1,9 +1,10 @@
 //
 //  FirebaseDIConfiguration.swift
-//  Varlix
+//  Dr. Kürşat Yılmaz Dental Clinic
 //
-//  Created by Sinan Dinç on 12/26/25.
+//  Created by Sinan Dinç on 3/8/26.
 //
+
 import Foundation
 import Firebase
 import FirebaseAuth

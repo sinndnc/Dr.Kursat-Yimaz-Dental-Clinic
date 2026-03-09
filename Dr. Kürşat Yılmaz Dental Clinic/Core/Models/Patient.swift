@@ -41,7 +41,10 @@ struct Patient: Identifiable, Codable, Hashable {
         guard let birthDate else { return nil }
         return Calendar.current.dateComponents([.year], from: birthDate, to: Date()).year
     }
+    
+    var avatarLetter: String { firstName.prefix(1).uppercased() }
 
+    
     // MARK: Init
     init(
         id: String? = nil,

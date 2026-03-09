@@ -9,7 +9,7 @@ import SwiftUI
 
 struct DoctorsView: View {
     
-    @EnvironmentObject private var fs: FirestoreService
+    @Injected private var fs: FirestoreServiceProtocol
     @EnvironmentObject private var navState: AppNavigationState
     
     @State private var headerAppeared = false
@@ -191,16 +191,6 @@ struct DoctorsView: View {
             .buttonStyle(ScaleButtonStyle())
         }
         .padding(.horizontal, 24)
-    }
-}
-
-struct ProfileSectionTitle: View {
-    let text: String
-    var body: some View {
-        Text(text)
-            .font(.system(size: 10, weight: .bold, design: .monospaced))
-            .tracking(2.5)
-            .foregroundColor(Color.kySubtext)
     }
 }
 

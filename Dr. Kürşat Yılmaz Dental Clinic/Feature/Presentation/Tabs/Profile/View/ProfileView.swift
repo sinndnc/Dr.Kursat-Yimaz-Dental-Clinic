@@ -1,145 +1,12 @@
 import SwiftUI
 
 
-private let menuSections: [ProfileMenuSection] = [
-    ProfileMenuSection(
-title: "Hesap",
- items: [
-    ProfileMenuItem(
-        title: "Kişisel Bilgiler",
-        route: .editProfile,
-        subtitle: "Ad, telefon, doğum tarihi",
-        icon: "person.fill",
-        color: Color(red: 0.82, green: 0.72, blue: 0.50),
-        trailingText: nil,
-        isDestructive: false,
-        hasChevron: true
-    ),
-    ProfileMenuItem(
-        title: "Sağlık Bilgileri",
-        route: .healthHistory,
-        subtitle: "Kan grubu, alerjiler, notlar",
-        icon: "cross.case.fill",
-        color: Color(red: 0.38, green: 0.78, blue: 0.50),
-        trailingText: nil,
-        isDestructive: false,
-        hasChevron: true
-    ),
-    ProfileMenuItem(
-        title: "Şifre & Güvenlik",
-        route: .editProfile,
-        subtitle: nil,
-        icon: "lock.fill",
-        color: Color(red: 0.30, green: 0.60, blue: 0.90),
-        trailingText: nil,
-        isDestructive: false,
-        hasChevron: true
-    ),
-    ]
-),
-    ProfileMenuSection(
-title: "Klinik",
-items: [
-    ProfileMenuItem(
-        title: "Tedavi Geçmişim",
-        route: .healthHistory,
-        subtitle: nil,
-        icon: "clock.fill",
-        color: Color(red: 0.55, green: 0.45, blue: 0.85),
-        trailingText: "5 işlem",
-        isDestructive: false,
-        hasChevron: true
-    ),
-    ProfileMenuItem(
-        title: "Belgelerim",
-        route: .paymentMethods,
-        subtitle: "Röntgen, raporlar",
-        icon: "doc.fill",
-        color: Color(red: 0.90, green: 0.55, blue: 0.30),
-        trailingText: nil,
-        isDestructive: false,
-        hasChevron: true
-    ),
-    ProfileMenuItem(
-        title: "Fatura & Ödemeler",
-        route: .paymentMethods,
-        subtitle: nil,
-        icon: "creditcard.fill",
-        color: Color(red: 0.82, green: 0.72, blue: 0.50),
-        trailingText: nil,
-        isDestructive: false,
-        hasChevron: true
-    ),
-    ]
-),
-    ProfileMenuSection(
-title: "Uygulama",
-items: [
-    ProfileMenuItem(
-        title: "Bildirimler",
-        route: .notifications,
-        subtitle: nil,
-        icon: "bell.fill",
-        color: Color(red: 0.25, green: 0.70, blue: 0.85),
-        trailingText: nil,
-        isDestructive: false,
-        hasChevron: true
-    ),
-    ProfileMenuItem(
-        title: "Dil",
-        route: .editProfile,
-        subtitle: nil,
-        icon: "globe",
-        color: Color(red: 0.40, green: 0.75, blue: 0.65),
-        trailingText: "Türkçe",
-        isDestructive: false,
-        hasChevron: true
-    ),
-    ProfileMenuItem(
-        title: "Tema",
-        route: .privacyPolicy,
-        subtitle: nil,
-        icon: "moon.fill",
-        color: Color(red: 0.55, green: 0.45, blue: 0.85),
-        trailingText: "Koyu",
-        isDestructive: false,
-        hasChevron: true
-    ),
-    ProfileMenuItem(
-        title: "Gizlilik Politikası",
-        route: .privacyPolicy,
-        subtitle: nil,
-        icon: "hand.raised.fill",
-        color: Color(red: 0.60, green: 0.58, blue: 0.55),
-        trailingText: nil,
-        isDestructive: false,
-        hasChevron: true
-    ),
-    ]
-),
-    ProfileMenuSection(
-title: "",
-items: [
-    ProfileMenuItem(
-        title: "Çıkış Yap",
-        route: .logout,
-        subtitle: nil,
-        icon: "arrow.right.square.fill",
-        color: Color(red: 0.85, green: 0.35, blue: 0.35),
-        trailingText: nil,
-        isDestructive: true,
-        hasChevron: false
-    ),
-    ]
-),
-]
-
-
 struct ProfileView: View {
     
-    @EnvironmentObject private var fs: FirestoreService
-    @EnvironmentObject private var currentUser: CurrentUser
     @EnvironmentObject private var navState: AppNavigationState
+    
+    @EnvironmentObject private var authVM: AuthViewModel
+    @EnvironmentObject private var appointmentsVM: AppointmentViewModel
     
     @State private var appeared = false
     
@@ -237,7 +104,7 @@ struct ProfileView: View {
                                 endPoint: .bottomTrailing
                             ))
                             .frame(width: 76, height: 76)
-                        Text(currentUser.avatarLetter)
+                        Text(authVM.currentPatient?.avatarLetter ?? "")
                             .font(.system(size: 26, weight: .bold))
                             .foregroundColor(Color.kyBackground)
                     }
@@ -254,17 +121,17 @@ struct ProfileView: View {
                     )
                     .scaleEffect(appeared ? 1 : 0.85)
                     .opacity(appeared ? 1 : 0)
-
+                    
                     VStack(alignment: .leading, spacing: 5) {
-                        Text(currentUser.fullName)
+                        Text(authVM.currentPatient?.fullName ?? "Not Found")
                             .font(.system(size: 20, weight: .bold, design: .serif))
                             .foregroundColor(Color.kyText)
-
+                        
                         HStack(spacing: 5) {
                             Image(systemName: "envelope.fill")
                                 .font(.system(size: 10))
                                 .foregroundColor(Color.kySubtext)
-                            Text(currentUser.patient?.email ?? "Not found")
+                            Text(authVM.currentPatient?.email ?? "Not Found")
                                 .font(.system(size: 12))
                                 .foregroundColor(Color.kySubtext)
                         }
@@ -272,7 +139,7 @@ struct ProfileView: View {
                             Image(systemName: "phone.fill")
                                 .font(.system(size: 10))
                                 .foregroundColor(Color.kySubtext)
-                            Text(currentUser.patient?.phone ?? "Not found")
+                            Text(authVM.currentPatient?.phone ?? "Not Found")
                                 .font(.system(size: 12))
                                 .foregroundColor(Color.kySubtext)
                         }
@@ -282,7 +149,7 @@ struct ProfileView: View {
                             Image(systemName: "star.fill")
                                 .font(.system(size: 9))
                                 .foregroundColor(Color.kyAccent)
-                            Text("Üye: \(currentUser.patient?.createdAt.formatted() ?? "")")
+                            Text("Üye: \(authVM.currentPatient?.createdAt.formatted() ?? "")")
                                 .font(.system(size: 10, weight: .semibold))
                                 .foregroundColor(Color.kyAccent)
                         }
@@ -304,19 +171,19 @@ struct ProfileView: View {
     private var statsRow: some View {
         HStack(spacing: 10) {
             ProfileStatCard(
-                value: "\("user.totalAppointments")",
+                value: "\(appointmentsVM.appointments.count)",
                 label: "Toplam Randevu",
                 icon: "calendar",
                 color: Color(red: 0.30, green: 0.60, blue: 0.90)
             )
             ProfileStatCard(
-                value: "\("user.completedTreatments")",
+                value: "\(appointmentsVM.appointments.past.count)",
                 label: "Tamamlanan",
                 icon: "checkmark.circle.fill",
                 color: Color.kyGreen
             )
             ProfileStatCard(
-                value: currentUser.patient?.bloodType?.rawValue ?? "Not found",
+                value: authVM.currentPatient?.bloodType?.rawValue ?? "Not found",
                 label: "Kan Grubu",
                 icon: "drop.fill",
                 color: Color.kyDanger
@@ -325,11 +192,10 @@ struct ProfileView: View {
         .padding(.horizontal, 20)
     }
     
-    // MARK: - Next Appointment Banner
     
     @ViewBuilder
     private var nextAppointmentBanner: some View {
-        if let next = currentUser.patient {
+        if let next = appointmentsVM.appointments.next {
             HStack(spacing: 14) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -339,22 +205,22 @@ struct ProfileView: View {
                         .font(.system(size: 20))
                         .foregroundColor(Color.kyGreen)
                 }
-
+                
                 VStack(alignment: .leading, spacing: 3) {
                     Text("Yaklaşan Randevu")
                         .font(.system(size: 12, weight: .bold, design: .monospaced))
                         .tracking(0.5)
                         .foregroundColor(Color.kyGreen)
-//                    Text("Test")
-//                        .font(.system(size: 15, weight: .bold, design: .serif))
-//                        .foregroundColor(Color.kyText)
+                    Text("\(next.notes)")
+                        .font(.system(size: 15, weight: .bold, design: .serif))
+                        .foregroundColor(Color.kyText)
                     Text("Dr. Kürşat Yılmaz · KY Clinic")
                         .font(.system(size: 11))
                         .foregroundColor(Color.kySubtext)
                 }
-
+                
                 Spacer()
-
+                
                 Image(systemName: "chevron.right")
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundColor(Color.kySubtext.opacity(0.5))
@@ -372,7 +238,7 @@ struct ProfileView: View {
     
     private var menuSectionsView: some View {
         VStack(spacing: 28) {
-            ForEach(menuSections) { section in
+            ForEach(ProfileMenuData.menuSections) { section in
                 VStack(alignment: .leading, spacing: 10) {
                     if !section.title.isEmpty {
                         Text(section.title.uppercased())

@@ -9,6 +9,79 @@ import Combine
 import SwiftUI
 import FirebaseFirestore
 
+struct TimeSlot: Identifiable, Hashable {
+    let id: String          // ISO8601 string of the date+time
+    let time: String        // "09:00"
+    let date: Date
+    var isAvailable: Bool
+    var isSelected: Bool = false
+}
+
+
+struct BookingForm {
+    // Selected by patient
+    var doctor: Doctor?
+    var clinic: Clinic?
+    var service: Service?
+    var date: Date = Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date()
+    var selectedSlot: TimeSlot?
+    var type: Appointment.AppointmentType = .checkup
+    var notes: String = ""
+    var durationMinutes: Int = 30
+
+    // Auto-filled from CurrentUser
+    var patientId: String = ""
+    var patientName: String = ""
+
+    // MARK: Derived
+    var time: String { selectedSlot?.time ?? "" }
+
+    // MARK: Validation
+    func validate() -> [String] {
+        var errors: [String] = []
+        if patientId.isEmpty             { errors.append("Kullanıcı oturumu bulunamadı.") }
+        if doctor == nil                 { errors.append("Lütfen bir doktor seçin.") }
+        if clinic == nil                 { errors.append("Lütfen bir klinik seçin.") }
+        if selectedSlot == nil           { errors.append("Lütfen randevu saati seçin.") }
+        if selectedSlot?.isAvailable == false { errors.append("Bu saat dolu, lütfen başka bir saat seçin.") }
+        if date < Calendar.current.startOfDay(for: Date()) { errors.append("Geçmiş bir tarih seçilemez.") }
+        return errors
+    }
+
+    /// Fills doctor/clinic from pre-selected service context
+    mutating func apply(doctor: Doctor, clinic: Clinic) {
+        self.doctor = doctor
+        self.clinic = clinic
+    }
+
+    /// Converts to an Appointment ready to write to Firestore
+    func toAppointment() -> Appointment {
+        Appointment(
+            patientId:       patientId,
+            patientName:     patientName,
+            doctorId:        doctor?.id ?? "",
+            doctorName:      doctor?.name ?? "",
+            doctorSpecialty: doctor?.specialty ?? "",
+            clinicId:        clinic?.id ?? "",
+            date:            date,
+            time:            time,
+            durationMinutes: durationMinutes,
+            type:            type,
+            status:          .upcoming,
+            notes:           notes,
+            roomNumber:      "",
+            serviceId:       service?.id
+        )
+    }
+
+    mutating func reset() {
+        doctor = nil; clinic = nil; service = nil
+        selectedSlot = nil; notes = ""
+        date = Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date()
+        type = .checkup; durationMinutes = 30
+    }
+}
+
 @MainActor
 final class BookingViewModel: ObservableObject {
 
@@ -28,82 +101,82 @@ final class BookingViewModel: ObservableObject {
             }
         }
     }
-
+    
     @Published var currentStep: Step = .service
     @Published var form = BookingForm()
-
+    
     // MARK: Catalog data (from Firestore)
     @Published private(set) var services: [Service] = []
     @Published private(set) var doctors:  [Doctor]        = []
     @Published private(set) var clinics:  [Clinic]        = []
-
+    
     // MARK: Calendar state
     @Published var calendarDisplayMonth: Date = Date()
     @Published private(set) var calendarDays: [CalendarDay] = []
-
+    
     // MARK: Slots
     @Published private(set) var availableSlots: [TimeSlot] = []
     @Published private(set) var isLoadingSlots = false
-
+    
     // MARK: Filters for doctor/service list
     @Published var serviceSearchQuery: String = "" { didSet { filterServices() } }
     @Published var selectedCategory: ServiceCategory? { didSet { filterServices() } }
     @Published private(set) var filteredServices: [Service] = []
     @Published var doctorSearchQuery: String = "" { didSet { filterDoctors() } }
     @Published private(set) var filteredDoctors: [Doctor] = []
-
+    
     // MARK: Booking result
     @Published private(set) var isSaving   = false
     @Published private(set) var isSuccess  = false
     @Published var errorMessage: String?
     @Published var validationErrors: [String] = []
-
+    
+    @Injected private var authService: AuthServiceProtocol
+    
+    
     // MARK: Private
     private let db = Firestore.firestore()
-    private let authService = AuthService.shared
     private var listeners: [ListenerRegistration] = []
-
+    
     // MARK: Init
     init() {
         startCatalogListeners()
         buildCalendar(for: Date())
     }
-
+    
     deinit { listeners.forEach { $0.remove() } }
-
     // =========================================================================
     // MARK: - Catalog Listeners
     // =========================================================================
-
     private func startCatalogListeners() {
-        let sl = db.collection("dental_services").whereField("is_active", isEqualTo: true)
+        let sl = db.collection("services").whereField("is_active", isEqualTo: true)
             .order(by: "title")
             .addSnapshotListener { [weak self] snap, _ in
                 self?.services = (try? snap?.documents.compactMap { try $0.data(as: Service.self) }) ?? []
                 self?.filterServices()
             }
-
+        
         let dl = db.collection("doctors").whereField("is_active", isEqualTo: true)
             .order(by: "name")
             .addSnapshotListener { [weak self] snap, _ in
                 self?.doctors = (try? snap?.documents.compactMap { try $0.data(as: Doctor.self) }) ?? []
                 self?.filterDoctors()
             }
-
+        
         let cl = db.collection("clinics").whereField("is_active", isEqualTo: true)
             .order(by: "name")
             .addSnapshotListener { [weak self] snap, _ in
                 self?.clinics = (try? snap?.documents.compactMap { try $0.data(as: Clinic.self) }) ?? []
                 if self?.form.clinic == nil { self?.form.clinic = self?.clinics.first }
             }
-
+        
         listeners = [sl, dl, cl]
     }
-
+    
     // =========================================================================
     // MARK: - Filtering
     // =========================================================================
-
+    
     private func filterServices() {
         var r = services
         if let cat = selectedCategory { r = r.filter { $0.category == cat } }

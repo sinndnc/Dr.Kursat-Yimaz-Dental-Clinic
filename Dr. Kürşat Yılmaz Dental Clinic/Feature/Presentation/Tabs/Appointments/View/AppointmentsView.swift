@@ -1,34 +1,10 @@
 import SwiftUI
 
-enum AppointmentStatus: String, CaseIterable {
-    case upcoming  = "Yaklaşan"
-    case completed = "Tamamlanan"
-    case cancelled = "İptal"
-
-    var color: Color {
-        switch self {
-        case .upcoming:  return Color(red: 0.4,  green: 0.78, blue: 0.50)
-        case .completed: return Color(red: 0.82, green: 0.72, blue: 0.50)
-        case .cancelled: return Color(red: 0.85, green: 0.38, blue: 0.38)
-        }
-    }
-
-    var icon: String {
-        switch self {
-        case .upcoming:  return "clock.fill"
-        case .completed: return "checkmark.circle.fill"
-        case .cancelled: return "xmark.circle.fill"
-        }
-    }
-}
-
-// MARK: - AppointmentsView
-
 struct AppointmentsView: View {
 
     @Namespace private var filterNamespace
 
-    @EnvironmentObject private var fs: FirestoreService
+    @Injected private var fs: FirestoreServiceProtocol
     @EnvironmentObject private var navState: AppNavigationState
     
     @State private var selectedFilter: AppointmentFilter = .all
@@ -50,7 +26,6 @@ struct AppointmentsView: View {
     }
     
     // MARK: - Filtered Appointments
-
     var filteredAppointments: [Appointment] {
         var base: [Appointment]
         switch selectedFilter {
@@ -70,17 +45,17 @@ struct AppointmentsView: View {
                 $0.doctorName.localizedCaseInsensitiveContains(searchText) 
             }
         }
-
+        
         return base
     }
-
+    
     /// Dates that have at least one appointment this month
     var appointmentDatesInMonth: Set<String> {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         return Set(fs.appointments.map { formatter.string(from: $0.date) })
     }
-
+    
     // MARK: - Body
     var body: some View {
         NavigationStack(path: $navState.appointmentsNavPath) {
@@ -106,10 +81,10 @@ struct AppointmentsView: View {
                             calendarSection
                                 .transition(.move(edge: .top).combined(with: .opacity))
                         }
-
+                        
                         filterBar
                             .padding(.top, 24)
-
+                        
                         // Active date filter chip
                         if let date = selectedCalendarDate {
                             activeDateChip(date: date)

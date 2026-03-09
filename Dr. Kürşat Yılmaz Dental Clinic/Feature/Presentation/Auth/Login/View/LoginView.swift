@@ -9,8 +9,8 @@ import SwiftUI
 
 struct LoginView: View {
     @Binding var showLogin: Bool
-    @EnvironmentObject var authService: AuthService
-    
+    @Injected var authService: AuthServiceProtocol
+
     @State private var email = ""
     @State private var password = ""
     @State private var showPassword = false

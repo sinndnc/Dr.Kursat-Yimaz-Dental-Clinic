@@ -168,3 +168,22 @@ struct Appointment: Identifiable, Codable, Hashable {
         case updatedAt       = "updated_at"
     }
 }
+
+extension Array where Element == Appointment {
+    var upcoming: [Appointment] {
+        filter { $0.status == .upcoming && $0.date >= Date() }
+            .sorted { $0.date < $1.date }
+    }
+    
+    var past: [Appointment] {
+        filter { $0.status == .completed || $0.status == .cancelled ||
+                 $0.status == .noShow || ($0.status == .upcoming && $0.date < Date()) }
+            .sorted { $0.date > $1.date }
+    }
+    
+    var next: Appointment? { upcoming.first }
+    
+    var cancelled: [Appointment] {
+        filter { $0.status == .cancelled }.sorted { $0.date > $1.date }
+    }
+}

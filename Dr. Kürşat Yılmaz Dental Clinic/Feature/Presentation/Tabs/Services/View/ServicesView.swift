@@ -5,7 +5,7 @@ struct ServicesView: View {
     
     @Namespace private var categoryNamespace
     
-    @EnvironmentObject private var fs: FirestoreService
+    @Injected private var fs: FirestoreServiceProtocol
     @EnvironmentObject private var navState: AppNavigationState
     
     @State private var showDetail = false

@@ -5,7 +5,6 @@
 //  Created by Sinan Dinç on 3/8/26.
 //
 
-
 import SwiftUI
 import FirebaseFirestore
 import Combine
@@ -17,7 +16,7 @@ struct BookingView: View {
     var body: some View {
         ZStack {
             Color.kyBackground.ignoresSafeArea()
-
+            
             if vm.isSuccess {
                 BookingSuccessView(vm: vm, dismiss: dismiss)
             } else {
@@ -25,7 +24,7 @@ struct BookingView: View {
                     BookingHeader(vm: vm, dismiss: dismiss)
                     BookingStepIndicator(vm: vm)
                     Divider().background(Color.kyBorder)
-
+                    
                     // Step content
                     ZStack {
                         switch vm.currentStep {
@@ -36,7 +35,7 @@ struct BookingView: View {
                         }
                     }
                     .animation(.spring(response: 0.38, dampingFraction: 0.85), value: vm.currentStep)
-
+                    
                     BookingNavigationBar(vm: vm)
                 }
             }
@@ -57,7 +56,7 @@ struct BookingView: View {
 private struct BookingHeader: View {
     @ObservedObject var vm: BookingViewModel
     let dismiss: DismissAction
-
+    
     var body: some View {
         HStack {
             Button(action: {
@@ -76,10 +75,12 @@ private struct BookingHeader: View {
                 .padding(.horizontal, 14)
                 .padding(.vertical, 8)
                 .background(Color.kyAccent.opacity(0.12), in: Capsule())
+                
+                Spacer()
             }
-
-            Spacer()
-
+            .frame(maxWidth: .infinity)
+            
+            
             VStack(spacing: 1) {
                 Text("Randevu Al")
                     .font(.custom("Georgia", size: 17))
@@ -89,11 +90,9 @@ private struct BookingHeader: View {
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(.kySubtext)
             }
-
-            Spacer()
-
+            
             // Right spacer to keep title centered
-            Color.clear.frame(width: 80, height: 36)
+            Color.clear.frame(maxWidth: .infinity,maxHeight: 36)
         }
         .padding(.horizontal, 20)
         .padding(.top, 8)
@@ -164,7 +163,6 @@ private struct ServiceStepView: View {
     var body: some View {
         ScrollView(showsIndicators: false) {
             LazyVStack(alignment: .leading, spacing: 20) {
-
                 // Category chips
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
@@ -207,8 +205,6 @@ private struct ServiceStepView: View {
                         .padding(.horizontal, 20)
                     }
                 }
-
-                Spacer(minLength: 120)
             }
             .padding(.top, 16)
         }

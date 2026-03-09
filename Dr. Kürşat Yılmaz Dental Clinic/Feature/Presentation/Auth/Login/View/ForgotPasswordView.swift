@@ -8,7 +8,8 @@
 import SwiftUI
 
 struct ForgotPasswordView: View {
-    @EnvironmentObject var authService: AuthService
+    @Injected var authService: AuthServiceProtocol
+    
     @Environment(\.dismiss) var dismiss
     @State private var email = ""
     @State private var sent = false

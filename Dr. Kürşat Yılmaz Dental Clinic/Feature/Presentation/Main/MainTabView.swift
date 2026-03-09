@@ -3,6 +3,7 @@ import SwiftUI
 struct MainTabView: View {
     
     @EnvironmentObject private var navState: AppNavigationState
+    @StateObject private var appointmentViewModel: AppointmentViewModel = AppointmentViewModel()
     
     private let primaryBlue = Color(red: 0.15, green: 0.45, blue: 0.95)
     
@@ -44,6 +45,7 @@ struct MainTabView: View {
                     }
                     .tag(AppTab.profile)
             }
+            .environmentObject(appointmentViewModel)
         }
     }
 }

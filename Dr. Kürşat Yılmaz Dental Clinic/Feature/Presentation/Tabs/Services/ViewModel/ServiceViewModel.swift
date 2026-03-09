@@ -173,12 +173,12 @@ final class ProfileViewModel: ObservableObject {
     @Published var showDeleteAccountAlert = false
 
     // MARK: Source of truth
-    private let authService = AuthService.shared
+    @Injected private var authService: AuthServiceProtocol
     private var cancellables = Set<AnyCancellable>()
 
     init() {
         // Whenever the patient profile updates (real-time), sync form fields
-        authService.$currentPatient
+        authService.currentPatientPublisher
             .compactMap { $0 }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] patient in
@@ -194,7 +194,7 @@ final class ProfileViewModel: ObservableObject {
         guard let p = currentPatient else { return "?" }
         return "\(p.firstName.prefix(1))\(p.lastName.prefix(1))".uppercased()
     }
-    var email: String { authService.firebaseUser?.email ?? "" }
+    var email: String { authService.currentPatient?.email ?? "" }
     var hasChanges: Bool {
         guard let p = currentPatient else { return false }
         return firstName != p.firstName || lastName != p.lastName ||

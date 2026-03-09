@@ -1,7 +1,16 @@
-// MARK: - AuthService.swift
-// Production-level Firebase Authentication service.
-// Handles sign-in, registration, sign-out, password reset,
-// session persistence, and syncs the current user's Patient profile.
+//
+//  AuthService.swift
+//  Dr. Kürşat Yılmaz Dental Clinic
+//
+//  Created by Sinan Dinç on 3/8/26.
+//
+//  Production-level Firebase Authentication service.
+//  Registered as a .singleton in DIContainer.
+//
+//  Responsibilities:
+//  - Firebase Auth state tracking (sign-in, register, sign-out, password ops)
+//  - Owns `currentPatient` — loaded from Firestore via UID on auth state change
+//  - FirestoreService is NOT responsible for currentPatient
 
 import Foundation
 import FirebaseAuth
@@ -9,77 +18,62 @@ import FirebaseFirestore
 import Combine
 
 @MainActor
-final class AuthService: ObservableObject {
-
-    // MARK: Shared instance
-    static let shared = AuthService()
-
-    // MARK: Published state
-    @Published private(set) var authState: AuthState = .loading
-    @Published private(set) var firebaseUser: FirebaseAuth.User?
+final class AuthService: AuthServiceProtocol {
+    
+    @Published private(set) var authState:      AuthState = .loading
+    @Published private(set) var firebaseUser:   FirebaseAuth.User?
     @Published private(set) var currentPatient: Patient?
-    @Published private(set) var isLoading: Bool = false
-    @Published private(set) var errorMessage: String?
-
-    // MARK: Private
+    @Published private(set) var isLoading:      Bool      = false
+    @Published private(set) var errorMessage:   String?
+    
+    var authStatePublisher:      AnyPublisher<AuthState, Never> { $authState.eraseToAnyPublisher()      }
+    var currentPatientPublisher: AnyPublisher<Patient?, Never>  { $currentPatient.eraseToAnyPublisher() }
+    var isLoadingPublisher:      AnyPublisher<Bool, Never>      { $isLoading.eraseToAnyPublisher()      }
+    var errorMessagePublisher:   AnyPublisher<String?, Never>   { $errorMessage.eraseToAnyPublisher()   }
+    
     private var authStateHandle: AuthStateDidChangeListenerHandle?
     private var patientListener: ListenerRegistration?
-    private let db = Firestore.firestore()
-    private let auth = Auth.auth()
-
-    // MARK: Convenience
-    var isAuthenticated: Bool { authState == .authenticated }
-    var currentUID: String? { auth.currentUser?.uid }
-
-    // MARK: Init
-    private init() {
+    private let db:   Firestore
+    private let auth: Auth
+    
+    var isAuthenticated: Bool    { authState == .authenticated }
+    var currentUID:      String? { auth.currentUser?.uid }
+    
+    init(db: Firestore, auth: Auth) {
+        self.db   = db
+        self.auth = auth
         attachAuthStateListener()
     }
-
+    
     deinit {
         if let handle = authStateHandle {
             auth.removeStateDidChangeListener(handle)
         }
         patientListener?.remove()
     }
-
-    // =========================================================================
-    // MARK: - Auth State Listener
-    // =========================================================================
-
+    
     private func attachAuthStateListener() {
         authStateHandle = auth.addStateDidChangeListener { [weak self] _, user in
             guard let self else { return }
             Task { @MainActor in
                 self.firebaseUser = user
                 if let user {
-                    await self.handleSignedInUser(user)
+                    self.attachPatientListener(uid: user.uid)
                 } else {
-                    self.handleSignedOutUser()
+                    self.tearDownSession()
                 }
             }
         }
     }
-
-    private func handleSignedInUser(_ user: FirebaseAuth.User) async {
-        patientListener?.remove()
-        attachPatientListener(uid: user.uid)
-    }
-
-    private func handleSignedOutUser() {
-        patientListener?.remove()
-        patientListener = nil
-        currentPatient = nil
-        authState = .unauthenticated
-    }
-
-    // =========================================================================
-    // MARK: - Real-time Patient Profile Listener
-    // =========================================================================
-
+    
+    /// Attaches a real-time Firestore listener to the authenticated user's Patient document.
+    /// Sets `authState` to `.authenticated` on success, `.registrationPending` if the document
+    /// doesn't exist yet or cannot be decoded (e.g. first-launch registration flow).
     private func attachPatientListener(uid: String) {
+        patientListener?.remove()
+        
         patientListener = db
-            .collection("patients")
+            .collection(FSCollection.patients)
             .document(uid)
             .addSnapshotListener { [weak self] snapshot, error in
                 guard let self else { return }
@@ -90,8 +84,7 @@ final class AuthService: ObservableObject {
                         return
                     }
                     guard let snapshot, snapshot.exists else {
-                        // Firebase user exists but no Patient doc yet
-                        
+                        print("🟡 Patient document not found → registrationPending")
                         self.authState = .registrationPending
                         return
                     }
@@ -105,43 +98,38 @@ final class AuthService: ObservableObject {
                 }
             }
     }
-
-    // =========================================================================
-    // MARK: - Sign In (Email & Password)
-    // =========================================================================
-
+    
+    private func tearDownSession() {
+        patientListener?.remove()
+        patientListener = nil
+        currentPatient  = nil
+        authState       = .unauthenticated
+    }
+    
     func signIn(email: String, password: String) async throws {
         clearError()
         isLoading = true
         defer { isLoading = false }
-        
         do {
-            let result = try await auth.signIn(withEmail: email, password: password)
+            let result   = try await auth.signIn(withEmail: email, password: password)
             firebaseUser = result.user
-            print("Result: \(result.user.uid)")
-            
-            // Patient listener is attached automatically via authStateDidChange
+            // Patient is loaded automatically via attachPatientListener triggered
+            // by addStateDidChangeListener — no manual fetch needed here.
         } catch let error as NSError {
-            let message = mapFirebaseError(error)
+            let message  = mapFirebaseError(error)
             errorMessage = message
             throw AuthError.signInFailed(message)
         }
     }
-
-    // =========================================================================
-    // MARK: - Registration (Email & Password + Patient profile)
-    // =========================================================================
-
-    /// Creates a Firebase Auth account and writes the Patient document to Firestore.
-    /// The Patient document ID equals the Firebase UID so lookups are O(1).
+    
     func register(
-        email: String,
-        password: String,
+        email:     String,
+        password:  String,
         firstName: String,
-        lastName: String,
-        phone: String? = nil,
-        birthDate: Date? = nil,
-        gender: Patient.Gender? = nil
+        lastName:  String,
+        phone:     String?         = nil,
+        birthDate: Date?           = nil,
+        gender:    Patient.Gender? = nil
     ) async throws {
         clearError()
         isLoading = true
@@ -152,115 +140,86 @@ final class AuthService: ObservableObject {
         do {
             result = try await auth.createUser(withEmail: email, password: password)
         } catch let error as NSError {
-            let message = mapFirebaseError(error)
+            let message  = mapFirebaseError(error)
             errorMessage = message
             throw AuthError.registrationFailed(message)
         }
 
         let uid = result.user.uid
 
-        // 2. Build Patient profile (document ID = Firebase UID)
+        // 2. Build Patient document (document ID == Firebase UID)
         let patient = Patient(
-            id: uid,
+            id:        uid,
             firstName: firstName,
-            lastName: lastName,
+            lastName:  lastName,
             birthDate: birthDate,
-            gender: gender,
-            phone: phone,
-            email: email,
+            gender:    gender,
+            phone:     phone,
+            email:     email,
             createdAt: Date(),
             updatedAt: Date()
         )
 
-        // 3. Write Patient document to Firestore
+        // 3. Persist Patient to Firestore — the real-time listener (already attached
+        //    by addStateDidChangeListener) will pick this up and set authState = .authenticated
         do {
-            try db.collection("patients").document(uid).setData(from: patient)
+            try db.collection(FSCollection.patients).document(uid).setData(from: patient)
         } catch {
-            // Auth user created but Firestore write failed → mark pending
-            authState = .registrationPending
+            authState    = .registrationPending
             errorMessage = "Profil kaydedilemedi. Lütfen tekrar deneyin."
             throw AuthError.registrationFailed(error.localizedDescription)
         }
 
-        // 4. Optionally send email verification
+        // 4. Email verification — non-critical
         try? await result.user.sendEmailVerification()
     }
-
-    // =========================================================================
-    // MARK: - Sign Out
-    // =========================================================================
 
     func signOut() throws {
         do {
             try auth.signOut()
-            // authStateDidChange fires → handleSignedOutUser cleans up
+            // tearDownSession() is called automatically via addStateDidChangeListener
         } catch let error as NSError {
-            let message = mapFirebaseError(error)
+            let message  = mapFirebaseError(error)
             errorMessage = message
             throw AuthError.signOutFailed(message)
         }
     }
 
-    // =========================================================================
-    // MARK: - Password Reset
-    // =========================================================================
-
     func sendPasswordReset(to email: String) async throws {
         clearError()
         isLoading = true
         defer { isLoading = false }
-
         do {
             try await auth.sendPasswordReset(withEmail: email)
         } catch let error as NSError {
-            let message = mapFirebaseError(error)
+            let message  = mapFirebaseError(error)
             errorMessage = message
             throw AuthError.passwordResetFailed(message)
         }
     }
 
-    // =========================================================================
-    // MARK: - Update Current Patient Profile
-    // =========================================================================
-
-    /// Persists changes to the current user's Patient document.
     func updateCurrentPatient(_ updated: Patient) async throws {
         guard let uid = currentUID else { throw AuthError.userNotFound }
-
-        var patient = updated
+        var patient       = updated
         patient.updatedAt = Date()
-
         do {
-            try db.collection("patients").document(uid).setData(from: patient, merge: true)
-            // currentPatient updates automatically via real-time listener
+            try db.collection(FSCollection.patients).document(uid).setData(from: patient, merge: true)
+            // Real-time listener updates `currentPatient` automatically
         } catch {
             throw AuthError.unknown(error)
         }
     }
 
-    // =========================================================================
-    // MARK: - Delete Account
-    // =========================================================================
-
-    /// Deletes the Firebase Auth user AND their Firestore Patient document.
     func deleteAccount() async throws {
         guard let user = auth.currentUser,
-              let uid = currentUID else { throw AuthError.userNotFound }
-
-        // 1. Delete Firestore patient document
-        try await db.collection("patients").document(uid).delete()
-
-        // 2. Delete Firebase Auth account
+              let uid  = currentUID else { throw AuthError.userNotFound }
+        try await db.collection(FSCollection.patients).document(uid).delete()
         do {
             try await user.delete()
         } catch let error as NSError {
             throw AuthError.unknown(error)
         }
     }
-
-    // =========================================================================
-    // MARK: - Re-authenticate (required before sensitive operations)
-    // =========================================================================
 
     func reauthenticate(email: String, password: String) async throws {
         guard let user = auth.currentUser else { throw AuthError.userNotFound }
@@ -272,17 +231,10 @@ final class AuthService: ObservableObject {
         }
     }
 
-    // =========================================================================
-    // MARK: - Change Password
-    // =========================================================================
-
     func changePassword(currentPassword: String, newPassword: String) async throws {
-        guard let user = auth.currentUser,
+        guard let user  = auth.currentUser,
               let email = user.email else { throw AuthError.userNotFound }
-
-        // Re-authenticate first (Firebase requires this for sensitive ops)
         try await reauthenticate(email: email, password: currentPassword)
-
         do {
             try await user.updatePassword(to: newPassword)
         } catch let error as NSError {
@@ -290,32 +242,27 @@ final class AuthService: ObservableObject {
         }
     }
 
-    // =========================================================================
-    // MARK: - Private Helpers
-    // =========================================================================
+    // MARK: - Helpers
 
-    private func clearError() {
-        errorMessage = nil
-    }
+    private func clearError() { errorMessage = nil }
 
-    /// Maps Firebase NSError codes to human-readable Turkish messages.
     private func mapFirebaseError(_ error: NSError) -> String {
-        guard let errorCode = AuthErrorCode(rawValue: error.code) else {
+        guard let code = AuthErrorCode(rawValue: error.code) else {
             return error.localizedDescription
         }
-        switch errorCode {
-        case .emailAlreadyInUse:       return "Bu e-posta adresi zaten kullanımda."
-        case .invalidEmail:            return "Geçersiz e-posta adresi."
-        case .weakPassword:            return "Şifre en az 6 karakter olmalıdır."
-        case .wrongPassword:           return "Hatalı şifre. Lütfen tekrar deneyin."
-        case .userNotFound:            return "Bu e-posta adresiyle kayıtlı bir hesap bulunamadı."
-        case .userDisabled:            return "Bu hesap devre dışı bırakılmıştır."
-        case .networkError:            return "Ağ bağlantısı hatası. İnternet bağlantınızı kontrol edin."
-        case .tooManyRequests:         return "Çok fazla başarısız deneme. Lütfen daha sonra tekrar deneyin."
-        case .requiresRecentLogin:     return "Bu işlem için tekrar giriş yapmanız gerekmektedir."
-        case .invalidCredential:       return "Geçersiz kimlik bilgileri. Lütfen bilgilerinizi kontrol edin."
-        case .operationNotAllowed:     return "Bu işlem şu anda kullanılamıyor."
-        default:                       return error.localizedDescription
+        switch code {
+        case .emailAlreadyInUse:   return "Bu e-posta adresi zaten kullanımda."
+        case .invalidEmail:        return "Geçersiz e-posta adresi."
+        case .weakPassword:        return "Şifre en az 6 karakter olmalıdır."
+        case .wrongPassword:       return "Hatalı şifre. Lütfen tekrar deneyin."
+        case .userNotFound:        return "Bu e-posta adresiyle kayıtlı bir hesap bulunamadı."
+        case .userDisabled:        return "Bu hesap devre dışı bırakılmıştır."
+        case .networkError:        return "Ağ bağlantısı hatası. İnternet bağlantınızı kontrol edin."
+        case .tooManyRequests:     return "Çok fazla başarısız deneme. Lütfen daha sonra tekrar deneyin."
+        case .requiresRecentLogin: return "Bu işlem için tekrar giriş yapmanız gerekmektedir."
+        case .invalidCredential:   return "Geçersiz kimlik bilgileri. Lütfen bilgilerinizi kontrol edin."
+        case .operationNotAllowed: return "Bu işlem şu anda kullanılamıyor."
+        default:                   return error.localizedDescription
         }
     }
 }
