@@ -18,11 +18,6 @@ struct DrKursatYilmazDentalClinicApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
-                .onAppear {
-                    Task{
-                        try await sseder.uploadPatients()
-                    }
-                }
                 .environmentObject(navState)
         }
         
