@@ -3,6 +3,13 @@ import SwiftUI
 struct MainTabView: View {
     
     @EnvironmentObject private var navState: AppNavigationState
+    
+    @StateObject private var homeNavState: HomeNavigationState = HomeNavigationState()
+    @StateObject private var profileNavState: ProfileNavigationState = ProfileNavigationState()
+    @StateObject private var doctorsNavState: DoctorsNavigationState = DoctorsNavigationState()
+    @StateObject private var servicesNavState: ServiceNavigationState = ServiceNavigationState()
+    @StateObject private var appointmentNavState: AppointmentNavigationState = AppointmentNavigationState()
+    
     @StateObject private var appointmentViewModel: AppointmentViewModel = AppointmentViewModel()
     
     private let primaryBlue = Color(red: 0.15, green: 0.45, blue: 0.95)
@@ -45,7 +52,13 @@ struct MainTabView: View {
                     }
                     .tag(AppTab.profile)
             }
+            .environmentObject(homeNavState)
+            .environmentObject(doctorsNavState)
+            .environmentObject(profileNavState)
+            .environmentObject(servicesNavState)
+            .environmentObject(appointmentNavState)
             .environmentObject(appointmentViewModel)
         }
     }
+    
 }

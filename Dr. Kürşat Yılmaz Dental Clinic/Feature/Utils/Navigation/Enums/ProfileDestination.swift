@@ -7,6 +7,9 @@
 import Foundation
 
 enum ProfileDestination: Hashable {
+    case auth
+    case login
+    case signup
     // Main tabs
     case appointments
     case treatments

@@ -38,4 +38,12 @@ class AppNavigationState: ObservableObject {
         profileNavPath = NavigationPath()
         profileNavPath.append(destination)
     }
+    
+    func clearAllPath(){
+        homeNavPath = NavigationPath()
+        doctorsNavPath = NavigationPath()
+        profileNavPath = NavigationPath()
+        servicesNavPath = NavigationPath()
+        appointmentsNavPath = NavigationPath()
+    }
 }

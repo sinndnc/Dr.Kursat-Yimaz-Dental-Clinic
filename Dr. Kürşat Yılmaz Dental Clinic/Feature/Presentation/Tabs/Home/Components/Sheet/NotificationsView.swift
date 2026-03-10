@@ -212,8 +212,6 @@ struct NotificationsView: View {
 
                 if vm.isLoading {
                     skeletonView
-                } else if vm.grouped.isEmpty {
-                    emptyStateView
                 } else {
                     contentList
                 }
@@ -251,23 +249,26 @@ struct NotificationsView: View {
                         .padding(.bottom, 10)
                         .transition(.move(edge: .top).combined(with: .opacity))
                 }
-
-                ForEach(vm.grouped, id: \.group) { section in
-                    Section {
-                        ForEach(section.items) { item in
-                            DentalNotificationRow(
-                                item: item,
-                                onTap: { vm.markAsRead(item.id) },
-                                onDelete: { vm.delete(item.id) }
-                            )
-                            .padding(.horizontal, 16)
-                            .padding(.bottom, 8)
+                
+                if vm.grouped.isEmpty {
+                    emptyStateView
+                }else{
+                    ForEach(vm.grouped, id: \.group) { section in
+                        Section {
+                            ForEach(section.items) { item in
+                                DentalNotificationRow(
+                                    item: item,
+                                    onTap: { vm.markAsRead(item.id) },
+                                    onDelete: { vm.delete(item.id) }
+                                )
+                                .padding(.horizontal, 16)
+                                .padding(.bottom, 8)
+                            }
+                        } header: {
+                            groupHeader(section.group.rawValue)
                         }
-                    } header: {
-                        groupHeader(section.group.rawValue)
                     }
                 }
-
                 Spacer(minLength: 40)
             }
         }

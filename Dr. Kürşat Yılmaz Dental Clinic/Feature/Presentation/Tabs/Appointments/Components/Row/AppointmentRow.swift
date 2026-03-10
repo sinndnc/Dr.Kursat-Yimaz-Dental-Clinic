@@ -10,7 +10,7 @@ import SwiftUI
 struct AppointmentRow: View {
     let appointment: Appointment
     @State private var isPressed = false
-
+    
     var body: some View {
         HStack(spacing: 0) {
             ZStack {
@@ -23,7 +23,7 @@ struct AppointmentRow: View {
                         )
                     )
                     .frame(width: 60)
-
+                
                 VStack(spacing: 6) {
                     ZStack {
                         Circle()
@@ -33,11 +33,11 @@ struct AppointmentRow: View {
                             .font(.system(size: 15, weight: .semibold))
                             .foregroundColor(appointment.type.color)
                     }
-
+                    
                     Text(appointment.roomNumber.isEmpty ? "–" : appointment.roomNumber)
                         .font(.system(size: 11, weight: .black, design: .rounded))
                         .foregroundColor(appointment.type.color)
-
+                    
                     Text(appointment.time)
                         .font(.system(size: 9, weight: .semibold))
                         .foregroundColor(Color.kySubtext)
@@ -45,23 +45,20 @@ struct AppointmentRow: View {
             }
             .frame(width: 60)
             .clipped()
-
-            // ── Main content ─────────────────────────────────────────────
+            
             VStack(alignment: .leading, spacing: 6) {
-
-                // Top row: type + status badge
+                
                 HStack(alignment: .center, spacing: 8) {
                     Text(appointment.type.rawValue)
                         .font(.system(size: 14, weight: .bold, design: .serif))
                         .foregroundColor(Color.kyText)
                         .lineLimit(1)
-
+                    
                     Spacer(minLength: 4)
-
+                    
                     StatusBadge(status: appointment.status)
                 }
-
-                // Doctor
+                
                 HStack(spacing: 5) {
                     Image(systemName: "person.fill")
                         .font(.system(size: 9))
@@ -71,16 +68,14 @@ struct AppointmentRow: View {
                         .foregroundColor(Color.kySubtext)
                         .lineLimit(1)
                 }
-
-                // Notes preview
+                
                 if !appointment.notes.isEmpty {
                     Text(appointment.notes)
                         .font(.system(size: 11))
                         .foregroundColor(Color.kySubtext.opacity(0.55))
                         .lineLimit(1)
                 }
-
-                // Bottom: date + duration pill
+                
                 HStack(spacing: 6) {
                     Label(
                         appointment.date.formatted(.dateTime.day().month(.abbreviated).year()),
@@ -136,7 +131,6 @@ struct AppointmentRow: View {
     }
 }
 
-// MARK: - StatusBadge ──────────────────────────────────────────────────────────
 
 private struct StatusBadge: View {
     let status: AppointmentStatus
@@ -157,6 +151,50 @@ private struct StatusBadge: View {
         .overlay(
             Capsule()
                 .strokeBorder(status.color.opacity(0.25), lineWidth: 0.5)
+        )
+        
+    }
+}
+
+
+struct GuestAppointmentRow: View {
+    
+    var body: some View {
+        HStack(spacing: 14) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(Color.kySubtext.opacity(0.08))
+                    .frame(width: 50, height: 50)
+                Image(systemName: "clock.badge.questionmark.fill")
+                    .font(.system(size: 22))
+                    .foregroundColor(.kySubtext.opacity(0.4))
+            }
+            
+            VStack(alignment: .leading, spacing: 3) {
+                Text("YAKLAŞAN RANDEVU")
+                    .font(.kyMono(10, weight: .bold))
+                    .tracking(1.5)
+                    .foregroundColor(.kySubtext.opacity(0.4))
+                Text("Randevunuz yok")
+                    .font(.kySerif(16, weight: .bold))
+                    .foregroundColor(.kySubtext.opacity(0.5))
+                Text("Randevu almak için giriş yapın")
+                    .font(.kySans(12))
+                    .foregroundColor(.kySubtext.opacity(0.4))
+            }
+            
+            Spacer()
+            
+            Image(systemName: "lock.fill")
+                .font(.system(size: 13))
+                .foregroundColor(.kySubtext.opacity(0.25))
+        }
+        .padding(16)
+        .background(Color.kyCard)
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .strokeBorder(Color.kyBorder, lineWidth: 1)
         )
     }
 }

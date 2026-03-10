@@ -346,7 +346,7 @@ struct PrivacyPolicyView: View {
         }
         .navigationBarHidden(true)
     }
-
+    
     @ViewBuilder
     func policySection(title: String, body: String) -> some View {
         KYCard {
@@ -359,6 +359,7 @@ struct PrivacyPolicyView: View {
                     .foregroundColor(.kySubtext)
                     .fixedSize(horizontal: false, vertical: true)
             }
+            .frame(maxWidth: .infinity)
         }
     }
 }

@@ -10,14 +10,14 @@ import SwiftUI
 struct DoctorsView: View {
     
     @Injected private var fs: FirestoreServiceProtocol
-    @EnvironmentObject private var navState: AppNavigationState
+    @EnvironmentObject private var navState: DoctorsNavigationState
     
     @State private var headerAppeared = false
     @State private var showAppointment = false
     @State private var selectedDoctor: Doctor? = nil
     
     var body: some View {
-        NavigationStack(path: $navState.doctorsNavPath){
+        NavigationStack(path: $navState.path){
             ZStack {
                 Color.kyBackground.ignoresSafeArea()
                 

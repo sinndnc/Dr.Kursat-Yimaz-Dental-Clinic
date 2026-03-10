@@ -7,204 +7,327 @@
 
 import SwiftUI
 
+// MARK: - Login View
 struct LoginView: View {
-    @Binding var showLogin: Bool
-    @Injected var authService: AuthServiceProtocol
+    @Environment(\.dismiss) private var dismiss
 
     @State private var email = ""
     @State private var password = ""
     @State private var showPassword = false
-    @State private var showForgotPassword = false
+    @State private var isLoading = false
+    @State private var animateIn = false
+    @State private var shakeOffset: CGFloat = 0
+    @State private var emailFocused = false
+    @State private var passwordFocused = false
     @FocusState private var focusedField: Field?
     
-    private let primaryBlue = Color(red: 0.15, green: 0.45, blue: 0.95)
+    @EnvironmentObject private var auth: AuthViewModel
+    @EnvironmentObject private var appNavState: AppNavigationState
     
     enum Field { case email, password }
     
     var body: some View {
         ZStack {
-            // Background
-            LinearGradient(
-                colors: [Color(red: 0.94, green: 0.97, blue: 1.0), Color.white],
-                startPoint: .top, endPoint: .bottom
-            ).ignoresSafeArea()
+            Color.kyBackground.ignoresSafeArea()
             
+            Circle()
+                .fill(Color.kyAccent.opacity(0.04))
+                .frame(width: 300, height: 300)
+                .blur(radius: 80)
+                .offset(x: 120, y: -160)
+                .ignoresSafeArea()
+
             ScrollView(showsIndicators: false) {
-                VStack(spacing: 0) {
-                    // Logo
-                    logoSection
-                        .padding(.top, 70)
-                        .padding(.bottom, 48)
-                    
+                VStack(alignment: .leading, spacing: 0) {
+
+                    // Header
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Sign In")
+                            .font(.kySerif(36, weight: .semibold))
+                            .foregroundColor(.kyText)
+
+                        Text("Good to have you back.")
+                            .font(.kySans(15))
+                            .foregroundColor(.kySubtext)
+                    }
+                    .padding(.top, 20)
+                    .padding(.bottom, 40)
+                    .opacity(animateIn ? 1 : 0)
+                    .offset(y: animateIn ? 0 : 16)
+
                     // Form
                     VStack(spacing: 16) {
-                        authField(
-                            icon: "envelope.fill",
-                            placeholder: "E-posta",
+                        // Email Field
+                        KyTextField(
+                            label: "Email",
+                            placeholder: "you@example.com",
                             text: $email,
-                            isSecure: false,
-                            field: .email
+                            icon: "envelope",
+                            keyboardType: .emailAddress,
+                            isFocused: focusedField == .email
                         )
-                        
-                        authField(
-                            icon: "lock.fill",
-                            placeholder: "Şifre",
+                        .focused($focusedField, equals: .email)
+                        .submitLabel(.next)
+                        .onSubmit { focusedField = .password }
+
+                        // Password Field
+                        KySecureField(
+                            label: "Password",
+                            placeholder: "••••••••",
                             text: $password,
-                            isSecure: !showPassword,
-                            field: .password,
-                            trailingButton: AnyView(
-                                Button(action: { showPassword.toggle() }) {
-                                    Image(systemName: showPassword ? "eye.slash" : "eye")
-                                        .foregroundColor(.secondary)
-                                }
-                            )
+                            showPassword: $showPassword,
+                            isFocused: focusedField == .password
                         )
-                        
-                        HStack {
-                            Spacer()
-                            Button("Şifremi Unuttum") { showForgotPassword = true }
-                                .font(.system(size: 14, weight: .semibold))
-                                .foregroundColor(primaryBlue)
-                        }
-                        .padding(.top, -4)
+                        .focused($focusedField, equals: .password)
+                        .submitLabel(.done)
+                        .onSubmit { focusedField = nil; handleLogin() }
                     }
-                    .padding(.horizontal, 28)
-                    
-                    // Error
-                    if let error = authService.errorMessage {
-                        HStack(spacing: 8) {
-                            Image(systemName: "exclamationmark.circle.fill")
-                                .foregroundColor(.red)
-                            Text(error)
-                                .font(.system(size: 13))
-                                .foregroundColor(.red)
-                        }
-                        .padding(12)
-                        .background(Color.red.opacity(0.08))
-                        .cornerRadius(10)
-                        .padding(.horizontal, 28)
-                        .padding(.top, 8)
-                        .transition(.opacity.combined(with: .scale(scale: 0.95)))
-                        .animation(.spring(), value: authService.errorMessage)
+                    .opacity(animateIn ? 1 : 0)
+                    .offset(y: animateIn ? 0 : 16)
+                    .offset(x: shakeOffset)
+
+                    // Forgot Password
+                    HStack {
+                        Spacer()
+                        Button("Forgot password?") {}
+                            .font(.kySans(13))
+                            .foregroundColor(.kyAccent)
                     }
-                    
+                    .padding(.top, 12)
+                    .opacity(animateIn ? 1 : 0)
+
+                    Spacer().frame(height: 36)
+
                     // Login Button
-                    Button(action: performLogin) {
+                    Button(action: handleLogin) {
                         ZStack {
-                            if authService.isLoading {
-                                ProgressView().tint(.white)
+                            if isLoading {
+                                ProgressView()
+                                    .tint(Color.kyBackground)
                             } else {
-                                Text("Giriş Yap")
-                                    .font(.system(size: 17, weight: .bold))
-                                    .foregroundColor(.white)
+                                Text("Sign In")
+                                    .font(.kySans(16, weight: .semibold))
+                                    .foregroundColor(.kyBackground)
                             }
                         }
                         .frame(maxWidth: .infinity)
-                        .frame(height: 56)
+                        .padding(.vertical, 17)
                         .background(
-                            LinearGradient(colors: [primaryBlue, Color(red: 0.05, green: 0.25, blue: 0.75)],
-                                           startPoint: .leading, endPoint: .trailing)
+                            LinearGradient(
+                                colors: [Color.kyAccent, Color.kyAccentDark],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
                         )
-                        .cornerRadius(16)
-                        .shadow(color: primaryBlue.opacity(0.4), radius: 12, y: 6)
+                        .cornerRadius(14)
+                        .shadow(color: Color.kyAccent.opacity(0.3), radius: 20, y: 8)
                     }
-                    .disabled(authService.isLoading || email.isEmpty || password.isEmpty)
-                    .opacity(email.isEmpty || password.isEmpty ? 0.6 : 1)
-                    .padding(.horizontal, 28)
-                    .padding(.top, 28)
-                    
-                    // Divider
-                    HStack {
-                        Rectangle().fill(Color.gray.opacity(0.2)).frame(height: 1)
-                        Text("veya")
-                            .font(.system(size: 13))
-                            .foregroundColor(.secondary)
-                            .padding(.horizontal, 12)
-                        Rectangle().fill(Color.gray.opacity(0.2)).frame(height: 1)
-                    }
-                    .padding(.horizontal, 28)
-                    .padding(.vertical, 24)
-                    
-                    // Register
-                    Button(action: { withAnimation { showLogin = false } }) {
-                        HStack(spacing: 4) {
-                            Text("Hesabın yok mu?")
-                                .foregroundColor(.secondary)
-                            Text("Kayıt Ol")
-                                .foregroundColor(primaryBlue)
-                                .fontWeight(.bold)
+                    .disabled(isLoading || !isFormValid)
+                    .opacity(isFormValid ? 1 : 0.5)
+                    .opacity(animateIn ? 1 : 0)
+                    .offset(y: animateIn ? 0 : 20)
+
+                    // Biometric option
+                    Button {
+                        // Face ID / Touch ID action
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "faceid")
+                                .font(.system(size: 16))
+                            Text("Use Face ID")
+                                .font(.kySans(14))
                         }
-                        .font(.system(size: 15))
+                        .foregroundColor(.kySubtext)
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, 16)
                     }
-                    
+                    .opacity(animateIn ? 1 : 0)
+
+                    Spacer().frame(height: 40)
+
+                    // Bottom divider + sign up
+                    VStack(spacing: 16) {
+                        HStack(spacing: 12) {
+                            Rectangle().fill(Color.kyBorder).frame(height: 1)
+                            Text("New here?")
+                                .font(.kySans(12))
+                                .foregroundColor(.kySubtext)
+                                .fixedSize()
+                            Rectangle().fill(Color.kyBorder).frame(height: 1)
+                        }
+
+                        NavigationLink {
+                            SignUpView()
+                        } label: {
+                            Text("Create an account")
+                                .font(.kySans(15, weight: .medium))
+                                .foregroundColor(.kyAccent)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 15)
+                                .background(Color.kyAccent.opacity(0.08))
+                                .cornerRadius(14)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 14)
+                                        .strokeBorder(Color.kyAccent.opacity(0.2), lineWidth: 1)
+                                )
+                        }
+                    }
+                    .opacity(animateIn ? 1 : 0)
+
                     Spacer().frame(height: 40)
                 }
+                .padding(.horizontal, 24)
             }
         }
-        .sheet(isPresented: $showForgotPassword) {
-            ForgotPasswordView()
-        }
-    }
-    
-    func performLogin() {
-        focusedField = nil
-        Task {
-//            try? await authService.login(email: email, password: password)
-        }
-    }
-    
-    var logoSection: some View {
-        VStack(spacing: 16) {
-            ZStack {
-                Circle()
-                    .fill(LinearGradient(colors: [primaryBlue, Color(red: 0.05, green: 0.25, blue: 0.75)],
-                                         startPoint: .topLeading, endPoint: .bottomTrailing))
-                    .frame(width: 88, height: 88)
-                    .shadow(color: primaryBlue.opacity(0.4), radius: 16, y: 8)
-                
-                Text("🦷")
-                    .font(.system(size: 44))
-            }
-            
-            VStack(spacing: 6) {
-                Text("DentCare")
-                    .font(.system(size: 32, weight: .bold, design: .rounded))
-                    .foregroundColor(.primary)
-                Text("Diş Sağlığınız Bizimlé Güvende")
-                    .font(.system(size: 15))
-                    .foregroundColor(.secondary)
-            }
-        }
-    }
-    
-    func authField(icon: String, placeholder: String, text: Binding<String>, isSecure: Bool, field: Field, trailingButton: AnyView? = nil) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: icon)
-                .foregroundColor(primaryBlue)
-                .frame(width: 20)
-            
-            Group {
-                if isSecure {
-                    SecureField(placeholder, text: text)
-                } else {
-                    TextField(placeholder, text: text)
-                        .keyboardType(field == .email ? .emailAddress : .default)
-                        .autocapitalization(.none)
-                        .autocorrectionDisabled()
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button {
+                    dismiss()
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 13, weight: .semibold))
+                        Text("Back")
+                            .font(.kySans(15))
+                    }
+                    .foregroundColor(.kySubtext)
                 }
             }
-            .font(.system(size: 16))
-            .focused($focusedField, equals: field)
-            
-            if let btn = trailingButton { btn }
         }
-        .padding(16)
-        .background(Color.white)
-        .cornerRadius(14)
-        .overlay(
-            RoundedRectangle(cornerRadius: 14)
-                .stroke(focusedField == field ? primaryBlue : Color.gray.opacity(0.15), lineWidth: 1.5)
-        )
-        .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+        .onAppear {
+            withAnimation(.spring(response: 0.75, dampingFraction: 0.8).delay(0.05)) {
+                animateIn = true
+            }
+        }
+    }
+
+    private var isFormValid: Bool {
+        email.contains("@") && password.count >= 6
+    }
+
+    private func handleLogin() {
+        guard isFormValid else {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.3)) {
+                shakeOffset = 10
+            }
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                withAnimation(.spring()) { shakeOffset = 0 }
+            }
+            return
+        }
+        focusedField = nil
+        Task{
+            withAnimation { isLoading = true }
+            await auth.signIn(email: email, password: password)
+            appNavState.clearAllPath()
+            appNavState.navigateToTab(.home)
+            withAnimation { isLoading = false }
+        }
+    }
+    
+    
+}
+
+// MARK: - KyTextField
+struct KyTextField: View {
+    let label: String
+    let placeholder: String
+    @Binding var text: String
+    let icon: String
+    var keyboardType: UIKeyboardType = .default
+    var isFocused: Bool = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(label)
+                .font(.kySans(12, weight: .medium))
+                .foregroundColor(isFocused ? .kyAccent : .kySubtext)
+
+            HStack(spacing: 12) {
+                Image(systemName: icon)
+                    .font(.system(size: 15))
+                    .foregroundColor(isFocused ? .kyAccent : .kySubtext)
+                    .frame(width: 20)
+
+                TextField(placeholder, text: $text)
+                    .font(.kySans(15))
+                    .foregroundColor(.kyText)
+                    .keyboardType(keyboardType)
+                    .autocapitalization(.none)
+                    .autocorrectionDisabled()
+                    .tint(.kyAccent)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 15)
+            .background(Color.kyCard)
+            .cornerRadius(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .strokeBorder(
+                        isFocused ? Color.kyAccent.opacity(0.5) : Color.kyBorder,
+                        lineWidth: isFocused ? 1.5 : 1
+                    )
+            )
+            .animation(.easeInOut(duration: 0.2), value: isFocused)
+        }
+    }
+}
+
+// MARK: - KySecureField
+struct KySecureField: View {
+    let label: String
+    let placeholder: String
+    @Binding var text: String
+    @Binding var showPassword: Bool
+    var isFocused: Bool = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(label)
+                .font(.kySans(12, weight: .medium))
+                .foregroundColor(isFocused ? .kyAccent : .kySubtext)
+
+            HStack(spacing: 12) {
+                Image(systemName: "lock")
+                    .font(.system(size: 15))
+                    .foregroundColor(isFocused ? .kyAccent : .kySubtext)
+                    .frame(width: 20)
+
+                Group {
+                    if showPassword {
+                        TextField(placeholder, text: $text)
+                    } else {
+                        SecureField(placeholder, text: $text)
+                    }
+                }
+                .font(.kySans(15))
+                .foregroundColor(.kyText)
+                .tint(.kyAccent)
+
+                Button {
+                    withAnimation(.easeInOut(duration: 0.15)) {
+                        showPassword.toggle()
+                    }
+                } label: {
+                    Image(systemName: showPassword ? "eye.slash" : "eye")
+                        .font(.system(size: 15))
+                        .foregroundColor(.kySubtext)
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 15)
+            .background(Color.kyCard)
+            .cornerRadius(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .strokeBorder(
+                        isFocused ? Color.kyAccent.opacity(0.5) : Color.kyBorder,
+                        lineWidth: isFocused ? 1.5 : 1
+                    )
+            )
+            .animation(.easeInOut(duration: 0.2), value: isFocused)
+        }
     }
 }

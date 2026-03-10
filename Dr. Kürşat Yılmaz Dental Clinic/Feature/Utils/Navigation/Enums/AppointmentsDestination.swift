@@ -7,9 +7,12 @@
 
 
 enum AppointmentsDestination: Hashable {
+    case auth
+    case login
+    case signup
     case newAppointment
-    case appointmentDetail(id: String)
-    case appointmentEdit(id: String)
     case doctorSelection
-    case dateTimePicker(appointmentId: String)
+    case dateTimePicker(apt: Appointment)
+    case appointmentEdit(apt: Appointment)
+    case appointmentDetail(apt: Appointment)
 }

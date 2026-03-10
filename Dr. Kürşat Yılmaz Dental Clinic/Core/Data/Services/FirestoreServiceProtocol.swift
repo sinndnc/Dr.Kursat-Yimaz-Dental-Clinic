@@ -24,7 +24,10 @@ protocol FirestoreServiceProtocol: AnyObject {
     var appointmentsPublisher: AnyPublisher<[Appointment], Never> { get }
     
     func removeAllListeners()
+    func removeAuthenticatedListeners()
+    func startPublicListeners(clinicId: String?)
     func startListeners(patientId: String?, clinicId: String?)
+    func startAuthenticatedListeners(patientId: String, clinicId: String?)
     
     func listenToAppointments(
         clinicId:  String?,

@@ -14,7 +14,9 @@ struct HomeView: View {
     
     @Injected private var fs: FirestoreServiceProtocol
     
-    @EnvironmentObject private var navState: AppNavigationState
+    @StateObject private var vm = AuthViewModel()
+    @EnvironmentObject private var navState: HomeNavigationState
+    @EnvironmentObject private var AppNavState: AppNavigationState
     @EnvironmentObject private var appointmentViewModel: AppointmentViewModel
     
     @State private var heroScale: CGFloat = 0.97
@@ -22,11 +24,7 @@ struct HomeView: View {
     @State private var currentTestimonialIndex = 0
     
     @State private var showMap: Bool = false
-    @State private var showClinicVideo: Bool = false
-    @State private var showNotifications: Bool = false
-    @State private var showNewAppointment: Bool = false
     @State private var showAppointmentBadge: Bool = true
-    @State private var selectedAppointment: Appointment? = nil
     
     let phoneNumber = "905366360880"
     let destinationName = "Dr. Kürşat Yılmaz"
@@ -34,14 +32,15 @@ struct HomeView: View {
     let destinationCoordinate = CLLocationCoordinate2D(latitude: 41.085185, longitude: 29.027958)
    
     var body: some View {
-        NavigationStack(path: $navState.homeNavPath) {
+        NavigationStack(path: $navState.path) {
             ZStack(alignment: .top) {
                 Color.kyBackground.ignoresSafeArea()
-                
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 0) {
                         heroSection
-                        appointmentCardSection
+                        if vm.authState == .authenticated {
+                            appointmentCardSection
+                        }
                         featuredServicesSection
                         statsSection
                         technologySection
@@ -51,23 +50,18 @@ struct HomeView: View {
                 }
                 .ignoresSafeArea()
             }
-            .onAppear {
-                withAnimation(.easeOut(duration: 0.8)) {
-                    greetingOpacity = 1
-                    heroScale = 1.0
+            .onAppear { withAnimation(.easeOut(duration: 0.8)) { greetingOpacity = 1 ; heroScale = 1.0 } }
+            .navigationDestination(for: HomeDestination.self) { route in
+                switch route{
+                case .newAppointment:
+                    BookingView()
+                case .clinicVideo:
+                    VideoPlayerView()
+                case .notifications:
+                    NotificationsView()
+                case .appointmentDetail(let apt):
+                    AppointmentDetailView(appointment: apt)
                 }
-            }
-            .sheet(isPresented: $showNotifications){
-                NotificationsView()
-            }
-            .sheet(isPresented: $showNewAppointment){
-                BookingView()
-            }
-            .fullScreenCover(isPresented: $showClinicVideo){
-                VideoPlayerView()
-            }
-            .sheet(item: $selectedAppointment) { appointment in
-                AppointmentDetailView(appointment: appointment)
             }
         }
         .ignoresSafeArea()
@@ -108,7 +102,7 @@ struct HomeView: View {
                     
                     //                     Notification bell
                     ZStack(alignment: .topTrailing) {
-                        Button { showNotifications.toggle() } label: {
+                        Button { navState.navigate(to: .notifications) } label: {
                             Image(systemName: "bell.fill")
                                 .font(.system(size: 16, weight: .medium))
                                 .foregroundColor(Color.kySubtext)
@@ -146,7 +140,7 @@ struct HomeView: View {
                     
                     // CTA Row
                     HStack(spacing: 12) {
-                        Button { showNewAppointment.toggle() } label: {
+                        Button { navState.navigate(to: .newAppointment) } label: {
                             HStack(spacing: 8) {
                                 Text("Randevu Al")
                                     .font(.system(size: 14, weight: .bold))
@@ -167,7 +161,7 @@ struct HomeView: View {
                         }
                         
                         Button {
-                            showClinicVideo.toggle()
+                            navState.navigate(to: .clinicVideo)
                         } label: {
                             HStack(spacing: 6) {
                                 Image(systemName: "play.circle.fill")
@@ -196,19 +190,20 @@ struct HomeView: View {
     private var appointmentCardSection: some View {
         VStack(alignment: .leading, spacing: 14) {
             sectionHeader(title: "Yaklaşan Randevu", subtitle: "Takvimde görüntüle →"){
-                navState.navigateToTab(.appointments)
+                AppNavState.navigateToTab(.appointments)
             }
             
-            if let appointment = fs.appointments.next{
+            if let appointment = fs.appointments.next {
                 Button {
-                    selectedAppointment = appointment
+                    navState.navigate(to: .appointmentDetail(apt: appointment))
                 } label: {
                     AppointmentCard(appointment: appointment)
                         .padding(.horizontal, 20)
                 }
             }else{
-                
+                EmptyView()
             }
+            
         }
         .padding(.top, 32)
     }
@@ -218,14 +213,14 @@ struct HomeView: View {
     private var featuredServicesSection: some View {
         VStack(alignment: .leading, spacing: 14) {
             sectionHeader(title: "Öne Çıkan Tedaviler", subtitle: "Tümünü gör →"){
-                navState.navigateToTab(.services)
+                AppNavState.navigateToTab(.services)
             }
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
                     ForEach(fs.services, id: \.self) { service in
                         Button {
-                            navState.navigateToService(service: service)
+                            AppNavState.navigateToService(service: service)
                         } label: {
                             FeaturedServicePill(
                                 name: service.title,

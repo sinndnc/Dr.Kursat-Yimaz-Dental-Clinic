@@ -7,8 +7,7 @@
 
 enum HomeDestination: Hashable {
     case notifications
-    case notificationDetail(id: String)
-    case campaigns
-    case campaignDetail(id: String)
-    case healthSummary
+    case newAppointment
+    case appointmentDetail(apt: Appointment)
+    case clinicVideo
 }

@@ -26,30 +26,45 @@ final class FirestoreService: FirestoreServiceProtocol {
     @Published private(set) var services: [Service] = []
     @Published private(set) var appointments: [Appointment] = []
     
-    var doctorsStatePublisher: AnyPublisher<[Doctor], Never> { $doctors.eraseToAnyPublisher() }
     var clinicsPublisher: AnyPublisher<[Clinic], Never> { $clinics.eraseToAnyPublisher() }
     var servicesPublisher: AnyPublisher<[Service], Never> { $services.eraseToAnyPublisher() }
+    var doctorsStatePublisher: AnyPublisher<[Doctor], Never> { $doctors.eraseToAnyPublisher() }
     var appointmentsPublisher: AnyPublisher<[Appointment], Never> { $appointments.eraseToAnyPublisher() }
     
     private let db: Firestore
-    private var listeners: [ListenerRegistration] = []
+    private var publicListeners: [ListenerRegistration] = []
+    private var authenticatedListeners: [ListenerRegistration] = []
     
     init(firestore: Firestore) {
         self.db = firestore
     }
     
-    func removeAllListeners() {
-        listeners.forEach { $0.remove() }
-        listeners.removeAll()
+    func removeAuthenticatedListeners() {
+        authenticatedListeners.forEach { $0.remove() }
+        authenticatedListeners.removeAll()
     }
     
-    func startListeners(patientId: String?, clinicId: String?) {
+    func removeAllListeners() {
+        publicListeners.forEach { $0.remove() }
+        authenticatedListeners.forEach { $0.remove() }
+        publicListeners.removeAll()
+        authenticatedListeners.removeAll()
+    }
+    
+    func startPublicListeners(clinicId: String? = nil) {
         listenToClinics()
         listenToServices()
         listenToDoctors(clinicId: clinicId)
-        
+    }
+    
+    func startAuthenticatedListeners(patientId: String, clinicId: String? = nil) {
+        listenToAppointments(clinicId: clinicId, patientId: patientId)
+    }
+    
+    func startListeners(patientId: String?, clinicId: String?) {
+        startPublicListeners(clinicId: clinicId)
         if let patientId {
-            listenToAppointments(clinicId: clinicId, patientId: patientId)
+            startAuthenticatedListeners(patientId: patientId, clinicId: clinicId)
         }
     }
     
@@ -66,7 +81,7 @@ final class FirestoreService: FirestoreServiceProtocol {
             .addSnapshotListener { [weak self] snapshot, error in
                 self?.handleSnapshot(snapshot: snapshot, error: error) { self?.doctors = $0 }
             }
-        listeners.append(listener)
+        publicListeners.append(listener)
     }
     
     private func listenToClinics() {
@@ -76,7 +91,7 @@ final class FirestoreService: FirestoreServiceProtocol {
             .addSnapshotListener { [weak self] snapshot, error in
                 self?.handleSnapshot(snapshot: snapshot, error: error) { self?.clinics = $0 }
             }
-        listeners.append(listener)
+        publicListeners.append(listener)
     }
     
     private func listenToServices() {
@@ -86,7 +101,7 @@ final class FirestoreService: FirestoreServiceProtocol {
             .addSnapshotListener { [weak self] snapshot, error in
                 self?.handleSnapshot(snapshot: snapshot, error: error) { self?.services = $0 }
             }
-        listeners.append(listener)
+        publicListeners.append(listener)
     }
     
     func listenToAppointments(
@@ -105,7 +120,7 @@ final class FirestoreService: FirestoreServiceProtocol {
             .addSnapshotListener { [weak self] snapshot, error in
                 self?.handleSnapshot(snapshot: snapshot, error: error) { self?.appointments = $0 }
             }
-        listeners.append(listener)
+        authenticatedListeners.append(listener)
     }
     
     func fetchPatient(id: String)     async throws -> Patient     { try await fetchDocument(collection: FSCollection.patients,     id: id) }

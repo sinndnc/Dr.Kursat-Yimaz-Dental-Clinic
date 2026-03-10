@@ -11,34 +11,54 @@ import Combine
 @MainActor
 final class AuthViewModel: ObservableObject {
     
-    @Published private(set) var isLoading: Bool = false
-    @Published private(set) var authState: AuthState = .loading
-    @Published private(set) var errorMessage: String? = nil
-    @Published private(set) var currentPatient: Patient? = nil
+    @Published private(set) var isLoading:      Bool      = false
+    @Published private(set) var authState:      AuthState = .loading
+    @Published private(set) var errorMessage:   String?   = nil
+    @Published private(set) var currentPatient: Patient?  = nil
     
-    @Injected private var authService: AuthServiceProtocol
+    @Injected private var authService:      AuthServiceProtocol
     @Injected private var firestoreService: FirestoreServiceProtocol
     
-    private var cancellables = Set<AnyCancellable>()
+    private var cancellables         = Set<AnyCancellable>()
+    private var publicListenersStarted = false
     
     init() {
+        startPublicListenersOnce()
         bindToAuthService()
     }
+    
+    private func startPublicListenersOnce() {
+        guard !publicListenersStarted else { return }
+        publicListenersStarted = true
+        firestoreService.startPublicListeners(
+            clinicId: "A1B2C3D4-E5F6-7890-ABCD-EF1234567890"
+        )
+    }
+    
+    // MARK: - Auth Binding
     
     private func bindToAuthService() {
         authService.authStatePublisher
             .receive(on: DispatchQueue.main)
-            .sink { state in
+            .sink { [weak self] state in
+                guard let self else { return }
+                self.authState = state
+                
                 switch state {
-                case .loading,.registrationPending,.unauthenticated:
-                    self.authState = state
                 case .authenticated:
-                    self.authState = state
-                    self.firestoreService
-                        .startListeners(
-                            patientId: self.authService.currentUID,
-                            clinicId: "A1B2C3D4-E5F6-7890-ABCD-EF1234567890"
-                        )
+                    // ✅ Sadece appointments gibi kullanıcıya özel dinleyiciler başlar
+                    self.firestoreService.startAuthenticatedListeners(
+                        patientId: self.authService.currentUID ?? "",
+                        clinicId:  "A1B2C3D4-E5F6-7890-ABCD-EF1234567890"
+                    )
+                    
+                case .unauthenticated:
+                    // ✅ Kullanıcı çıkınca sadece authenticated listeners temizlenir
+                    // Clinics/Services/Doctors dinlemeye devam eder
+                    self.firestoreService.removeAuthenticatedListeners()
+                    
+                case .loading, .registrationPending:
+                    break
                 }
             }
             .store(in: &cancellables)
@@ -70,9 +90,9 @@ final class AuthViewModel: ObservableObject {
         password:  String,
         firstName: String,
         lastName:  String,
-        phone:     String?         = nil,
-        birthDate: Date?           = nil,
-        gender: Gender? = nil
+        phone:     String? = nil,
+        birthDate: Date?   = nil,
+        gender:    Gender? = nil
     ) async {
         do {
             try await authService.register(

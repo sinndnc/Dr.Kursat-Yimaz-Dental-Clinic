@@ -88,10 +88,12 @@ struct ProfileNavItem: View {
 // MARK: - ProfileView
 
 struct ProfileView: View {
-    @StateObject private var vm = ProfileViewModel()
-    @StateObject private var navState = ProfileNavigationState()
+    
     @State private var appeared = false
-
+    
+    @StateObject private var vm = ProfileViewModel()
+    @EnvironmentObject private var navState: ProfileNavigationState
+    
     var body: some View {
         NavigationStack(path: $navState.path) {
             ZStack {
@@ -107,25 +109,19 @@ struct ProfileView: View {
                                 .padding(.top, 28)
                             footerNote(patient: patient)
                                 .padding(.top, 32)
-                                .padding(.bottom, 60)
                         }
                     }
                     .ignoresSafeArea(edges: .top)
                 }else{
-                    EmptyProfileView()
+                    GuestProfileView()
                 }
             }
-            .onAppear {
-                withAnimation(.spring(response: 0.65, dampingFraction: 0.82)) {
-                    appeared = true
-                }
-            }
+            .onAppear { withAnimation(.spring(response: 0.65, dampingFraction: 0.82)) { appeared = true } }
             .navigationDestination(for: ProfileDestination.self) { route in
                 destinationView(for: route)
             }
         }
         .environmentObject(vm)
-        .environmentObject(navState)
     }
     
     @ViewBuilder
@@ -230,9 +226,7 @@ struct ProfileView: View {
                 
                 
                 // Çıkış
-                Button {
-                    // logout action
-                } label: {
+                Button { vm.signOut() } label: {
                     HStack(spacing: 14) {
                         ZStack {
                             RoundedRectangle(cornerRadius: 10, style: .continuous)
@@ -540,66 +534,12 @@ struct ProfileView: View {
             PrivacyPolicyView()
         case .helpSupport:
             HelpSupportView()
-        }
-    }
-}
-
-struct EmptyProfileView: View {
-    
-    @State private var showLogin = false
-    
-    var body: some View {
-        VStack(spacing: 28) {
-            
-            Spacer()
-            
-            Image(systemName: "person.crop.circle.badge.exclamationmark")
-                .font(.system(size: 70))
-                .foregroundStyle(.blue)
-            
-            VStack(spacing: 10) {
-                Text("No Account Found")
-                    .font(.title2.bold())
-                
-                Text("Sign in to access your profile, appointments and personal settings.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
-            }
-            
-            VStack(spacing: 12) {
-                
-                Button {
-                    showLogin = true
-                } label: {
-                    Text("Sign In")
-                        .fontWeight(.semibold)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(.blue)
-                        .foregroundStyle(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
-                }
-                
-                Button {
-                    
-                } label: {
-                    Text("Create Account")
-                        .fontWeight(.semibold)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(.gray.opacity(0.12))
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
-                }
-            }
-            .padding(.horizontal, 32)
-            
-            Spacer()
-        }
-        .padding()
-        .sheet(isPresented: $showLogin) {
-            LoginView(showLogin: .constant(true))
+        case .auth:
+            AuthSelectionView()
+        case .login:
+            LoginView()
+        case .signup:
+            SignUpView()
         }
     }
 }

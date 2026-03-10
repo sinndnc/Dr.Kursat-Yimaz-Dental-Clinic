@@ -9,72 +9,105 @@ import SwiftUI
 
 struct DoctorCard: View {
     let doctor: Doctor
+    @State private var isPressed = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             
-            // Top row
-            HStack(spacing: 14) {
-                // Avatar
+            HStack(alignment: .top, spacing: 14) {
+                
                 ZStack {
                     Circle()
-                        .fill(Color.kyBackground)
-                        .strokeBorder(.gray.opacity(0.3), lineWidth: 2)
-                        .frame(width: 62, height: 62)
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    doctor.accentColor.opacity(0.85),
+                                    doctor.accentColor.opacity(0.40)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 58, height: 58)
+                    
                     Text(doctor.avatarInitials)
-                        .font(.system(size: 22, weight: .bold))
+                        .font(.system(size: 20, weight: .bold, design: .rounded))
                         .foregroundColor(.white)
                 }
+                .overlay(
+                    Circle()
+                        .strokeBorder(doctor.accentColor.opacity(0.30), lineWidth: 1.5)
+                )
                 
                 VStack(alignment: .leading, spacing: 3) {
                     Text(doctor.name)
-                        .font(.system(size: 16, weight: .bold, design: .serif))
+                        .font(.system(size: 15, weight: .bold, design: .serif))
                         .foregroundColor(Color.kyText)
-                    HStack{
+                        .lineLimit(1)
+                    
+                    HStack(spacing: 6) {
                         Text(doctor.title)
-                            .font(.system(size: 11, weight: .semibold))
-                        //                        .foregroundColor(doctor.color)
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundColor(.white)
+                        
+                        Circle()
+                            .fill(Color.kyBorder)
+                            .frame(width: 3, height: 3)
+                        
                         Text(doctor.specialty)
-                            .font(.system(size: 12))
+                            .font(.system(size: 10))
                             .foregroundColor(Color.kySubtext)
+                    }
+                    
+                    // Languages
+                    if !doctor.languages.isEmpty {
+                        HStack(spacing: 4) {
+                            ForEach(doctor.languages.prefix(3), id: \.self) { lang in
+                                Text(lang)
+                                    .font(.system(size: 8, weight: .semibold))
+                                    .foregroundColor(Color.kySubtext)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2.5)
+                                    .background(Color.kySurface)
+                                    .clipShape(Capsule())
+                            }
+                        }
+                        .padding(.top, 4)
                     }
                 }
                 Spacer()
-                
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundColor(Color.kySubtext.opacity(0.4))
             }
             
-            // Tagline
-            Text("\(doctor.tagline)")
+            Text(doctor.tagline)
                 .font(.system(size: 12, weight: .regular, design: .serif))
                 .foregroundColor(Color.kySubtext)
-                .lineSpacing(3)
+                .lineSpacing(4)
+                .lineLimit(2)
                 .padding(.top, 12)
             
-            // Divider
-            Rectangle()
-                .fill(Color.kyBorder)
-                .frame(height: 1)
-                .padding(.vertical, 14)
-            
-            // Stats
             HStack(spacing: 0) {
-//                DoctorStat(value: doctor.experience,       label: "Deneyim",    color: doctor.color)
-//                Divider().frame(height: 30).background(Color.kyBorder)
-//                DoctorStat(value: doctor.patientCount,    label: "Hasta",       color: doctor.color)
-//                Divider().frame(height: 30).background(Color.kyBorder)
-//                DoctorStat(value: doctor.satisfactionRate, label: "Memnuniyet", color: doctor.color)
+                CardStat(value: doctor.experience,label: "Deneyim")
+                CardStatDivider()
+                CardStat(value: doctor.patientCount,label: "Hasta")
+                CardStatDivider()
+                CardStat(value: doctor.satisfactionRate, label: "Memnuniyet")
             }
+            .padding(.vertical, 12)
+            .padding(.horizontal, 10)
+            .background(Color.kySurface)
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .strokeBorder(Color.kyBorder, lineWidth: 1)
+            )
+            .padding(.top, 14)
             
-            // Expertise pills
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 6) {
-                    ForEach(doctor.expertise.prefix(4)) { exp in
+                    ForEach(doctor.expertise.prefix(5)) { exp in
                         HStack(spacing: 4) {
                             Image(systemName: exp.icon)
-                                .font(.system(size: 9, weight: .semibold))
+                                .font(.system(size: 8, weight: .bold))
                             Text(exp.title)
                                 .font(.system(size: 10, weight: .semibold))
                         }
@@ -83,38 +116,99 @@ struct DoctorCard: View {
                         .padding(.vertical, 5)
                         .background(exp.color.opacity(0.10))
                         .clipShape(Capsule())
+                        .overlay(
+                            Capsule()
+                                .strokeBorder(exp.color.opacity(0.20), lineWidth: 0.5)
+                        )
                     }
                 }
+                .padding(.horizontal, 1)
             }
             .padding(.top, 12)
             
-            // Available days
-            HStack(spacing: 6) {
+            HStack(spacing: 5) {
                 Image(systemName: "calendar")
                     .font(.system(size: 10))
                     .foregroundColor(Color.kySubtext)
-                HStack(spacing: 4) {
-                    let days: [String] = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt"]
-                    ForEach(days, id: \.self) { day in
-                        Text(day)
-                            .font(.system(size: 9, weight: .bold))
-//                            .foregroundColor(true ? doctor.color : Color.kySubtext.opacity(0.3))
-                            .frame(width: 28)
-                            .padding(.vertical, 4)
-//                            .background(true ? doctor.color.opacity(0.10) : Color.clear)
-                            .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
-                    }
+                
+                let allDays = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt"]
+                ForEach(allDays, id: \.self) { day in
+                    let isAvailable = doctor.availableDays.contains(where: {
+                        $0.lowercased().hasPrefix(day.lowercased().prefix(3))
+                    })
+                    Text(day)
+                        .font(.system(size: 8.5, weight: isAvailable ? .bold : .medium))
+                        .foregroundColor(isAvailable ? Color.white : Color.kySubtext.opacity(0.25))
+                        .frame(width: 26)
+                        .padding(.vertical, 4)
+                        .background(
+                            isAvailable ? Color.white.opacity(0.1): Color.clear
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 5, style: .continuous)
+                                .strokeBorder(
+                                    isAvailable
+                                    ? Color.white.opacity(0.2)
+                                    : Color.kyBorder.opacity(0.5),
+                                    lineWidth: 0.5
+                                )
+                        )
                 }
             }
             .padding(.top, 10)
         }
-        .padding(18)
-        .background(Color.kyCard)
-        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .padding(16)
+        .background(
+            ZStack(alignment: .topTrailing) {
+                Color.kyCard
+
+                // Subtle accent glow top-right
+                Circle()
+                    .fill(doctor.accentColor.opacity(0.04))
+                    .frame(width: 120, height: 120)
+                    .offset(x: 30, y: -30)
+                    .blur(radius: 30)
+            }
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .strokeBorder(Color.kyBorder, lineWidth: 1)
         )
-        .buttonStyle(ScaleButtonStyle())
+        .scaleEffect(isPressed ? 0.97 : 1.0)
+        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isPressed)
+        .onLongPressGesture(
+            minimumDuration: .infinity,
+            pressing: { pressing in isPressed = pressing },
+            perform: {}
+        )
+    }
+}
+
+// MARK: - Subviews
+
+private struct CardStat: View {
+    let value: String
+    let label: String
+    
+    var body: some View {
+        VStack(spacing: 2) {
+            Text(value)
+                .font(.system(size: 14, weight: .bold, design: .rounded))
+                .foregroundColor(.white)
+            Text(label)
+                .font(.system(size: 9, weight: .medium))
+                .foregroundColor(Color.kySubtext)
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
+
+private struct CardStatDivider: View {
+    var body: some View {
+        Rectangle()
+            .fill(Color.kyBorder)
+            .frame(width: 1, height: 28)
     }
 }

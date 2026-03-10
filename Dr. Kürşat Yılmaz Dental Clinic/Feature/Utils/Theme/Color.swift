@@ -20,7 +20,6 @@ extension Color {
     static let kyPurple = Color(red: 0.60, green: 0.40, blue: 0.80)
 }
 
-// MARK: - Typography
 
 extension Font {
     static func kySerif(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {

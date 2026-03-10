@@ -9,14 +9,14 @@ import SwiftUI
 
 struct EducationRow: View {
     let edu: DoctorEducation
-    let accentColor: Color
     let isLast: Bool
-
+    
     var body: some View {
         HStack(alignment: .top, spacing: 14) {
+            
             VStack(spacing: 0) {
                 Circle()
-                    .fill(accentColor)
+                    .fill(.white)
                     .frame(width: 8, height: 8)
                     .padding(.top, 5)
                 if !isLast {
@@ -24,26 +24,26 @@ struct EducationRow: View {
                         .fill(Color.kyBorder)
                         .frame(width: 1)
                         .frame(maxHeight: .infinity)
-                        .padding(.top, 4)
                 }
             }
             .frame(width: 8)
-
+            
             VStack(alignment: .leading, spacing: 3) {
-                HStack {
-                    Text(edu.degree)
-                        .font(.system(size: 13, weight: .bold))
-                        .foregroundColor(Color.kyText)
-                    Spacer()
-                    Text(edu.year)
-                        .font(.system(size: 11, weight: .semibold, design: .monospaced))
-                        .foregroundColor(accentColor)
-                }
+                Text(edu.degree)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundColor(Color.kyText)
                 Text(edu.institution)
                     .font(.system(size: 12))
                     .foregroundColor(Color.kySubtext)
+                Text(edu.year)
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundColor(.white.opacity(0.7))
+                    .padding(.top, 1)
             }
             .padding(.bottom, isLast ? 0 : 16)
+            
+            Spacer()
+            
         }
     }
 }

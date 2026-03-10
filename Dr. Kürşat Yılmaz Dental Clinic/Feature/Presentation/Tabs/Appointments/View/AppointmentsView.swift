@@ -13,19 +13,17 @@ enum AppointmentFilter: String, CaseIterable {
 
 
 struct AppointmentsView: View {
-
-    @Namespace private var filterNamespace
-
+    
     @Injected private var fs: FirestoreServiceProtocol
-    @EnvironmentObject private var navState: AppNavigationState
+    
+    @Namespace private var filterNamespace
+    @EnvironmentObject private var vm: AuthViewModel
+    @EnvironmentObject private var navState: AppointmentNavigationState
     
     @State private var selectedFilter: AppointmentFilter = .all
-    @State private var selectedAppointment: Appointment? = nil
-    @State private var showNewAppointment = false
-    @State private var headerAppeared = false
     
-    // Calendar states
     @State private var showCalendar = false
+    @State private var headerAppeared = false
     @State private var currentMonth: Date = Date()
     @State private var selectedCalendarDate: Date? = nil
     
@@ -66,15 +64,13 @@ struct AppointmentsView: View {
     
     // MARK: - Body
     var body: some View {
-        NavigationStack(path: $navState.appointmentsNavPath) {
+        NavigationStack(path: $navState.path) {
             ZStack(alignment: .bottomTrailing) {
                 Color.kyBackground.ignoresSafeArea()
-                
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 0) {
                         headerSection
                         
-                        // Search Bar (animated)
                         if showSearch {
                             searchBar
                                 .padding(.top, 16)
@@ -82,18 +78,18 @@ struct AppointmentsView: View {
                                 .transition(.move(edge: .top).combined(with: .opacity))
                         }
                         
-                        // Calendar Toggle & Calendar
-                        calendarToggleBar
-                            .padding(.top, 20)
-                        if showCalendar {
-                            calendarSection
-                                .transition(.move(edge: .top).combined(with: .opacity))
+                        if vm.authState == .authenticated {
+                            calendarToggleBar
+                                .padding(.top, 20)
+                            if showCalendar {
+                                calendarSection
+                                    .transition(.move(edge: .top).combined(with: .opacity))
+                            }
+                            
+                            filterBar
+                                .padding(.top, 24)
                         }
                         
-                        filterBar
-                            .padding(.top, 24)
-                        
-                        // Active date filter chip
                         if let date = selectedCalendarDate {
                             activeDateChip(date: date)
                                 .padding(.top, 10)
@@ -107,25 +103,33 @@ struct AppointmentsView: View {
                     }
                 }
                 .ignoresSafeArea()
-
-                fabButton
-                    .padding(.trailing, 24)
-                    .padding(.bottom, 32)
+                
+                if vm.authState == .authenticated {
+                    fabButton
+                        .padding(.trailing, 24)
+                        .padding(.bottom, 32)
+                }
             }
-            .sheet(item: $selectedAppointment) { appt in
-                AppointmentDetailView(appointment: appt)
-            }
-            .sheet(isPresented: $showNewAppointment) {
-                BookingView()
-            }
-            .onAppear {
-                withAnimation(.easeOut(duration: 0.7)) { headerAppeared = true }
+            .onAppear { withAnimation(.easeOut(duration: 0.7)) { headerAppeared = true } }
+            .navigationDestination(for: AppointmentsDestination.self){ route in
+                switch route {
+                case .auth:
+                    AuthSelectionView()
+                case .login:
+                    LoginView()
+                case .signup:
+                    SignUpView()
+                case .appointmentDetail(let apt):
+                    AppointmentDetailView(appointment: apt)
+                case .newAppointment:
+                    BookingView()
+                default:
+                    EmptyView()
+                }
             }
         }
     }
-
-    // MARK: - Header
-
+    
     private var headerSection: some View {
         ZStack(alignment: .bottomLeading) {
             ZStack {
@@ -319,9 +323,7 @@ struct AppointmentsView: View {
         .padding(.horizontal, 20)
         .padding(.top, 10)
     }
-
-    // MARK: - Active Date Chip
-
+    
     private func activeDateChip(date: Date) -> some View {
         HStack(spacing: 6) {
             Image(systemName: "calendar")
@@ -353,9 +355,7 @@ struct AppointmentsView: View {
                 .strokeBorder(Color.kyAccent.opacity(0.3), lineWidth: 1)
         )
     }
-
-    // MARK: - Filter Bar
-
+    
     private var filterBar: some View {
         HStack(spacing: 8) {
             ForEach(AppointmentFilter.allCases, id: \.self.rawValue) { filter in
@@ -371,22 +371,25 @@ struct AppointmentsView: View {
         }
         .padding(.horizontal, 20)
     }
-
-    // MARK: - Appointments List
-
+    
     private var appointmentsList: some View {
         LazyVStack(spacing: 14) {
-            if filteredAppointments.isEmpty {
-                emptyState
-            } else {
-                ForEach(filteredAppointments) { appt in
-                    AppointmentRow(appointment: appt)
-                        .onTapGesture { selectedAppointment = appt }
-                        .transition(.asymmetric(
-                            insertion: .move(edge: .bottom).combined(with: .opacity),
-                            removal: .opacity
-                        ))
+            Divider()
+            if vm.authState == .authenticated{
+                if filteredAppointments.isEmpty {
+                    emptyState
+                } else {
+                    ForEach(filteredAppointments) { appt in
+                        AppointmentRow(appointment: appt)
+                            .onTapGesture { navState.navigate(to: .appointmentDetail(apt: appt)) }
+                            .transition(.asymmetric(
+                                insertion: .move(edge: .bottom).combined(with: .opacity),
+                                removal: .opacity
+                            ))
+                    }
                 }
+            }else{
+                notLoggedInState
             }
         }
         .padding(.horizontal, 20)
@@ -394,9 +397,7 @@ struct AppointmentsView: View {
         .animation(.spring(response: 0.42, dampingFraction: 0.82), value: selectedCalendarDate)
         .animation(.spring(response: 0.42, dampingFraction: 0.82), value: searchText)
     }
-
-    // MARK: - Empty State
-
+    
     private var emptyState: some View {
         VStack(spacing: 14) {
             ZStack {
@@ -420,11 +421,44 @@ struct AppointmentsView: View {
         .frame(maxWidth: .infinity)
         .padding(.vertical, 48)
     }
-
-    // MARK: - FAB
-
+    
+    private var notLoggedInState: some View {
+        VStack(spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(Color.kyCard)
+                    .frame(width: 72, height: 72)
+                Image(systemName: "person.crop.circle.badge.exclamationmark")
+                    .font(.system(size: 28))
+                    .foregroundColor(Color.kySubtext)
+            }
+            Text("Giriş yapılmadı")
+                .font(.system(size: 16, weight: .semibold, design: .serif))
+                .foregroundColor(Color.kyText)
+            Text("Randevularınızı görüntülemek için\nlütfen giriş yapın.")
+                .font(.system(size: 13))
+                .foregroundColor(Color.kySubtext)
+                .multilineTextAlignment(.center)
+            
+            Button(action: {
+                navState.navigate(to: .auth)
+            }) {
+                Text("Giriş Yap")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 32)
+                    .padding(.vertical, 10)
+                    .background(Color.kySubtext)
+                    .clipShape(Capsule())
+            }
+            .padding(.top, 4)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 48)
+    }
+    
     private var fabButton: some View {
-        Button { showNewAppointment = true } label: {
+        Button{ navState.navigate(to: .newAppointment) } label: {
             HStack(spacing: 8) {
                 Image(systemName: "plus")
                     .font(.system(size: 15, weight: .bold))

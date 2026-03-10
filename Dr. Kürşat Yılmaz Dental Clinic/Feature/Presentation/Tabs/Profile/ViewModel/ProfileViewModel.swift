@@ -45,6 +45,14 @@ class ProfileViewModel: ObservableObject {
             .assign(to: &$patient)
     }
     
+    func signOut(){
+        do {
+            try auth.signOut()
+        } catch(let error) {
+            Logger.log("\(error)")
+        }
+    }
+    
     var totalDebt: Double {
         payments.filter { $0.status == .pending || $0.status == .overdue }
             .reduce(0) { $0 + $1.amount }

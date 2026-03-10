@@ -7,17 +7,16 @@
 
 import SwiftUI
 
-
 struct ServicesView: View {
     
     @Namespace private var categoryNamespace
     
     @Injected private var fs: FirestoreServiceProtocol
-    @EnvironmentObject private var navState: AppNavigationState
+    @EnvironmentObject private var navState: ServiceNavigationState
     
-    @State private var showDetail = false
-    @State private var headerAppeared = false
-    @State private var showAppointment = false
+    @State private var showDetail: Bool = false
+    @State private var headerAppeared: Bool = false
+    @State private var showAppointment: Bool = false
     @State private var selectedCategory: ServiceCategory = .restorative
     
     private var filteredServices: [Service] {
@@ -25,7 +24,7 @@ struct ServicesView: View {
     }
     
     var body: some View {
-        NavigationStack(path: $navState.servicesNavPath){
+        NavigationStack(path: $navState.path){
             ZStack {
                 Color.kyBackground.ignoresSafeArea()
                 ScrollView(showsIndicators: false) {
@@ -40,7 +39,7 @@ struct ServicesView: View {
                         LazyVStack(spacing: 16) {
                             ForEach(Array(filteredServices.enumerated()), id: \.element.id) { index, service in
                                 Button{
-                                    navState.navigateToService(service: service)
+                                    navState.navigate(to: .serviceDetail(service: service))
                                     withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
                                         showDetail = true
                                     }
@@ -90,9 +89,8 @@ struct ServicesView: View {
                 }
             }
         }
-        
     }
-
+    
     // MARK: Header Section
     private var headerSection: some View {
         ZStack(alignment: .bottomLeading) {

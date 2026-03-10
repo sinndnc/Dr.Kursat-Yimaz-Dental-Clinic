@@ -17,15 +17,10 @@ struct RootView: View {
             Color.kyBackground.ignoresSafeArea()
             Group {
                 switch authVM.authState {
-                case .loading:
+                case .loading :
                     ProgressView()
-                case .unauthenticated:
-                    LoginView(showLogin: .constant(true))
-                case .registrationPending:
-                    Text("Registration Pending")
-                case .authenticated:
+                default:
                     MainTabView()
-                       
                 }
             }
         }

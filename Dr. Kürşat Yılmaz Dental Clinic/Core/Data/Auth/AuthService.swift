@@ -20,16 +20,18 @@ import Combine
 @MainActor
 final class AuthService: AuthServiceProtocol {
     
-    @Published private(set) var authState:      AuthState = .loading
-    @Published private(set) var firebaseUser:   FirebaseAuth.User?
-    @Published private(set) var currentPatient: Patient?
-    @Published private(set) var isLoading:      Bool      = false
-    @Published private(set) var errorMessage:   String?
+    @Injected private var fs: FirestoreServiceProtocol
     
-    var authStatePublisher:      AnyPublisher<AuthState, Never> { $authState.eraseToAnyPublisher()      }
-    var currentPatientPublisher: AnyPublisher<Patient?, Never>  { $currentPatient.eraseToAnyPublisher() }
-    var isLoadingPublisher:      AnyPublisher<Bool, Never>      { $isLoading.eraseToAnyPublisher()      }
-    var errorMessagePublisher:   AnyPublisher<String?, Never>   { $errorMessage.eraseToAnyPublisher()   }
+    @Published private(set) var errorMessage: String?
+    @Published private(set) var isLoading: Bool = false
+    @Published private(set) var currentPatient: Patient?
+    @Published private(set) var authState: AuthState = .loading
+    @Published private(set) var firebaseUser: FirebaseAuth.User?
+    
+    var isLoadingPublisher: AnyPublisher<Bool, Never> { $isLoading.eraseToAnyPublisher() }
+    var authStatePublisher: AnyPublisher<AuthState, Never> { $authState.eraseToAnyPublisher() }
+    var errorMessagePublisher: AnyPublisher<String?, Never> { $errorMessage.eraseToAnyPublisher() }
+    var currentPatientPublisher: AnyPublisher<Patient?, Never> { $currentPatient.eraseToAnyPublisher() }
     
     private var authStateHandle: AuthStateDidChangeListenerHandle?
     private var patientListener: ListenerRegistration?
@@ -59,8 +61,10 @@ final class AuthService: AuthServiceProtocol {
                 self.firebaseUser = user
                 if let user {
                     self.attachPatientListener(uid: user.uid)
+                    self.fs.startAuthenticatedListeners(patientId: user.uid,clinicId: nil)
                 } else {
                     self.tearDownSession()
+                    self.fs.removeAuthenticatedListeners()
                 }
             }
         }
@@ -103,7 +107,8 @@ final class AuthService: AuthServiceProtocol {
         patientListener?.remove()
         patientListener = nil
         currentPatient  = nil
-        authState       = .unauthenticated
+        authState = .unauthenticated
+        
     }
     
     func signIn(email: String, password: String) async throws {
@@ -134,8 +139,7 @@ final class AuthService: AuthServiceProtocol {
         clearError()
         isLoading = true
         defer { isLoading = false }
-
-        // 1. Create Firebase Auth user
+        
         let result: AuthDataResult
         do {
             result = try await auth.createUser(withEmail: email, password: password)
@@ -147,7 +151,6 @@ final class AuthService: AuthServiceProtocol {
         
         let uid = result.user.uid
         
-        // 2. Build Patient document (document ID == Firebase UID)
         let patient = Patient(
             id:        uid,
             firstName: firstName,
