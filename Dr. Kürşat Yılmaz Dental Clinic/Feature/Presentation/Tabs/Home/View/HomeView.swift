@@ -9,28 +9,16 @@ import SwiftUI
 import AVKit
 import MapKit
 
-
 struct HomeView: View {
     
     @Injected private var fs: FirestoreServiceProtocol
     
-    @StateObject private var vm = AuthViewModel()
+    @EnvironmentObject private var vm: HomeViewModel
+    @EnvironmentObject private var authVm: AuthViewModel
     @EnvironmentObject private var navState: HomeNavigationState
-    @EnvironmentObject private var AppNavState: AppNavigationState
-    @EnvironmentObject private var appointmentViewModel: AppointmentViewModel
     
-    @State private var heroScale: CGFloat = 0.97
-    @State private var greetingOpacity: Double = 0
-    @State private var currentTestimonialIndex = 0
+    @Environment(AppNavigationState.self) private var AppNavState: AppNavigationState
     
-    @State private var showMap: Bool = false
-    @State private var showAppointmentBadge: Bool = true
-    
-    let phoneNumber = "905366360880"
-    let destinationName = "Dr. Kürşat Yılmaz"
-    let message = "Merhaba, bilgi almak istiyorum."
-    let destinationCoordinate = CLLocationCoordinate2D(latitude: 41.085185, longitude: 29.027958)
-   
     var body: some View {
         NavigationStack(path: $navState.path) {
             ZStack(alignment: .top) {
@@ -38,7 +26,7 @@ struct HomeView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 0) {
                         heroSection
-                        if vm.authState == .authenticated {
+                        if authVm.authState == .authenticated {
                             appointmentCardSection
                         }
                         featuredServicesSection
@@ -50,7 +38,7 @@ struct HomeView: View {
                 }
                 .ignoresSafeArea()
             }
-            .onAppear { withAnimation(.easeOut(duration: 0.8)) { greetingOpacity = 1 ; heroScale = 1.0 } }
+            .onAppear { withAnimation(.easeOut(duration: 0.8)) { vm.greetingOpacity = 1 ; vm.heroScale = 1.0 } }
             .navigationDestination(for: HomeDestination.self) { route in
                 switch route{
                 case .newAppointment:
@@ -113,7 +101,7 @@ struct HomeView: View {
                                     Circle().strokeBorder(Color.kyBorder, lineWidth: 1)
                                 )
                         }
-                        if showAppointmentBadge {
+                        if vm.showAppointmentBadge {
                             Circle()
                                 .fill(Color.kyAccent)
                                 .frame(width: 9, height: 9)
@@ -130,13 +118,13 @@ struct HomeView: View {
                         .font(.system(size: 36, weight: .bold, design: .serif))
                         .foregroundColor(Color.kyText)
                         .lineSpacing(3)
-                        .opacity(greetingOpacity)
-                        .scaleEffect(heroScale, anchor: .leading)
+                        .opacity(vm.greetingOpacity)
+                        .scaleEffect(vm.heroScale, anchor: .leading)
                     
                     Text("Dijital planlama · Minimal invaziv · Kişiye özel")
                         .font(.system(size: 13, weight: .regular))
                         .foregroundColor(Color.kySubtext)
-                        .opacity(greetingOpacity)
+                        .opacity(vm.greetingOpacity)
                     
                     // CTA Row
                     HStack(spacing: 12) {
@@ -177,7 +165,7 @@ struct HomeView: View {
                             .overlay(Capsule().strokeBorder(Color.kyBorder, lineWidth: 1))
                         }
                     }
-                    .opacity(greetingOpacity)
+                    .opacity(vm.greetingOpacity)
                 }
                 .padding(.bottom)
                 .padding(.horizontal)
@@ -194,21 +182,20 @@ struct HomeView: View {
             }
             
             if let appointment = fs.appointments.next {
-                Button {
+                AppointmentCard(appointment: appointment){
                     navState.navigate(to: .appointmentDetail(apt: appointment))
-                } label: {
-                    AppointmentCard(appointment: appointment)
-                        .padding(.horizontal, 20)
                 }
+                .padding(.horizontal)
             }else{
-                EmptyView()
+                NoAppointmentCard{
+                    navState.navigate(to: .newAppointment)
+                }
+                .padding(.horizontal)
             }
-            
         }
         .padding(.top, 32)
     }
     
-    // MARK: - Featured Services Horizontal Scroll
     
     private var featuredServicesSection: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -220,7 +207,7 @@ struct HomeView: View {
                 HStack(spacing: 12) {
                     ForEach(fs.services, id: \.self) { service in
                         Button {
-                            AppNavState.navigateToService(service: service)
+//                            AppNavState.navigateToService(service: service)
                         } label: {
                             FeaturedServicePill(
                                 name: service.title,
@@ -319,27 +306,27 @@ struct HomeView: View {
             // Contact buttons
             HStack(spacing: 12) {
                 ContactButton(label: "Ara",       icon: "phone.fill",    isPrimary: true){
-                    makePhoneCall()
+                    vm.makePhoneCall()
                 }
                 ContactButton(label: "WhatsApp",  icon: "message.fill",  isPrimary: false){
-                    sendWhatsAppMessage()
+                    vm.sendWhatsAppMessage()
                 }
                 ContactButton(label: "Harita",    icon: "map.fill",      isPrimary: false){
-                    showMap.toggle()
+                    vm.showMap.toggle()
                 }
                 .confirmationDialog(
                     "Choose a Map App",
-                    isPresented: $showMap,
+                    isPresented: $vm.showMap,
                     titleVisibility: .visible
                 ) {
                     Button("Apple Maps") {
-                        openInAppleMaps()
+                        vm.openInAppleMaps()
                     }
                     
                     // Google Maps yüklüyse göster
                     if UIApplication.shared.canOpenURL(URL(string: "comgooglemaps://")!) {
                         Button("Google Maps") {
-                            openInGoogleMaps()
+                            vm.openInGoogleMaps()
                         }
                     }
                     
@@ -347,14 +334,14 @@ struct HomeView: View {
                     if UIApplication.shared.canOpenURL(URL(string: "yandexmaps://")!) ||
                         UIApplication.shared.canOpenURL(URL(string: "yandexnavi://")!) {
                         Button("Yandex Maps / Navi") {
-                            openInYandex()
+                            vm.openInYandex()
                         }
                     }
                     
                     // İsterseniz Waze de eklenebilir
                     if UIApplication.shared.canOpenURL(URL(string: "waze://")!) {
                         Button("Waze") {
-                            openInWaze()
+                            vm.openInWaze()
                         }
                     }
                     
@@ -396,78 +383,7 @@ struct HomeView: View {
         }
         .padding(.horizontal, 20)
     }
-    
-    func sendWhatsAppMessage() {
-        // Mesajı URL için kodla (boşluklar, Türkçe karakterler)
-        let escapedMessage = message.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        let urlString = "whatsapp://send?phone=\(phoneNumber)&text=\(escapedMessage)"
-        
-        if let whatsappURL = URL(string: urlString) {
-            if UIApplication.shared.canOpenURL(whatsappURL) {
-                UIApplication.shared.open(whatsappURL)
-            } else {
-                // WhatsApp yüklü değilse alternatif işlem (örneğin Safari ile açma)
-                let webURLString = "https://wa.me/\(phoneNumber)?text=\(escapedMessage)"
-                if let webURL = URL(string: webURLString) {
-                    UIApplication.shared.open(webURL)
-                }
-            }
-        }
-    }
-    
-    private func openInAppleMaps() {
-        let placemark = MKPlacemark(coordinate: destinationCoordinate)
-        let mapItem = MKMapItem(placemark: placemark)
-        mapItem.name = destinationName
-        
-        mapItem.openInMaps(launchOptions: [
-            MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeDriving
-            // isterseniz .Walking, .Transit vs.
-        ])
-    }
-    
-    // MARK: - Google Maps
-    private func openInGoogleMaps() {
-        let urlString = "comgooglemaps://?daddr=\(destinationCoordinate.latitude),\(destinationCoordinate.longitude)&directionsmode=driving"
-        
-        if let url = URL(string: urlString) {
-            UIApplication.shared.open(url)
-        }
-    }
-    
-    // MARK: - Yandex Maps / Navi
-    private func openInYandex() {
-        // Yandex Navi öncelikli (navigasyon odaklı)
-        let naviURL = "yandexnavi://build_route_on_map?lat_to=\(destinationCoordinate.latitude)&lon_to=\(destinationCoordinate.longitude)"
-        
-        let mapsURL = "yandexmaps://maps.yandex.ru/?pt=\(destinationCoordinate.longitude),\(destinationCoordinate.latitude)&z=16&name=\(destinationName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")"
-        
-        // Navi yüklüyse Navi'yi tercih et, yoksa Maps
-        if UIApplication.shared.canOpenURL(URL(string: "yandexnavi://")!) {
-            if let url = URL(string: naviURL) {
-                UIApplication.shared.open(url)
-            }
-        } else if let url = URL(string: mapsURL) {
-            UIApplication.shared.open(url)
-        }
-    }
-    
-    // MARK: - Waze (opsiyonel)
-    private func openInWaze() {
-        let urlString = "waze://?ll=\(destinationCoordinate.latitude),\(destinationCoordinate.longitude)&navigate=yes"
-        
-        if let url = URL(string: urlString) {
-            UIApplication.shared.open(url)
-        }
-    }
-    
-    func makePhoneCall() {
-        if let url = URL(string: "tel://\(phoneNumber)") {
-            if UIApplication.shared.canOpenURL(url) {
-                UIApplication.shared.open(url, options: [:], completionHandler: nil)
-            }
-        }
-    }
+  
     
 }
 

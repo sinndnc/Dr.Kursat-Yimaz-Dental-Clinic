@@ -7,9 +7,6 @@
 
 
 enum AppointmentsDestination: Hashable {
-    case auth
-    case login
-    case signup
     case newAppointment
     case doctorSelection
     case dateTimePicker(apt: Appointment)

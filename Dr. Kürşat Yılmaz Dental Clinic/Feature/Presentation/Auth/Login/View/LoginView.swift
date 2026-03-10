@@ -9,8 +9,10 @@ import SwiftUI
 
 // MARK: - Login View
 struct LoginView: View {
+    
     @Environment(\.dismiss) private var dismiss
-
+    @Environment(AppNavigationState.self) private var appNav
+    
     @State private var email = ""
     @State private var password = ""
     @State private var showPassword = false
@@ -22,7 +24,6 @@ struct LoginView: View {
     @FocusState private var focusedField: Field?
     
     @EnvironmentObject private var auth: AuthViewModel
-    @EnvironmentObject private var appNavState: AppNavigationState
     
     enum Field { case email, password }
     
@@ -221,8 +222,8 @@ struct LoginView: View {
         Task{
             withAnimation { isLoading = true }
             await auth.signIn(email: email, password: password)
-            appNavState.clearAllPath()
-            appNavState.navigateToTab(.home)
+            dismiss()
+            appNav.completeAuth()
             withAnimation { isLoading = false }
         }
     }

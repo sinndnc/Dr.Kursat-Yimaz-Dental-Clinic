@@ -3,4 +3,22 @@
    uuid = "6C726086-7289-4660-852D-E8B61D3D7269"
    type = "1"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "51C132DB-1625-4F80-A1D4-C5F62344B6F4"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../../../../var/folders/76/93j436hx253279nvb0bksgr00000gn/T/swift-generated-sources/@__swiftmacro_0038Dr__Krat_Ylmaz_Dental_Clinic_FGcJAnvBb18AppNavigationStateC11selectedTab18ObservationTrackedfMa_.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1"
+            endingLineNumber = "1"
+            landmarkName = "unknown"
+            landmarkType = "0">
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>

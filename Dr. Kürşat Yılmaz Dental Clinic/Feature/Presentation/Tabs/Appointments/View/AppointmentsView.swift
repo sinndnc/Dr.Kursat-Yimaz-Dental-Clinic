@@ -11,58 +11,15 @@ enum AppointmentFilter: String, CaseIterable {
     case all = "Tümü"; case upcoming = "Yaklaşan"; case completed = "Geçmiş"
 }
 
-
 struct AppointmentsView: View {
     
-    @Injected private var fs: FirestoreServiceProtocol
-    
     @Namespace private var filterNamespace
-    @EnvironmentObject private var vm: AuthViewModel
+    @EnvironmentObject private var vm: AppointmentViewModel
+    @EnvironmentObject private var authVm: AuthViewModel
     @EnvironmentObject private var navState: AppointmentNavigationState
     
-    @State private var selectedFilter: AppointmentFilter = .all
+    @Environment(AppNavigationState.self) private var appNav
     
-    @State private var showCalendar = false
-    @State private var headerAppeared = false
-    @State private var currentMonth: Date = Date()
-    @State private var selectedCalendarDate: Date? = nil
-    
-    // Search states
-    @State private var searchText: String = ""
-    @State private var showSearch: Bool = false
-    
-    // MARK: - Filtered Appointments
-    var filteredAppointments: [Appointment] {
-        var base: [Appointment]
-        switch selectedFilter {
-        case .upcoming:  base = fs.appointments.filter { $0.status == .upcoming }
-        case .completed: base = fs.appointments.filter { $0.status == .completed }
-        case .all:       base = fs.appointments
-        }
-        
-        // Calendar date filter
-        if let date = selectedCalendarDate {
-            base = base.filter { Calendar.current.isDate($0.date, inSameDayAs: date) }
-        }
-        
-        // Search filter
-        if !searchText.isEmpty {
-            base = base.filter {
-                $0.doctorName.localizedCaseInsensitiveContains(searchText) 
-            }
-        }
-        
-        return base
-    }
-    
-    /// Dates that have at least one appointment this month
-    var appointmentDatesInMonth: Set<String> {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        return Set(fs.appointments.map { formatter.string(from: $0.date) })
-    }
-    
-    // MARK: - Body
     var body: some View {
         NavigationStack(path: $navState.path) {
             ZStack(alignment: .bottomTrailing) {
@@ -71,17 +28,17 @@ struct AppointmentsView: View {
                     VStack(spacing: 0) {
                         headerSection
                         
-                        if showSearch {
+                        if vm.showSearch {
                             searchBar
                                 .padding(.top, 16)
                                 .padding(.horizontal, 20)
                                 .transition(.move(edge: .top).combined(with: .opacity))
                         }
                         
-                        if vm.authState == .authenticated {
+                        if authVm.authState == .authenticated {
                             calendarToggleBar
                                 .padding(.top, 20)
-                            if showCalendar {
+                            if vm.showCalendar {
                                 calendarSection
                                     .transition(.move(edge: .top).combined(with: .opacity))
                             }
@@ -90,7 +47,7 @@ struct AppointmentsView: View {
                                 .padding(.top, 24)
                         }
                         
-                        if let date = selectedCalendarDate {
+                        if let date = vm.selectedCalendarDate {
                             activeDateChip(date: date)
                                 .padding(.top, 10)
                                 .padding(.horizontal, 20)
@@ -104,21 +61,15 @@ struct AppointmentsView: View {
                 }
                 .ignoresSafeArea()
                 
-                if vm.authState == .authenticated {
+                if authVm.authState == .authenticated {
                     fabButton
                         .padding(.trailing, 24)
                         .padding(.bottom, 32)
                 }
             }
-            .onAppear { withAnimation(.easeOut(duration: 0.7)) { headerAppeared = true } }
+            .onAppear { withAnimation(.easeOut(duration: 0.7)) { vm.headerAppeared = true } }
             .navigationDestination(for: AppointmentsDestination.self){ route in
                 switch route {
-                case .auth:
-                    AuthSelectionView()
-                case .login:
-                    LoginView()
-                case .signup:
-                    SignUpView()
                 case .appointmentDetail(let apt):
                     AppointmentDetailView(appointment: apt)
                 case .newAppointment:
@@ -154,8 +105,8 @@ struct AppointmentsView: View {
                 Text("Randevularım")
                     .font(.system(size: 34, weight: .bold, design: .serif))
                     .foregroundColor(Color.kyText)
-                    .opacity(headerAppeared ? 1 : 0)
-                    .offset(y: headerAppeared ? 0 : 10)
+                    .opacity(vm.headerAppeared ? 1 : 0)
+                    .offset(y: vm.headerAppeared ? 0 : 10)
                 Text("Geçmiş ve planlanan randevularınız")
                     .font(.system(size: 14))
                     .foregroundColor(Color.kySubtext)
@@ -166,11 +117,11 @@ struct AppointmentsView: View {
                 Spacer()
                 Button {
                     withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
-                        showSearch.toggle()
-                        if !showSearch { searchText = "" }
+                        vm.showSearch.toggle()
+                        if !vm.showSearch { vm.searchText = "" }
                     }
                 } label: {
-                    Image(systemName: showSearch ? "xmark.circle.fill" : "magnifyingglass")
+                    Image(systemName: vm.showSearch ? "xmark.circle.fill" : "magnifyingglass")
                         .font(.system(size: 18, weight: .semibold))
                         .foregroundColor(Color.kyAccent)
                         .padding(10)
@@ -191,7 +142,7 @@ struct AppointmentsView: View {
             Image(systemName: "magnifyingglass")
                 .foregroundColor(Color.kySubtext)
                 .font(.system(size: 14))
-            TextField("Doktor, branş veya klinik ara...", text: $searchText)
+            TextField("Doktor, branş veya klinik ara...", text: $vm.searchText)
                 .font(.system(size: 14))
                 .foregroundColor(Color.kyText)
                 .autocorrectionDisabled()
@@ -215,14 +166,14 @@ struct AppointmentsView: View {
             Spacer()
             Button {
                 withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
-                    showCalendar.toggle()
+                    vm.showCalendar.toggle()
                 }
             } label: {
                 HStack(spacing: 4) {
-                    Text(showCalendar ? "Gizle" : "Göster")
+                    Text(vm.showCalendar ? "Gizle" : "Göster")
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundColor(Color.kyAccent)
-                    Image(systemName: showCalendar ? "chevron.up" : "chevron.down")
+                    Image(systemName: vm.showCalendar ? "chevron.up" : "chevron.down")
                         .font(.system(size: 10, weight: .bold))
                         .foregroundColor(Color.kyAccent)
                 }
@@ -239,7 +190,7 @@ struct AppointmentsView: View {
             HStack {
                 Button {
                     withAnimation(.easeInOut(duration: 0.3)) {
-                        currentMonth = Calendar.current.date(byAdding: .month, value: -1, to: currentMonth) ?? currentMonth
+                        vm.currentMonth = Calendar.current.date(byAdding: .month, value: -1, to: vm.currentMonth) ?? vm.currentMonth
                     }
                 } label: {
                     Image(systemName: "chevron.left")
@@ -252,7 +203,7 @@ struct AppointmentsView: View {
 
                 Spacer()
 
-                Text(currentMonth.formatted(.dateTime.month(.wide).year()))
+                Text(vm.currentMonth.formatted(.dateTime.month(.wide).year()))
                     .font(.system(size: 15, weight: .bold, design: .serif))
                     .foregroundColor(Color.kyText)
 
@@ -260,7 +211,7 @@ struct AppointmentsView: View {
 
                 Button {
                     withAnimation(.easeInOut(duration: 0.3)) {
-                        currentMonth = Calendar.current.date(byAdding: .month, value: 1, to: currentMonth) ?? currentMonth
+                        vm.currentMonth = Calendar.current.date(byAdding: .month, value: 1, to: vm.currentMonth) ?? vm.currentMonth
                     }
                 } label: {
                     Image(systemName: "chevron.right")
@@ -288,21 +239,21 @@ struct AppointmentsView: View {
             .padding(.bottom, 6)
 
             // Day Grid
-            let days = generateDays(for: currentMonth)
+            let days = generateDays(for: vm.currentMonth)
             LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 0), count: 7), spacing: 4) {
                 ForEach(Array(days.enumerated()), id: \.offset) { _, day in
                     if let day = day {
                         CalendarDayCell(
                             date: day,
                             isToday: Calendar.current.isDateInToday(day),
-                            isSelected: selectedCalendarDate.map { Calendar.current.isDate($0, inSameDayAs: day) } ?? false,
-                            hasAppointment: appointmentDatesInMonth.contains(dayKey(day))
+                            isSelected: vm.selectedCalendarDate.map { Calendar.current.isDate($0, inSameDayAs: day) } ?? false,
+                            hasAppointment: vm.appointmentDatesInMonth.contains(dayKey(day))
                         ) {
                             withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
-                                if let sel = selectedCalendarDate, Calendar.current.isDate(sel, inSameDayAs: day) {
-                                    selectedCalendarDate = nil
+                                if let sel = vm.selectedCalendarDate, Calendar.current.isDate(sel, inSameDayAs: day) {
+                                    vm.selectedCalendarDate = nil
                                 } else {
-                                    selectedCalendarDate = day
+                                    vm.selectedCalendarDate = day
                                 }
                             }
                         }
@@ -335,7 +286,7 @@ struct AppointmentsView: View {
             Spacer()
             Button {
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
-                    selectedCalendarDate = nil
+                    vm.selectedCalendarDate = nil
                 }
             } label: {
                 Image(systemName: "xmark")
@@ -361,9 +312,9 @@ struct AppointmentsView: View {
             ForEach(AppointmentFilter.allCases, id: \.self.rawValue) { filter in
                 FilterChip(
                     label: filter.rawValue,
-                    isSelected: selectedFilter == filter) {
+                    isSelected: vm.selectedFilter == filter) {
                         withAnimation(.spring(response: 0.32, dampingFraction: 0.8)) {
-                            selectedFilter = filter
+                            vm.selectedFilter = filter
                         }
                     }
             }
@@ -375,11 +326,11 @@ struct AppointmentsView: View {
     private var appointmentsList: some View {
         LazyVStack(spacing: 14) {
             Divider()
-            if vm.authState == .authenticated{
-                if filteredAppointments.isEmpty {
+            if authVm.authState == .authenticated{
+                if vm.filteredAppointments.isEmpty {
                     emptyState
                 } else {
-                    ForEach(filteredAppointments) { appt in
+                    ForEach(vm.filteredAppointments) { appt in
                         AppointmentRow(appointment: appt)
                             .onTapGesture { navState.navigate(to: .appointmentDetail(apt: appt)) }
                             .transition(.asymmetric(
@@ -393,9 +344,9 @@ struct AppointmentsView: View {
             }
         }
         .padding(.horizontal, 20)
-        .animation(.spring(response: 0.42, dampingFraction: 0.82), value: selectedFilter)
-        .animation(.spring(response: 0.42, dampingFraction: 0.82), value: selectedCalendarDate)
-        .animation(.spring(response: 0.42, dampingFraction: 0.82), value: searchText)
+        .animation(.spring(response: 0.42, dampingFraction: 0.82), value: vm.selectedFilter)
+        .animation(.spring(response: 0.42, dampingFraction: 0.82), value: vm.selectedCalendarDate)
+        .animation(.spring(response: 0.42, dampingFraction: 0.82), value: vm.searchText)
     }
     
     private var emptyState: some View {
@@ -411,7 +362,7 @@ struct AppointmentsView: View {
             Text("Randevu bulunamadı")
                 .font(.system(size: 16, weight: .semibold, design: .serif))
                 .foregroundColor(Color.kyText)
-            Text(selectedCalendarDate != nil
+            Text(vm.selectedCalendarDate != nil
                  ? "Bu tarih için randevu kaydınız yok."
                  : "Seçili filtre için randevu bulunmuyor.")
                 .font(.system(size: 13))
@@ -441,7 +392,7 @@ struct AppointmentsView: View {
                 .multilineTextAlignment(.center)
             
             Button(action: {
-                navState.navigate(to: .auth)
+                appNav.presentAuth()
             }) {
                 Text("Giriş Yap")
                     .font(.system(size: 14, weight: .semibold))

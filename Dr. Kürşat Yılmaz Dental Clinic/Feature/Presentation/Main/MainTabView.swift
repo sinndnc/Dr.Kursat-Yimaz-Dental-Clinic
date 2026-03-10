@@ -2,7 +2,7 @@ import SwiftUI
 
 struct MainTabView: View {
     
-    @EnvironmentObject private var navState: AppNavigationState
+    @State private var navState = AppNavigationState()
     
     @StateObject private var homeNavState: HomeNavigationState = HomeNavigationState()
     @StateObject private var profileNavState: ProfileNavigationState = ProfileNavigationState()
@@ -10,6 +10,10 @@ struct MainTabView: View {
     @StateObject private var servicesNavState: ServiceNavigationState = ServiceNavigationState()
     @StateObject private var appointmentNavState: AppointmentNavigationState = AppointmentNavigationState()
     
+    @StateObject private var homeViewModel: HomeViewModel = HomeViewModel()
+    @StateObject private var doctorsViewModel: DoctorsViewModel = DoctorsViewModel()
+    @StateObject private var profileViewModel: ProfileViewModel = ProfileViewModel()
+    @StateObject private var servicesViewModel: ServicesViewModel = ServicesViewModel()
     @StateObject private var appointmentViewModel: AppointmentViewModel = AppointmentViewModel()
     
     private let primaryBlue = Color(red: 0.15, green: 0.45, blue: 0.95)
@@ -52,12 +56,21 @@ struct MainTabView: View {
                     }
                     .tag(AppTab.profile)
             }
+            .environment(navState)
             .environmentObject(homeNavState)
             .environmentObject(doctorsNavState)
             .environmentObject(profileNavState)
             .environmentObject(servicesNavState)
             .environmentObject(appointmentNavState)
+            .environmentObject(homeViewModel)
+            .environmentObject(doctorsViewModel)
+            .environmentObject(profileViewModel)
+            .environmentObject(servicesViewModel)
             .environmentObject(appointmentViewModel)
+            .fullScreenCover(item: $navState.authSheet) { sheet in
+                AuthFlowView(initialSheet: sheet)
+                    .environment(navState)
+            }
         }
     }
     

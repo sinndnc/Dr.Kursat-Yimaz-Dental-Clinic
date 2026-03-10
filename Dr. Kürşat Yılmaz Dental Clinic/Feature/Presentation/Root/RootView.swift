@@ -6,9 +6,8 @@
 //
 
 import SwiftUI
+
 struct RootView: View {
-    
-    @EnvironmentObject private var navState: AppNavigationState
     
     @StateObject private var authVM: AuthViewModel = AuthViewModel()
     
@@ -25,6 +24,6 @@ struct RootView: View {
             }
         }
         .environmentObject(authVM)
-        .animation(.easeInOut(duration: 0.3), value: authVM.authState)
+//        .animation(.default, value: authVM.authState)
     }
 }

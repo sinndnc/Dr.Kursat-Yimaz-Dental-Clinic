@@ -9,11 +9,10 @@ import SwiftUI
 import FirebaseFirestore
 
 @MainActor
-final class DoctorViewModel: ObservableObject {
-
-    @Published private(set) var doctors: [Doctor] = []
-    @Published private(set) var filteredDoctors: [Doctor] = []
-    @Published var selectedDoctor: Doctor?
+final class DoctorsViewModel: ObservableObject {
+    
+    @Injected private var fs: FirestoreServiceProtocol
+    
     @Published var searchQuery: String = "" {
         didSet { applyFilter() }
     }
@@ -25,46 +24,31 @@ final class DoctorViewModel: ObservableObject {
     }
     @Published private(set) var isLoading = false
     @Published var errorMessage: String?
-
-    private let db = Firestore.firestore()
-    private var listener: ListenerRegistration?
-
-    init() { startListener() }
-    deinit { listener?.remove() }
-
-    // MARK: Computed
+    
+    @Published var headerAppeared = false
+    @Published var showAppointment = false
+    @Published var selectedDoctor: Doctor? = nil
+    @Published private(set) var doctors: [Doctor] = []
+    @Published private(set) var filteredDoctors: [Doctor] = []
+    
+    
+    init() {
+        fs.doctorsStatePublisher
+            .assign(to: &$doctors)
+        applyFilter()
+    }
+    
     var allSpecialties: [String] {
         Array(Set(doctors.map(\.specialty))).sorted()
     }
-
+    
     var hasActiveFilter: Bool {
         selectedSpecialty != nil || selectedClinicId != nil || !searchQuery.isEmpty
     }
-
-    // MARK: Listener
-    private func startListener() {
-        isLoading = true
-        listener = db.collection("doctors")
-            .whereField("is_active", isEqualTo: true)
-            .order(by: "name")
-            .addSnapshotListener { [weak self] snapshot, error in
-                guard let self else { return }
-                self.isLoading = false
-                if let error { self.errorMessage = error.localizedDescription; return }
-                do {
-                    self.doctors = try snapshot?.documents
-                        .compactMap { try $0.data(as: Doctor.self) } ?? []
-                    self.applyFilter()
-                } catch {
-                    self.errorMessage = error.localizedDescription
-                }
-            }
-    }
-
-    // MARK: Filter
+    
     private func applyFilter() {
         var result = doctors
-
+        
         if let clinicId = selectedClinicId {
             result = result.filter { $0.clinicIds.contains(clinicId) }
         }

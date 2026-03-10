@@ -10,11 +10,9 @@ import SwiftUI
 struct DoctorsView: View {
     
     @Injected private var fs: FirestoreServiceProtocol
+    @EnvironmentObject private var vm: DoctorsViewModel
     @EnvironmentObject private var navState: DoctorsNavigationState
-    
-    @State private var headerAppeared = false
-    @State private var showAppointment = false
-    @State private var selectedDoctor: Doctor? = nil
+
     
     var body: some View {
         NavigationStack(path: $navState.path){
@@ -37,14 +35,14 @@ struct DoctorsView: View {
                 }
                 .ignoresSafeArea()
             }
-            .sheet(isPresented: $showAppointment){
+            .sheet(isPresented: $vm.showAppointment){
                 BookingView()
             }
-            .sheet(item: $selectedDoctor) { doc in
+            .sheet(item: $vm.selectedDoctor) { doc in
                 DoctorProfileSheet(doctor: doc)
             }
             .onAppear {
-                withAnimation(.easeOut(duration: 0.7)) { headerAppeared = true }
+                withAnimation(.easeOut(duration: 0.7)) { vm.headerAppeared = true }
             }
         }
     }
@@ -72,8 +70,8 @@ struct DoctorsView: View {
                 Text("Ekibimiz")
                     .font(.system(size: 34, weight: .bold, design: .serif))
                     .foregroundColor(Color.kyText)
-                    .opacity(headerAppeared ? 1 : 0)
-                    .offset(y: headerAppeared ? 0 : 10)
+                    .opacity(vm.headerAppeared ? 1 : 0)
+                    .offset(y: vm.headerAppeared ? 0 : 10)
                 Text("Uzman kadromuzla tanışın")
                     .font(.system(size: 14)).foregroundColor(Color.kySubtext)
             }
@@ -120,7 +118,7 @@ struct DoctorsView: View {
         VStack(spacing: 16) {
             ForEach(fs.doctors) { doc in
                 DoctorCard(doctor: doc)
-                    .onTapGesture { selectedDoctor = doc }
+                    .onTapGesture { vm.selectedDoctor = doc }
             }
         }
         .padding(.horizontal, 20)
@@ -168,7 +166,7 @@ struct DoctorsView: View {
                 .foregroundColor(Color.kySubtext)
             
             Button {
-                showAppointment.toggle()
+                vm.showAppointment.toggle()
             } label: {
                 HStack(spacing: 8) {
                     Spacer()

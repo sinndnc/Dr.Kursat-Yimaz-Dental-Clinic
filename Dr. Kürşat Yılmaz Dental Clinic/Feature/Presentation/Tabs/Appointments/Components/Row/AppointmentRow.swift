@@ -101,8 +101,7 @@ struct AppointmentRow: View {
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 14)
-
-            // ── Chevron ──────────────────────────────────────────────────
+            
             Image(systemName: "chevron.right")
                 .font(.system(size: 10, weight: .bold))
                 .foregroundColor(Color.kySubtext.opacity(0.35))

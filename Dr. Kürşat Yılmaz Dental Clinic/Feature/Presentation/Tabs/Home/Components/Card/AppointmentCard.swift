@@ -9,9 +9,11 @@ import SwiftUI
 
 struct AppointmentCard: View {
     let appointment: Appointment
+    let action: () -> Void
     
     var body: some View {
-        HStack(spacing: 16) {
+        Button(action: action) {
+            HStack(spacing: 16) {
             // Date badge
             VStack(spacing: 2) {
                 Text(appointment.month)
@@ -29,7 +31,7 @@ struct AppointmentCard: View {
             .padding(.vertical, 14)
             .background(Color.kyAccent.opacity(0.08))
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-
+            
             VStack(alignment: .leading, spacing: 5) {
                 Text(appointment.type.rawValue)
                     .font(.system(size: 15, weight: .bold, design: .serif))
@@ -51,9 +53,9 @@ struct AppointmentCard: View {
                         .foregroundColor(Color.kySubtext.opacity(0.7))
                 }
             }
-
+            
             Spacer()
-
+            
             VStack(spacing: 8) {
                 // Status dot
                 HStack(spacing: 4) {
@@ -68,7 +70,7 @@ struct AppointmentCard: View {
                 .padding(.vertical, 4)
                 .background(Color(red: 0.4, green: 0.78, blue: 0.5).opacity(0.1))
                 .clipShape(Capsule())
-
+                
                 Button {} label: {
                     Image(systemName: "chevron.right")
                         .font(.system(size: 12, weight: .semibold))
@@ -83,5 +85,6 @@ struct AppointmentCard: View {
             RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .strokeBorder(Color.kyAccent.opacity(0.15), lineWidth: 1)
         )
+    }
     }
 }

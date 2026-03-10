@@ -33,6 +33,7 @@ class ProfileViewModel: ObservableObject {
     @Published var appointmentReminder1h = true
     
     // App preferences
+    @Published var appeared = false
     @Published var selectedLanguage = "TR"
     @Published var isDarkMode = true
     @Published var biometricEnabled = false

@@ -10,15 +10,11 @@ import SwiftUI
 @main
 struct DrKursatYilmazDentalClinicApp: App {
     
-    @StateObject var sseder = MockDataSeeder()
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegateü
-    
-    @StateObject private var navState =  AppNavigationState()
     
     var body: some Scene {
         WindowGroup {
             RootView()
-                .environmentObject(navState)
         }
         
     }

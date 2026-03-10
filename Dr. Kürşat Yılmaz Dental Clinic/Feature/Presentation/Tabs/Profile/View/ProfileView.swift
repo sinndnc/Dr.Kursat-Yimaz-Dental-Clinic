@@ -85,11 +85,8 @@ struct ProfileNavItem: View {
     }
 }
 
-// MARK: - ProfileView
 
 struct ProfileView: View {
-    
-    @State private var appeared = false
     
     @StateObject private var vm = ProfileViewModel()
     @EnvironmentObject private var navState: ProfileNavigationState
@@ -116,7 +113,7 @@ struct ProfileView: View {
                     GuestProfileView()
                 }
             }
-            .onAppear { withAnimation(.spring(response: 0.65, dampingFraction: 0.82)) { appeared = true } }
+            .onAppear { withAnimation(.spring(response: 0.65, dampingFraction: 0.82)) { vm.appeared = true } }
             .navigationDestination(for: ProfileDestination.self) { route in
                 destinationView(for: route)
             }
@@ -384,8 +381,8 @@ struct ProfileView: View {
                             }
                         }
                     }
-                    .scaleEffect(appeared ? 1 : 0.85)
-                    .opacity(appeared ? 1 : 0)
+                    .scaleEffect(vm.appeared ? 1 : 0.85)
+                    .opacity(vm.appeared ? 1 : 0)
                     
                     VStack(alignment: .leading, spacing: 4) {
                         Text(patient.fullName)
@@ -534,12 +531,6 @@ struct ProfileView: View {
             PrivacyPolicyView()
         case .helpSupport:
             HelpSupportView()
-        case .auth:
-            AuthSelectionView()
-        case .login:
-            LoginView()
-        case .signup:
-            SignUpView()
         }
     }
 }

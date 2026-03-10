@@ -11,17 +11,8 @@ struct ServicesView: View {
     
     @Namespace private var categoryNamespace
     
-    @Injected private var fs: FirestoreServiceProtocol
+    @EnvironmentObject private var vm: ServicesViewModel
     @EnvironmentObject private var navState: ServiceNavigationState
-    
-    @State private var showDetail: Bool = false
-    @State private var headerAppeared: Bool = false
-    @State private var showAppointment: Bool = false
-    @State private var selectedCategory: ServiceCategory = .restorative
-    
-    private var filteredServices: [Service] {
-        fs.services.filter { $0.category == selectedCategory }
-    }
     
     var body: some View {
         NavigationStack(path: $navState.path){
@@ -37,11 +28,11 @@ struct ServicesView: View {
                         
                         // MARK: Service Cards
                         LazyVStack(spacing: 16) {
-                            ForEach(Array(filteredServices.enumerated()), id: \.element.id) { index, service in
+                            ForEach(Array(vm.filteredServices.enumerated()), id: \.element.id) { index, service in
                                 Button{
                                     navState.navigate(to: .serviceDetail(service: service))
                                     withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
-                                        showDetail = true
+                                        vm.showDetail = true
                                     }
                                 } label: {
                                     ServiceCard(service: service)
@@ -54,11 +45,11 @@ struct ServicesView: View {
                         }
                         .padding(.horizontal, 20)
                         .padding(.bottom, 40)
-                        .animation(.spring(response: 0.45, dampingFraction: 0.82), value: selectedCategory)
+                        .animation(.spring(response: 0.45, dampingFraction: 0.82), value: vm.selectedCategory)
                         
                         // MARK: CTA Banner
                         Button{
-                            showAppointment.toggle()
+                            vm.showAppointment.toggle()
                         }label:{
                             appointmentBanner
                                 .padding(.horizontal, 20)
@@ -71,9 +62,9 @@ struct ServicesView: View {
             }
             .ignoresSafeArea()
             .onAppear {
-                withAnimation(.easeOut(duration: 0.7)) { headerAppeared = true }
+                withAnimation(.easeOut(duration: 0.7)) { vm.headerAppeared = true }
             }
-            .sheet(isPresented: $showAppointment){
+            .sheet(isPresented: $vm.showAppointment){
                 BookingView()
             }
             .navigationDestination(for: ServicesDestination.self) { destination in
@@ -117,8 +108,8 @@ struct ServicesView: View {
                 Text("Tedavi\nSeçenekleri")
                     .font(.system(size: 38, weight: .bold, design: .serif))
                     .foregroundColor(Color.kyText)
-                    .opacity(headerAppeared ? 1 : 0)
-                    .offset(y: headerAppeared ? 0 : 10)
+                    .opacity(vm.headerAppeared ? 1 : 0)
+                    .offset(y: vm.headerAppeared ? 0 : 10)
                     .lineSpacing(2)
                 
                 Text("Dijital planlama ile kişiye özel,\nminimal invaziv yaklaşım.")
@@ -138,7 +129,7 @@ struct ServicesView: View {
             ForEach(ServiceCategory.allCases) { cat in
                 Button {
                     withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
-                        selectedCategory = cat
+                        vm.selectedCategory = cat
                     }
                 } label: {
                     VStack(spacing: 6) {
@@ -148,17 +139,17 @@ struct ServicesView: View {
                             Text(cat.rawValue)
                                 .font(.system(size: 14, weight: .semibold))
                         }
-                        .foregroundColor(selectedCategory == cat ? Color.kyAccent : Color.kySubtext)
+                        .foregroundColor(vm.selectedCategory == cat ? Color.kyAccent : Color.kySubtext)
                         .padding(.vertical, 10)
-
+                        
                         Rectangle()
-                            .fill(selectedCategory == cat ? Color.kyAccent : Color.clear)
+                            .fill(vm.selectedCategory == cat ? Color.kyAccent : Color.clear)
                             .frame(height: 2)
-                            .matchedGeometryEffect(id: "underline", in: categoryNamespace, isSource: selectedCategory == cat)
+                            .matchedGeometryEffect(id: "underline", in: categoryNamespace, isSource: vm.selectedCategory == cat)
                     }
                 }
                 .frame(maxWidth: .infinity)
-                .animation(.spring(response: 0.3), value: selectedCategory)
+                .animation(.spring(response: 0.3), value: vm.selectedCategory)
             }
         }
         .padding(.horizontal, 20)

@@ -9,18 +9,14 @@ import SwiftUI
 
 struct AuthSelectionView: View {
     @State private var animateIn = false
-    @State private var navigateTo: AuthDestination? = nil
     
-    enum AuthDestination {
-        case login, signup
-    }
+    @Environment(AppNavigationState.self) private var appNav
+    @State private var authPath = NavigationPath()
     
     var body: some View {
         ZStack {
-            // Background
             Color.kyBackground.ignoresSafeArea()
             
-            // Subtle radial glow
             RadialGradient(
                 colors: [Color.kyAccent.opacity(0.06), Color.clear],
                 center: .top,
@@ -32,7 +28,6 @@ struct AuthSelectionView: View {
             VStack(spacing: 0) {
                 Spacer()
                 
-                // Logo + Brand
                 VStack(spacing: 5) {
                     ZStack {
                         Image("ClinicLogo")

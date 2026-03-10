@@ -10,7 +10,7 @@ import SwiftUI
 struct GuestProfileView: View {
     
     @State private var appeared: Bool = false
-    @EnvironmentObject private var navState: ProfileNavigationState
+    @Environment(AppNavigationState.self) private var appNav
     
     var body: some View {
         ZStack {
@@ -101,7 +101,7 @@ struct GuestProfileView: View {
                 HStack(spacing: 18) {
                     
                     Button {
-                        navState.navigate(to: .auth)
+                        appNav.presentAuth()
                     } label: {
                         ZStack {
                             Circle()
@@ -133,7 +133,7 @@ struct GuestProfileView: View {
                         
                         HStack(spacing: 8) {
                             Button {
-                                navState.navigate(to: .auth)
+                                appNav.presentAuth()
                             } label: {
                                 Text("Giriş Yap")
                                     .font(.kySans(13, weight: .semibold))
@@ -151,7 +151,7 @@ struct GuestProfileView: View {
                             }
                             
                             Button {
-                                navState.navigate(to: .signup)
+                                appNav.presentSignUp()
                             } label: {
                                 Text("Kayıt Ol")
                                     .font(.kySans(13, weight: .medium))
@@ -241,7 +241,7 @@ struct GuestProfileView: View {
             
             VStack(spacing: 10) {
                 Button {
-                    navState.navigate(to: .auth)
+                    appNav.presentAuth()
                 } label: {
                     Text("Giriş Yap")
                         .font(.kySans(15, weight: .semibold))
@@ -260,7 +260,7 @@ struct GuestProfileView: View {
                 }
                 
                 Button {
-                    navState.navigate(to: .signup)
+                    appNav.presentSignUp()
                 } label: {
                     Text("Hesabım yok, kayıt olayım")
                         .font(.kySans(14, weight: .medium))
