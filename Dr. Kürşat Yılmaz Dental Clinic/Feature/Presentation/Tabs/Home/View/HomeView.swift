@@ -28,21 +28,6 @@ struct HomeView: View {
             ZStack(alignment: .top) {
                 Color.kyBackground.ignoresSafeArea()
                 
-                BackgroundVideoPlayerView(videoName: "servicesVideo", videoExtension: "mp4")
-                    .ignoresSafeArea()
-                    .frame(height: 300)
-                    .mask(
-                        LinearGradient(
-                            gradient: Gradient(stops: [
-                                .init(color: .black, location: 0.0),
-                                .init(color: .black, location: 0.5),
-                                .init(color: .clear, location: 1.0)
-                            ]),
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-                
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 0) {
                         heroSection

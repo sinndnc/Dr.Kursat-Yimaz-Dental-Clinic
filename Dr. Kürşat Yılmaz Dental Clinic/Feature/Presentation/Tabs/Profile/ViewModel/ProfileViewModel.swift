@@ -19,9 +19,9 @@ class ProfileViewModel: ObservableObject {
     
     @Published var patient: Patient? = nil
     @Published var appointments: [Appointment] = []
-    @Published var payments: [Payment] = mockPayments
-    @Published var treatments: [ToothTreatment] = mockTreatments
-    @Published var documents: [PatientDocument] = mockDocuments
+    @Published var payments: [Payment] = []
+    @Published var treatments: [ToothTreatment] = []
+    @Published var documents: [PatientDocument] = []
     @Published var isLoading = false
     
     // Notification preferences

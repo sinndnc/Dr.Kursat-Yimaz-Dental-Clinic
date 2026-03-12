@@ -395,7 +395,9 @@ struct ProfileView: View {
         case .loyaltyPoints:
             LoyaltyPointsView(patient: vm.patient!)
         case .privacyPolicy:
-            PrivacyPolicyView()
+            ConsentView{
+                
+            }
         case .helpSupport:
             HelpSupportView()
         }

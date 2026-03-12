@@ -113,8 +113,7 @@ final class AuthService: AuthServiceProtocol {
             firebaseUser = result.user
             // Patient is loaded automatically via attachPatientListener triggered
             // by addStateDidChangeListener — no manual fetch needed here.
-            //TEST
-            try await fs.updatePatient(MockPatients.sinan(id: result.user.uid))
+//            try await fs.updatePatient(MockPatients.sinan(id: result.user.uid))
         } catch let error as NSError {
             let message  = mapFirebaseError(error)
             errorMessage = message

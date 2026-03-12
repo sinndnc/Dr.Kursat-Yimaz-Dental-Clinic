@@ -10,16 +10,11 @@ import SwiftUI
 @main
 struct DrKursatYilmazDentalClinicApp: App {
     
-    @StateObject private var seeder = MockDataSeeder()
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegateü
     
     var body: some Scene {
         WindowGroup {
             RootView()
-                .task {
-//                    try? await seeder.uploadPatients()
-                }
         }
-        
     }
 }

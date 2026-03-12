@@ -11,17 +11,12 @@ import AVKit
 import SwiftUI
 
 struct BackgroundVideoPlayerView: UIViewRepresentable {
-    let videoName: String
-    let videoExtension: String
+    let videoURL: URL
     
     func makeUIView(context: Context) -> UIView {
         let view = UIView()
         
-        guard let url = Bundle.main.url(forResource: videoName, withExtension: videoExtension) else {
-            return view
-        }
-        
-        let player = AVPlayer(url: url)
+        let player = AVPlayer(url: videoURL)
         player.isMuted = true
         
         let playerLayer = AVPlayerLayer(player: player)
