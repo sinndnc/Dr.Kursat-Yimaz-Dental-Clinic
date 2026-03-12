@@ -7,12 +7,14 @@
 
 import Combine
 import SwiftUI
+import UIKit
 
 @MainActor
 class ProfileViewModel: ObservableObject {
     
     
     @Injected private var auth: AuthServiceProtocol
+    @Injected private var storage: SupabaseStorageServiceProtocol
     @Injected private var firestore: FirestoreServiceProtocol
     
     @Published var patient: Patient? = nil
@@ -37,6 +39,12 @@ class ProfileViewModel: ObservableObject {
     @Published var selectedLanguage = "TR"
     @Published var isDarkMode = true
     @Published var biometricEnabled = false
+    @Published var profilePhotoURL: URL? = nil
+    
+    var pendingPhoto: UIImage?
+    var isUploading = false
+    
+    private var cancellables = Set<AnyCancellable>()
     
     init(){
         firestore.appointmentsPublisher
@@ -44,6 +52,29 @@ class ProfileViewModel: ObservableObject {
         
         auth.currentPatientPublisher
             .assign(to: &$patient)
+    }
+    
+    func loadPatientImage(id: String) async {
+        isLoading = true
+        do {
+            let path = "A88BE787-507A-4D83-A2DA-ED7199885724/photo_0.jpg"
+            let url = try await storage.getPublicURL(
+                bucket: .patients,
+                path: path
+            )
+            self.profilePhotoURL = url
+        } catch {
+        }
+        
+        isLoading = false
+    }
+    
+    func uploadPhoto(_ image: UIImage) async throws {
+        guard let id = patient?.id else { return }
+        let path = try await storage.uploadProfilePhoto(patientID: id, image: image)
+        try await firestore.updatePatientField("profile_photo_path", value: path, patientID: id)
+        patient?.profilePhotoPath = path
+        pendingPhoto = nil
     }
     
     func signOut(){

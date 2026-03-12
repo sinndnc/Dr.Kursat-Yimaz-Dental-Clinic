@@ -9,8 +9,9 @@ import Combine
 import SwiftUI
 import AVKit
 
+
 struct VideoPlayerView: View {
-    private let videoURL = URL(string: "https://framerusercontent.com/assets/abt50i9bj1pkM8Z69REgS1LLCo.mp4")!
+    let videoURL : URL
     
     @StateObject private var playerModel = VideoPlayerModel()
     @Environment(\.dismiss) private var dismiss
@@ -53,12 +54,12 @@ struct VideoPlayerView: View {
         .onDisappear {
             playerModel.cleanup()
         }
-        .preferredColorScheme(.dark)
+        .ignoresSafeArea()
         .navigationBarHidden(true)
+        .preferredColorScheme(.dark)
     }
 }
 
-// MARK: - Video Player Model
 class VideoPlayerModel: ObservableObject {
     @Published var player: AVPlayer?
     

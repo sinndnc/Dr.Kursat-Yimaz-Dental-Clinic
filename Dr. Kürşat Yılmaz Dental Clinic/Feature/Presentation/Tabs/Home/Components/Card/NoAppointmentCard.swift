@@ -54,10 +54,7 @@ struct NoAppointmentCard: View {
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .strokeBorder(
-                    Color.kyAccent.opacity(0.08),
-                    style: StrokeStyle(lineWidth: 1, dash: [5, 4])
-                )
+                .strokeBorder(Color.kyAccent.opacity(0.08),lineWidth: 1)
         )
     }
 }

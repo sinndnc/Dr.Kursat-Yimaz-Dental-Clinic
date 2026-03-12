@@ -12,12 +12,17 @@ final class ServicesViewModel: ObservableObject{
     
     @Injected private var fs: FirestoreServiceProtocol
     
+    @Published var services: [Service] = []
     @Published var showDetail: Bool = false
-    @Published var headerAppeared: Bool = false
     @Published var showAppointment: Bool = false
     @Published var selectedCategory: ServiceCategory = .restorative
     
     var filteredServices: [Service] {
-        fs.services.filter { $0.category == selectedCategory }
+        services.filter { $0.category == selectedCategory }
+    }
+    
+    init(){
+        fs.servicesPublisher
+            .assign(to: &$services)
     }
 }

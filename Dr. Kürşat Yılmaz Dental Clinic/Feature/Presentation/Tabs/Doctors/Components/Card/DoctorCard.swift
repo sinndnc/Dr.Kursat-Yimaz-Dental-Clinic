@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct DoctorCard: View {
-    let doctor: Doctor
+    let doctor: EnrichedDoctor
     @State private var isPressed = false
     
     var body: some View {
@@ -30,15 +30,30 @@ struct DoctorCard: View {
                         )
                         .frame(width: 58, height: 58)
                     
-                    Text(doctor.avatarInitials)
-                        .font(.system(size: 20, weight: .bold, design: .rounded))
-                        .foregroundColor(.white)
+                    if let photoURL = doctor.primaryPhotoURL {
+                           AsyncImage(url: photoURL) { phase in
+                               switch phase {
+                               case .success(let image):
+                                   image
+                                       .resizable()
+                                       .scaledToFill()
+                                       .frame(width: 58, height: 58)
+                                       .clipShape(Circle())
+                               case .failure, .empty:
+                                   // Yüklenemezse initials fallback
+                                   Text(doctor.avatarInitials)
+                                       .font(.system(size: 20, weight: .bold, design: .rounded))
+                                       .foregroundColor(.white)
+                               @unknown default:
+                                   ProgressView()
+                               }
+                           }
+                       } else {
+                           Text(doctor.avatarInitials)
+                               .font(.system(size: 20, weight: .bold, design: .rounded))
+                               .foregroundColor(.white)
+                       }
                 }
-                .overlay(
-                    Circle()
-                        .strokeBorder(doctor.accentColor.opacity(0.30), lineWidth: 1.5)
-                )
-                
                 VStack(alignment: .leading, spacing: 3) {
                     Text(doctor.name)
                         .font(.system(size: 15, weight: .bold, design: .serif))

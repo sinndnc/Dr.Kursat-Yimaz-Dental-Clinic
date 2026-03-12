@@ -8,6 +8,6 @@
 enum HomeDestination: Hashable {
     case notifications
     case newAppointment
+    case serviceDetail(service: Service)
     case appointmentDetail(apt: Appointment)
-    case clinicVideo
 }

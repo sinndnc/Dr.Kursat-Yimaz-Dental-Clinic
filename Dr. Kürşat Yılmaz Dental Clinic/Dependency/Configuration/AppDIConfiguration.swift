@@ -28,9 +28,21 @@ class AppDIConfiguration {
             )
         }
         
+        container.register(SupabaseStorageServiceProtocol.self,scope: .singleton) { c in
+            SupabaseStorageService()
+        }
+        
         container.register(FirestoreServiceProtocol.self, scope: .singleton) { c in
             FirestoreService(firestore: c.resolve(Firestore.self))
         }
+        
+        container
+            .register(DoctorsRepositoryProtocol.self, scope: .singleton) { c in
+                DoctorsRepository(
+                    firestoreService: c.resolve(FirestoreServiceProtocol.self),
+                    storageService: c.resolve(SupabaseStorageServiceProtocol.self)
+                )
+            }
     }
     
 }

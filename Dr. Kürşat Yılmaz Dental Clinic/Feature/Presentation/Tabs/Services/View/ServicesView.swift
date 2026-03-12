@@ -11,13 +11,30 @@ struct ServicesView: View {
     
     @Namespace private var categoryNamespace
     
+    @State private var headerAppeared: Bool = false
     @EnvironmentObject private var vm: ServicesViewModel
     @EnvironmentObject private var navState: ServiceNavigationState
     
     var body: some View {
         NavigationStack(path: $navState.path){
-            ZStack {
+            ZStack(alignment: .top){
                 Color.kyBackground.ignoresSafeArea()
+                
+                BackgroundVideoPlayerView(videoName: "servicesVideo", videoExtension: "mp4")
+                    .ignoresSafeArea()
+                    .frame(height: 300)
+                    .mask(
+                        LinearGradient(
+                            gradient: Gradient(stops: [
+                                .init(color: .black, location: 0.0),
+                                .init(color: .black, location: 0.5),
+                                .init(color: .clear, location: 1.0)
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 0) {
                         // MARK: Header
@@ -61,12 +78,8 @@ struct ServicesView: View {
                 .ignoresSafeArea()
             }
             .ignoresSafeArea()
-            .onAppear {
-                withAnimation(.easeOut(duration: 0.7)) { vm.headerAppeared = true }
-            }
-            .sheet(isPresented: $vm.showAppointment){
-                BookingView()
-            }
+            .onAppear { withAnimation(.easeOut(duration: 0.7)) { headerAppeared = true } }
+            .sheet(isPresented: $vm.showAppointment){ BookingView() }
             .navigationDestination(for: ServicesDestination.self) { destination in
                 switch destination {
                 case .serviceDetail(let service):
@@ -80,12 +93,13 @@ struct ServicesView: View {
                 }
             }
         }
+        .environmentObject(vm)
     }
     
     // MARK: Header Section
     private var headerSection: some View {
         ZStack(alignment: .bottomLeading) {
-            // Subtle gradient accent top
+            
             LinearGradient(
                 colors: [Color.kyAccent.opacity(0.12), Color.clear],
                 startPoint: .top,
@@ -94,6 +108,7 @@ struct ServicesView: View {
             .frame(height: 250)
             .ignoresSafeArea()
             
+      
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 6) {
                     Circle()
@@ -108,8 +123,8 @@ struct ServicesView: View {
                 Text("Tedavi\nSeçenekleri")
                     .font(.system(size: 38, weight: .bold, design: .serif))
                     .foregroundColor(Color.kyText)
-                    .opacity(vm.headerAppeared ? 1 : 0)
-                    .offset(y: vm.headerAppeared ? 0 : 10)
+                    .opacity(headerAppeared ? 1 : 0)
+                    .offset(y: headerAppeared ? 0 : 10)
                     .lineSpacing(2)
                 
                 Text("Dijital planlama ile kişiye özel,\nminimal invaziv yaklaşım.")

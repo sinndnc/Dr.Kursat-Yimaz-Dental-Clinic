@@ -88,7 +88,7 @@ struct ProfileNavItem: View {
 
 struct ProfileView: View {
     
-    @StateObject private var vm = ProfileViewModel()
+    @EnvironmentObject private var vm: ProfileViewModel
     @EnvironmentObject private var navState: ProfileNavigationState
     
     var body: some View {
@@ -107,6 +107,9 @@ struct ProfileView: View {
                             footerNote(patient: patient)
                                 .padding(.top, 32)
                         }
+                    }
+                    .task {
+                        await vm.loadPatientImage(id: patient.id!)
                     }
                     .ignoresSafeArea(edges: .top)
                 }else{
@@ -349,37 +352,7 @@ struct ProfileView: View {
                     Button {
                         navState.navigate(to: .editProfile)
                     } label: {
-                        ZStack(alignment: .bottomTrailing) {
-                            ZStack {
-                                Circle()
-                                    .fill(LinearGradient(
-                                        colors: [Color.kyAccent, Color.kyAccentDark],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ))
-                                    .frame(width: 80, height: 80)
-                                Text(patient.avatarLetter)
-                                    .font(.kySerif(30, weight: .bold))
-                                    .foregroundColor(.kyBackground)
-                            }
-                            .overlay(
-                                Circle().strokeBorder(
-                                    LinearGradient(
-                                        colors: [Color.kyAccent.opacity(0.6), Color.clear],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
-                                    lineWidth: 2.5
-                                )
-                            )
-
-                            ZStack {
-                                Circle().fill(Color.kyBackground).frame(width: 24, height: 24)
-                                Image(systemName: "pencil.circle.fill")
-                                    .font(.system(size: 22))
-                                    .foregroundColor(.kyAccent)
-                            }
-                        }
+                        EditablePatientAvatar(patient: patient)
                     }
                     .scaleEffect(vm.appeared ? 1 : 0.85)
                     .opacity(vm.appeared ? 1 : 0)

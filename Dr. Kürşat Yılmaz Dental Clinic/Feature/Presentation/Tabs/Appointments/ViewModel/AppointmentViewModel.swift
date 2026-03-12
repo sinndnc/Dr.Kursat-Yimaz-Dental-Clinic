@@ -14,17 +14,24 @@ final class AppointmentViewModel: ObservableObject {
     @Published var headerAppeared = false
     @Published var currentMonth: Date = Date()
     @Published var selectedCalendarDate: Date? = nil
-    
+
     @Published var searchText: String = ""
     @Published var showSearch: Bool = false
     
     @Published var selectedAppointment: Appointment?
+    
+    @Published private(set) var isLoading: Bool = true
     @Published private(set) var appointments: [Appointment] = []
+    private var cancellables = Set<AnyCancellable>()
     
     
     init() {
         firestoreService.appointmentsPublisher
-            .assign(to: &$appointments)
+            .sink { [weak self] appointments in
+                self?.appointments = appointments
+                self?.isLoading = false
+            }
+            .store(in: &cancellables)
     }
     
     

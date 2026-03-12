@@ -10,5 +10,5 @@ enum AuthState: Equatable {
     case loading
     case unauthenticated
     case authenticated
-    case registrationPending    // Auth created but Patient profile not yet saved
+    case registrationPending   
 }

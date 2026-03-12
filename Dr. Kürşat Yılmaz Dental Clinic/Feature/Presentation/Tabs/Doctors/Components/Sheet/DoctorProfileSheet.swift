@@ -8,7 +8,7 @@ import SwiftUI
 
 
 struct DoctorProfileSheet: View {
-    let doctor: Doctor
+    let doctor: EnrichedDoctor
     @Environment(\.dismiss) private var dismiss
     @State private var headerVisible = false
     @State private var showAppointment = false
@@ -33,9 +33,8 @@ struct DoctorProfileSheet: View {
                                     endPoint: .bottom
                                 )
                             )
-                            .frame(height: 170)
+                            .frame(height: 250)
                             .overlay(alignment: .topTrailing) {
-                                // Decorative circle
                                 Circle()
                                     .fill(doctor.accentColor.opacity(0.08))
                                     .frame(width: 140, height: 140)
@@ -44,33 +43,35 @@ struct DoctorProfileSheet: View {
                             }
                         
                         VStack(alignment: .leading, spacing: 0) {
-                            Spacer().frame(height: 60)
                             
                             HStack(alignment: .bottom, spacing: 18) {
                                 
-                                // Avatar
-                                ZStack {
-                                    Circle()
-                                        .fill(
-                                            LinearGradient(
-                                                colors: [
-                                                    doctor.accentColor,
-                                                    doctor.accentColor.opacity(0.50)
-                                                ],
-                                                startPoint: .topLeading,
-                                                endPoint: .bottomTrailing
-                                            )
-                                        )
-                                        .frame(width: 86, height: 86)
+                                if let photoURL = doctor.primaryPhotoURL {
+                                    AsyncImage(url: photoURL) { phase in
+                                        switch phase {
+                                        case .success(let image):
+                                            image
+                                                .resizable()
+                                                .scaledToFill()
+                                                .frame(width: 86, height: 86)
+                                                .clipShape(Circle())
+                                        case .failure, .empty:
+                                            // Yüklenemezse initials fallback
+                                            Text(doctor.avatarInitials)
+                                                .font(.system(size: 20, weight: .bold, design: .rounded))
+                                                .foregroundColor(.white)
+                                        @unknown default:
+                                            ProgressView()
+                                        }
+                                    }
+                                } else {
                                     Text(doctor.avatarInitials)
+                                        .frame(width: 86, height: 86)
                                         .font(.system(size: 30, weight: .bold, design: .rounded))
                                         .foregroundColor(.white)
+                                        .background(doctor.accentColor)
+                                        .clipShape(Circle())
                                 }
-                                .overlay(
-                                    Circle()
-                                        .strokeBorder(doctor.accentColor.opacity(0.40), lineWidth: 2)
-                                )
-                                .shadow(color: doctor.accentColor.opacity(0.30), radius: 16, x: 0, y: 8)
                                 
                                 VStack(alignment: .leading, spacing: 5) {
                                     Text(doctor.name)
@@ -109,6 +110,7 @@ struct DoctorProfileSheet: View {
                                     .padding(.top, 2)
                                 }
                             }
+                            .padding(.top,50)
                             .padding(.horizontal, 24)
                             .padding(.bottom, 24)
                         }
@@ -214,8 +216,6 @@ struct DoctorProfileSheet: View {
                     .padding(.top, 20)
                 }
             }
-
-            // ── Dismiss button ───────────────────────────────────────
             HStack {
                 Spacer()
                 Button { dismiss() } label: {
@@ -234,6 +234,7 @@ struct DoctorProfileSheet: View {
                 .padding(.top, 14)
             }
         }
+        .ignoresSafeArea()
         .sheet(isPresented: $showAppointment){
             BookingView()
         }

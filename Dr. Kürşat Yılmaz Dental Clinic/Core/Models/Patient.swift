@@ -8,6 +8,8 @@
 import Foundation
 import FirebaseFirestore
 
+
+
 struct Patient: Identifiable, Codable, Hashable {
 
     // MARK: Firestore document ID
@@ -36,11 +38,10 @@ struct Patient: Identifiable, Codable, Hashable {
     var toothSensitivityLevel: Int
     var lastTetanusDate: Date?
     var emergencyContacts: [EmergencyContact]
-    
+    var profilePhotoPath: String?
     var fullName: String { "\(firstName) \(lastName)" }
     var avatarLetter: String { firstName.prefix(1).uppercased() }
     var age: Int { Calendar.current.dateComponents([.year], from: birthDate, to: Date()).year ?? 0 }
-    
     
     init(
         id: String? = nil,
@@ -299,5 +300,6 @@ extension Patient {
         case emergencyContacts = "emergency_contacts"
         case createdAt = "created_at"
         case updatedAt = "updated_at"
+        case profilePhotoPath = "profile_photo_path"
     }
 }

@@ -79,6 +79,7 @@ struct AppointmentsView: View {
                 }
             }
         }
+        .environmentObject(vm)
     }
     
     private var headerSection: some View {

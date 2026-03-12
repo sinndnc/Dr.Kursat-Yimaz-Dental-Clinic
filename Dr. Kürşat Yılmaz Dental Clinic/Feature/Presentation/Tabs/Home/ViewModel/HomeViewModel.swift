@@ -12,12 +12,10 @@ import Foundation
 
 final class HomeViewModel: ObservableObject{
     
-    @Published var heroScale: CGFloat = 0.97
-    @Published var greetingOpacity: Double = 0
-    @Published var currentTestimonialIndex = 0
     
     @Published var showMap: Bool = false
     @Published var showAppointmentBadge: Bool = true
+    @Published var currentTestimonialIndex = 0
     
     let phoneNumber = "905366360880"
     let destinationName = "Dr. Kürşat Yılmaz"

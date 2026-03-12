@@ -15,15 +15,14 @@ struct RootView: View {
         ZStack {
             Color.kyBackground.ignoresSafeArea()
             Group {
-                switch authVM.authState {
-                case .loading :
-                    ProgressView()
-                default:
+                if authVM.isLoading {
+                    SplashView()
+                }else{
                     MainTabView()
                 }
             }
+            .environmentObject(authVM)
+            .animation(.easeInOut(duration: 0.4), value: authVM.isLoading)
         }
-        .environmentObject(authVM)
-//        .animation(.default, value: authVM.authState)
     }
 }

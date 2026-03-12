@@ -7,8 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		997AD4F72F5853E1007AC84B /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 997AD4F62F5853E1007AC84B /* FirebaseAuth */; };
+		99230D852F61AAD000BB4E0A /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 99230D842F61AAD000BB4E0A /* Storage */; };
+		99230D8B2F61B66900BB4E0A /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 99230D8A2F61B66900BB4E0A /* Supabase */; };
 		997AD4F92F5853E1007AC84B /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 997AD4F82F5853E1007AC84B /* FirebaseFirestore */; };
+		99E934A72F62C67400F5C7CE /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 997AD4F62F5853E1007AC84B /* FirebaseAuth */; };
 		99F4E6FE2F58A78500FEC6AA /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 99F4E6FD2F58A78500FEC6AA /* FirebaseMessaging */; };
 		99F4E7002F58A7ED00FEC6AA /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 99F4E6FF2F58A7ED00FEC6AA /* FirebaseStorage */; };
 /* End PBXBuildFile section */
@@ -59,9 +61,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				99E934A72F62C67400F5C7CE /* FirebaseAuth in Frameworks */,
 				99F4E6FE2F58A78500FEC6AA /* FirebaseMessaging in Frameworks */,
 				99F4E7002F58A7ED00FEC6AA /* FirebaseStorage in Frameworks */,
-				997AD4F72F5853E1007AC84B /* FirebaseAuth in Frameworks */,
+				99230D8B2F61B66900BB4E0A /* Supabase in Frameworks */,
+				99230D852F61AAD000BB4E0A /* Storage in Frameworks */,
 				997AD4F92F5853E1007AC84B /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -135,6 +139,9 @@
 				997AD4F82F5853E1007AC84B /* FirebaseFirestore */,
 				99F4E6FD2F58A78500FEC6AA /* FirebaseMessaging */,
 				99F4E6FF2F58A7ED00FEC6AA /* FirebaseStorage */,
+				99230D842F61AAD000BB4E0A /* Storage */,
+				99230D8A2F61B66900BB4E0A /* Supabase */,
+				99C6F5832F61F41600A22EEF /* Auth */,
 			);
 			productName = "Dr. Kürşat Yılmaz Dental Clinic";
 			productReference = 997AD4BD2F585222007AC84B /* Dr. Kürşat Yılmaz Dental Clinic.app */;
@@ -220,6 +227,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				997AD4F52F5853E1007AC84B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				99230D832F61AAD000BB4E0A /* XCRemoteSwiftPackageReference "supabase-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 997AD4BE2F585222007AC84B /* Products */;
@@ -620,6 +628,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		99230D832F61AAD000BB4E0A /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.1;
+			};
+		};
 		997AD4F52F5853E1007AC84B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -631,6 +647,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		99230D842F61AAD000BB4E0A /* Storage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 99230D832F61AAD000BB4E0A /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Storage;
+		};
+		99230D8A2F61B66900BB4E0A /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 99230D832F61AAD000BB4E0A /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
 		997AD4F62F5853E1007AC84B /* FirebaseAuth */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 997AD4F52F5853E1007AC84B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
@@ -640,6 +666,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 997AD4F52F5853E1007AC84B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseFirestore;
+		};
+		99C6F5832F61F41600A22EEF /* Auth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 99230D832F61AAD000BB4E0A /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Auth;
 		};
 		99F4E6FD2F58A78500FEC6AA /* FirebaseMessaging */ = {
 			isa = XCSwiftPackageProductDependency;

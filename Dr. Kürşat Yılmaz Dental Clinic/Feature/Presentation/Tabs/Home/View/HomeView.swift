@@ -11,63 +11,109 @@ import MapKit
 
 struct HomeView: View {
     
-    @Injected private var fs: FirestoreServiceProtocol
-    
-    @EnvironmentObject private var vm: HomeViewModel
+    @StateObject private var vm = HomeViewModel()
     @EnvironmentObject private var authVm: AuthViewModel
+    @EnvironmentObject private var serVM: ServicesViewModel
+    @EnvironmentObject private var apptVM: AppointmentViewModel
     @EnvironmentObject private var navState: HomeNavigationState
     
-    @Environment(AppNavigationState.self) private var AppNavState: AppNavigationState
+    @State private var heroScale: CGFloat = 0.97
+    @State private var greetingOpacity: Double = 0
+    @State private var showClinicVideo: Bool = false
     
     var body: some View {
         NavigationStack(path: $navState.path) {
             ZStack(alignment: .top) {
                 Color.kyBackground.ignoresSafeArea()
+                
+                BackgroundVideoPlayerView(videoName: "servicesVideo", videoExtension: "mp4")
+                    .ignoresSafeArea()
+                    .frame(height: 300)
+                    .mask(
+                        LinearGradient(
+                            gradient: Gradient(stops: [
+                                .init(color: .black, location: 0.0),
+                                .init(color: .black, location: 0.5),
+                                .init(color: .clear, location: 1.0)
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 0) {
                         heroSection
-                        if authVm.authState == .authenticated {
-                            appointmentCardSection
-                        }
+                        appointmentCardSection
                         featuredServicesSection
                         statsSection
                         technologySection
-                        testimonialsSection
+//                        testimonialsSection
                         footerCTA
                     }
                 }
                 .ignoresSafeArea()
             }
-            .onAppear { withAnimation(.easeOut(duration: 0.8)) { vm.greetingOpacity = 1 ; vm.heroScale = 1.0 } }
+            .ignoresSafeArea()
+            .onAppear { withAnimation(.easeOut(duration: 0.8)) { greetingOpacity = 1 ; heroScale = 1.0 } }
             .navigationDestination(for: HomeDestination.self) { route in
                 switch route{
                 case .newAppointment:
                     BookingView()
-                case .clinicVideo:
-                    VideoPlayerView()
                 case .notifications:
                     NotificationsView()
                 case .appointmentDetail(let apt):
                     AppointmentDetailView(appointment: apt)
+                case .serviceDetail(let service):
+                    ServiceDetailView(service: service)
                 }
             }
+            .fullScreenCover(isPresented: $showClinicVideo) {
+                let url = URL(string: "https://framerusercontent.com/assets/abt50i9bj1pkM8Z69REgS1LLCo.mp4")!
+                VideoPlayerView(videoURL: url)
+            }
         }
-        .ignoresSafeArea()
+        .environmentObject(vm)
+    }
+    
+    private var appointmentCardSection: some View{
+        VStack(alignment: .leading, spacing: 14) {
+            sectionHeader(title: "Yaklaşan Randevu", subtitle: "Takvimde görüntüle →"){
+                //AppNavState.navigateToTab(.appointments)
+            }
+            Group{
+                switch authVm.authState {
+                case .loading:
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(Color.kyCard)
+                        .frame(height: 200)
+                        .overlay(ProgressView())
+                case .unauthenticated , .registrationPending:
+                    NoAppointmentCard { navState.navigate(to: .newAppointment) }
+                case .authenticated:
+                    if let appointment = apptVM.appointments.next {
+                        AppointmentCard(appointment: appointment) {
+                            navState.navigate(to: .appointmentDetail(apt: appointment))
+                        }
+                    }else{
+                        NoAppointmentCard { navState.navigate(to: .newAppointment) }
+                    }
+                }
+            }
+            .padding(.horizontal)
+        }
     }
     
     private var heroSection: some View {
         ZStack(alignment: .bottomLeading) {
-            ZStack {
-                Color.kyBackground
-                RadialGradient(
-                    colors: [Color.kyAccent.opacity(0.18), Color.kyBackground],
-                    center: UnitPoint(x: 0.85, y: 0.1),
-                    startRadius: 0,
-                    endRadius: 275
-                )
-                .ignoresSafeArea()
-            }
+            LinearGradient(
+                colors: [Color.kyAccent.opacity(0.12), Color.clear],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
             .frame(height: 300)
+            
             
             VStack(alignment: .leading, spacing: 0) {
                 HStack {
@@ -88,7 +134,6 @@ struct HomeView: View {
                     
                     Spacer()
                     
-                    //                     Notification bell
                     ZStack(alignment: .topTrailing) {
                         Button { navState.navigate(to: .notifications) } label: {
                             Image(systemName: "bell.fill")
@@ -112,19 +157,18 @@ struct HomeView: View {
                 .padding(.horizontal, 24)
                 .padding(.top, 60)
                 
-                // Hero text
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Yeni Nesil\nGülüş Tasarımı")
                         .font(.system(size: 36, weight: .bold, design: .serif))
                         .foregroundColor(Color.kyText)
                         .lineSpacing(3)
-                        .opacity(vm.greetingOpacity)
-                        .scaleEffect(vm.heroScale, anchor: .leading)
+                        .opacity(greetingOpacity)
+                        .scaleEffect(heroScale, anchor: .leading)
                     
                     Text("Dijital planlama · Minimal invaziv · Kişiye özel")
                         .font(.system(size: 13, weight: .regular))
                         .foregroundColor(Color.kySubtext)
-                        .opacity(vm.greetingOpacity)
+                        .opacity(greetingOpacity)
                     
                     // CTA Row
                     HStack(spacing: 12) {
@@ -149,7 +193,7 @@ struct HomeView: View {
                         }
                         
                         Button {
-                            navState.navigate(to: .clinicVideo)
+                            showClinicVideo.toggle()
                         } label: {
                             HStack(spacing: 6) {
                                 Image(systemName: "play.circle.fill")
@@ -165,49 +209,27 @@ struct HomeView: View {
                             .overlay(Capsule().strokeBorder(Color.kyBorder, lineWidth: 1))
                         }
                     }
-                    .opacity(vm.greetingOpacity)
+                    .opacity(greetingOpacity)
                 }
                 .padding(.bottom)
                 .padding(.horizontal)
-                .safeAreaPadding(.top)
             }
         }
-    }
-    
-    
-    private var appointmentCardSection: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            sectionHeader(title: "Yaklaşan Randevu", subtitle: "Takvimde görüntüle →"){
-                AppNavState.navigateToTab(.appointments)
-            }
-            
-            if let appointment = fs.appointments.next {
-                AppointmentCard(appointment: appointment){
-                    navState.navigate(to: .appointmentDetail(apt: appointment))
-                }
-                .padding(.horizontal)
-            }else{
-                NoAppointmentCard{
-                    navState.navigate(to: .newAppointment)
-                }
-                .padding(.horizontal)
-            }
-        }
-        .padding(.top, 32)
+        .ignoresSafeArea()
     }
     
     
     private var featuredServicesSection: some View {
         VStack(alignment: .leading, spacing: 14) {
             sectionHeader(title: "Öne Çıkan Tedaviler", subtitle: "Tümünü gör →"){
-                AppNavState.navigateToTab(.services)
+//                AppNavState.navigateToTab(.services)
             }
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
-                    ForEach(fs.services, id: \.self) { service in
+                    ForEach(serVM.services, id: \.self) { service in
                         Button {
-//                            AppNavState.navigateToService(service: service)
+                            navState.navigate(to: .serviceDetail(service: service))
                         } label: {
                             FeaturedServicePill(
                                 name: service.title,
@@ -225,7 +247,6 @@ struct HomeView: View {
         .padding(.top, 32)
     }
     
-    // MARK: - Stats Section
     
     private var statsSection: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -242,31 +263,24 @@ struct HomeView: View {
         .padding(.top, 32)
     }
     
-    // MARK: - Technology Section
     
     private var technologySection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            sectionHeader(title: "Teknoloji Altyapısı", subtitle: nil){
-                
-            }
-            
+            sectionHeader(title: "Teknoloji Altyapısı", subtitle: nil){}
             VStack(spacing: 10) {
                 ForEach(TechItemData.items) { item in
                     TechRow(item: item)
                 }
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal)
         }
         .padding(.top, 32)
     }
     
-    // MARK: - Testimonials
     
     private var testimonialsSection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            sectionHeader(title: "Hasta Deneyimleri", subtitle: nil){
-                
-            }
+            sectionHeader(title: "Hasta Deneyimleri", subtitle: nil){ }
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(alignment: .top, spacing: 14) {
@@ -365,8 +379,6 @@ struct HomeView: View {
         .padding(.bottom,50)
     }
     
-    // MARK: - Section Header Helper
-    
     private func sectionHeader(title: String, subtitle: String?,action: @escaping () -> Void) -> some View {
         HStack(alignment: .bottom) {
             Text(title)
@@ -383,8 +395,6 @@ struct HomeView: View {
         }
         .padding(.horizontal, 20)
     }
-  
-    
 }
 
 

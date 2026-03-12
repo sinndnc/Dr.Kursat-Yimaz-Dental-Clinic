@@ -7,10 +7,6 @@
 //  Production-level Firebase Authentication service.
 //  Registered as a .singleton in DIContainer.
 //
-//  Responsibilities:
-//  - Firebase Auth state tracking (sign-in, register, sign-out, password ops)
-//  - Owns `currentPatient` — loaded from Firestore via UID on auth state change
-//  - FirestoreService is NOT responsible for currentPatient
 
 import Foundation
 import FirebaseAuth
@@ -70,9 +66,6 @@ final class AuthService: AuthServiceProtocol {
         }
     }
     
-    /// Attaches a real-time Firestore listener to the authenticated user's Patient document.
-    /// Sets `authState` to `.authenticated` on success, `.registrationPending` if the document
-    /// doesn't exist yet or cannot be decoded (e.g. first-launch registration flow).
     private func attachPatientListener(uid: String) {
         patientListener?.remove()
         
@@ -120,6 +113,8 @@ final class AuthService: AuthServiceProtocol {
             firebaseUser = result.user
             // Patient is loaded automatically via attachPatientListener triggered
             // by addStateDidChangeListener — no manual fetch needed here.
+            //TEST
+            try await fs.updatePatient(MockPatients.sinan(id: result.user.uid))
         } catch let error as NSError {
             let message  = mapFirebaseError(error)
             errorMessage = message

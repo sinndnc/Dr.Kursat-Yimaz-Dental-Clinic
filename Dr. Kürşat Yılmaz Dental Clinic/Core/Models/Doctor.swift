@@ -10,10 +10,9 @@ import SwiftUI
 import FirebaseFirestore
 
 struct Doctor: Identifiable, Codable, Hashable {
-
     // MARK: Firestore document ID
     @DocumentID var id: String?
-
+    
     var name: String
     var title: String          // e.g. "Uzm. Dt."
     var specialty: String
@@ -30,10 +29,9 @@ struct Doctor: Identifiable, Codable, Hashable {
     var availableDays: [String]  // e.g. ["Pazartesi", "Salı"]
     var clinicIds: [String]      // Clinics this doctor works at
     var isActive: Bool
-
-    // MARK: UI-only helper (not Codable)
+    
     var accentColor: Color { Color(colorName: avatarColorName) }
-
+    
     // MARK: Init
     init(
         id: String? = nil,

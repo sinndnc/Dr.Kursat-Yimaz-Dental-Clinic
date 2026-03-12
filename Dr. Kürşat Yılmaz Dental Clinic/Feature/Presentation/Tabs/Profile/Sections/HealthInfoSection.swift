@@ -29,7 +29,7 @@ struct HealthInfoSection: View {
                 HealthInfoTile(
                     icon: "person.fill",
                     label: "Cinsiyet",
-                    value: patient.gender.rawValue ?? "",
+                    value: patient.gender.rawValue,
                     color: .kyPurple
                 )
                 HealthInfoTile(

@@ -9,10 +9,9 @@ import SwiftUI
 
 struct DoctorsView: View {
     
-    @Injected private var fs: FirestoreServiceProtocol
+    @State var headerAppeared  = false
     @EnvironmentObject private var vm: DoctorsViewModel
     @EnvironmentObject private var navState: DoctorsNavigationState
-
     
     var body: some View {
         NavigationStack(path: $navState.path){
@@ -35,16 +34,19 @@ struct DoctorsView: View {
                 }
                 .ignoresSafeArea()
             }
-            .sheet(isPresented: $vm.showAppointment){
-                BookingView()
-            }
-            .sheet(item: $vm.selectedDoctor) { doc in
-                DoctorProfileSheet(doctor: doc)
-            }
-            .onAppear {
-                withAnimation(.easeOut(duration: 0.7)) { vm.headerAppeared = true }
+            .onAppear { withAnimation(.easeOut(duration: 0.7)) { headerAppeared = true } }
+            .navigationDestination(for: DoctorsDestination.self) { route in
+                switch route{
+                case .doctorDetail(let doc):
+                    DoctorProfileSheet(doctor: doc)
+                case .bookAppointment:
+                    BookingView()
+                default:
+                    EmptyView()
+                }
             }
         }
+        .environmentObject(vm)
     }
     
     private var headerSection: some View {
@@ -70,8 +72,8 @@ struct DoctorsView: View {
                 Text("Ekibimiz")
                     .font(.system(size: 34, weight: .bold, design: .serif))
                     .foregroundColor(Color.kyText)
-                    .opacity(vm.headerAppeared ? 1 : 0)
-                    .offset(y: vm.headerAppeared ? 0 : 10)
+                    .opacity(headerAppeared ? 1 : 0)
+                    .offset(y:headerAppeared ? 0 : 10)
                 Text("Uzman kadromuzla tanışın")
                     .font(.system(size: 14)).foregroundColor(Color.kySubtext)
             }
@@ -116,16 +118,17 @@ struct DoctorsView: View {
 
     private var doctorCardsSection: some View {
         VStack(spacing: 16) {
-            ForEach(fs.doctors) { doc in
+            ForEach(vm.doctors) { doc in
                 DoctorCard(doctor: doc)
-                    .onTapGesture { vm.selectedDoctor = doc }
+                    .onTapGesture {
+                        navState.navigate(to: .doctorDetail(doc: doc))
+                    }
             }
         }
         .padding(.horizontal, 20)
     }
-
-    // MARK: Credentials Strip
-
+    
+    
     private var credentialsStrip: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
@@ -166,7 +169,7 @@ struct DoctorsView: View {
                 .foregroundColor(Color.kySubtext)
             
             Button {
-                vm.showAppointment.toggle()
+                navState.navigate(to: .bookAppointment)
             } label: {
                 HStack(spacing: 8) {
                     Spacer()

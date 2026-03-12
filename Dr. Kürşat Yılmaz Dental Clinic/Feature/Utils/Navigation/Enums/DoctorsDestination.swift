@@ -7,8 +7,7 @@
 
 
 enum DoctorsDestination: Hashable {
-    case doctorDetail(id: String)
-    case doctorReviews(doctorId: String)
-    case bookAppointment(doctorId: String)
+    case doctorDetail(doc: EnrichedDoctor)
+    case bookAppointment
     case doctorFilter
 }
