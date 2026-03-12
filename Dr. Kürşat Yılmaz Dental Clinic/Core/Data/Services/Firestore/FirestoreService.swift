@@ -159,18 +159,18 @@ final class FirestoreService: FirestoreServiceProtocol {
     @discardableResult func createAppointment(_ appt: Appointment) async throws -> String { try await createDocument(appt,     collection: FSCollection.appointments) }
     
     func updatePatient(_ patient: Patient) async throws {
-        guard let id = patient.id else { throw FirestoreError.missingId }
+        guard let id = patient.id else { throw FirestoreError.permissionDenied }
         var updated = patient; updated.updatedAt = Date()
         try await updateDocument(updated, collection: FSCollection.patients, id: id)
     }
     
     func updateDoctor(_ doctor: Doctor) async throws {
-        guard let id = doctor.id else { throw FirestoreError.missingId }
+        guard let id = doctor.id else { throw FirestoreError.permissionDenied }
         try await updateDocument(doctor, collection: FSCollection.doctors, id: id)
     }
     
     func updateClinic(_ clinic: Clinic) async throws {
-        guard let id = clinic.id else { throw FirestoreError.missingId }
+        guard let id = clinic.id else { throw FirestoreError.permissionDenied }
         var updated = clinic; updated.updatedAt = Date()
         try await updateDocument(updated, collection: FSCollection.clinics, id: id)
     }
@@ -180,7 +180,7 @@ final class FirestoreService: FirestoreServiceProtocol {
     }
     
     func updateAppointment(_ appointment: Appointment) async throws {
-        guard let id = appointment.id else { throw FirestoreError.missingId }
+        guard let id = appointment.id else { throw FirestoreError.permissionDenied }
         var updated = appointment; updated.updatedAt = Date()
         try await updateDocument(updated, collection: FSCollection.appointments, id: id)
     }
@@ -229,20 +229,20 @@ final class FirestoreService: FirestoreServiceProtocol {
     
     private func fetchDocument<T: Codable>(collection: String, id: String) async throws -> T {
         let snapshot = try await db.collection(collection).document(id).getDocument()
-        guard snapshot.exists else { throw FirestoreError.documentNotFound(id) }
+        guard snapshot.exists else { throw FirestoreError.documentNotFound(id:id) }
         do    { return try snapshot.data(as: T.self) }
-        catch { throw FirestoreError.firestoreError(error) }
+        catch { throw FirestoreError.unknown(underlying: error) }
     }
 
     @discardableResult
     private func createDocument<T: Encodable>(_ value: T, collection: String) async throws -> String {
         let ref = db.collection(collection).document()
         do    { try ref.setData(from: value); return ref.documentID }
-        catch { throw FirestoreError.encodingFailed(error) }
+        catch { throw FirestoreError.unknown(underlying: error) }
     }
 
     private func updateDocument<T: Encodable>(_ value: T, collection: String, id: String) async throws {
         do    { try db.collection(collection).document(id).setData(from: value, merge: true) }
-        catch { throw FirestoreError.encodingFailed(error) }
+        catch { throw FirestoreError.unknown(underlying: error) }
     }
 }

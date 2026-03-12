@@ -38,7 +38,7 @@ struct DoctorsView: View {
             .navigationDestination(for: DoctorsDestination.self) { route in
                 switch route{
                 case .doctorDetail(let doc):
-                    DoctorProfileSheet(doctor: doc)
+                    DoctorDetailView(doctor: doc)
                 case .bookAppointment:
                     BookingView()
                 default:
@@ -157,7 +157,6 @@ struct DoctorsView: View {
         }
     }
     
-    // MARK: Bottom CTA
     private var bottomCTA: some View {
         VStack(spacing: 14) {
             Text("Hangi hekim size uygun?")
@@ -195,8 +194,6 @@ struct DoctorsView: View {
         .padding(.horizontal, 24)
     }
 }
-
-// MARK: - Preview
 
 #Preview {
     DoctorsView()

@@ -290,15 +290,15 @@ struct StepProgressBar: View {
 // MARK: - Password Strength View
 struct PasswordStrengthView: View {
     let password: String
-
+    
     private var strength: (level: Int, label: String, color: Color) {
         let len = password.count
         let hasUpper = password.range(of: "[A-Z]", options: .regularExpression) != nil
         let hasNum = password.range(of: "[0-9]", options: .regularExpression) != nil
         let hasSpecial = password.range(of: "[^a-zA-Z0-9]", options: .regularExpression) != nil
-
+        
         let score = (len >= 8 ? 1 : 0) + (len >= 12 ? 1 : 0) + (hasUpper ? 1 : 0) + (hasNum ? 1 : 0) + (hasSpecial ? 1 : 0)
-
+        
         switch score {
         case 0...1: return (1, "Weak", .kyDanger)
         case 2...3: return (2, "Fair", .kyOrange)
@@ -306,7 +306,7 @@ struct PasswordStrengthView: View {
         default:    return (4, "Strong", .kyGreen)
         }
     }
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 4) {
@@ -317,7 +317,7 @@ struct PasswordStrengthView: View {
                         .animation(.spring(response: 0.3), value: strength.level)
                 }
             }
-
+            
             Text("Password strength: \(strength.label)")
                 .font(.kySans(11))
                 .foregroundColor(strength.color)

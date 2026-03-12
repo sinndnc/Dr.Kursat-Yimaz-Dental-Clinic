@@ -14,27 +14,18 @@ struct ServiceCard: View {
     var body: some View {
         ZStack(alignment: .topTrailing) {
             HStack(alignment: .top, spacing: 16) {
-                // Icon
-                ZStack {
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .fill(service.accentColor.opacity(0.12))
-                        .frame(width: 52, height: 52)
-                    Image(systemName: service.sfSymbol)
-                        .font(.system(size: 22, weight: .medium))
-                        .foregroundColor(service.accentColor)
-                }
-
+              
                 VStack(alignment: .leading, spacing: 6) {
                     Text(service.title)
                         .multilineTextAlignment(.leading)
                         .font(.system(size: 16, weight: .bold, design: .serif))
                         .foregroundColor(Color.kyText)
-
+                    
                     Text(service.subtitle)
                         .multilineTextAlignment(.leading)
                         .font(.system(size: 12, weight: .medium))
-                        .foregroundColor(service.accentColor)
-
+                        .foregroundColor(.gray)
+                    
                     Text(service.description)
                         .multilineTextAlignment(.leading)
                         .font(.system(size: 13, weight: .regular))
@@ -42,7 +33,7 @@ struct ServiceCard: View {
                         .lineSpacing(3)
                         .lineLimit(3)
                         .padding(.top, 2)
-
+                    
                     // Tags
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 6) {
@@ -50,10 +41,9 @@ struct ServiceCard: View {
                                 Text(tag)
                                     .font(.system(size: 10, weight: .semibold))
                                     .tracking(0.3)
-                                    .foregroundColor(service.accentColor.opacity(0.9))
                                     .padding(.horizontal, 8)
                                     .padding(.vertical, 4)
-                                    .background(service.accentColor.opacity(0.1))
+                                    .background(.white.opacity(0.1))
                                     .clipShape(Capsule())
                             }
                         }
@@ -77,7 +67,8 @@ struct ServiceCard: View {
                     .foregroundColor(.white)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
-                    .background(service.accentColor)
+                    .background(Color.kyGreen)
+                    .foregroundStyle(.white)
                     .clipShape(Capsule())
                     .padding(.top, 14)
                     .padding(.trailing, 14)

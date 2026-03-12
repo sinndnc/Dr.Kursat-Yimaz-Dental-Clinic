@@ -10,10 +10,10 @@ import SwiftUI
 import FirebaseFirestore
 
 struct Appointment: Identifiable, Codable, Hashable {
-
+    
     // MARK: Firestore document ID
     @DocumentID var id: String?
-
+    
     var patientId: String
     var patientName: String       // denormalized for quick display
     var doctorId: String
@@ -73,7 +73,7 @@ struct Appointment: Identifiable, Codable, Hashable {
         self.createdAt = createdAt
         self.updatedAt = updatedAt
     }
-
+    
     // MARK: - AppointmentType
     enum AppointmentType: String, Codable, CaseIterable, Identifiable, Hashable {
         case checkup      = "Kontrol"
@@ -84,9 +84,9 @@ struct Appointment: Identifiable, Codable, Hashable {
         case rootCanal    = "Kanal Tedavisi"
         case extraction   = "Çekim"
         case prosthetics  = "Protez"
-
+        
         var id: String { rawValue }
-
+        
         var icon: String {
             switch self {
             case .checkup:      return "magnifyingglass.circle.fill"
@@ -99,7 +99,7 @@ struct Appointment: Identifiable, Codable, Hashable {
             case .prosthetics:  return "staroflife.fill"
             }
         }
-
+        
         var colorName: String {
             switch self {
             case .checkup:      return "blue"
@@ -116,7 +116,6 @@ struct Appointment: Identifiable, Codable, Hashable {
         var color: Color { Color(colorName: colorName) }
     }
     
-    // MARK: - CodingKeys
     enum CodingKeys: String, CodingKey {
         case id
         case patientId       = "patient_id"
@@ -144,9 +143,9 @@ enum AppointmentStatus: String, Codable, CaseIterable, Identifiable, Hashable {
     case completed  = "Tamamlandı"
     case cancelled  = "İptal"
     case noShow     = "Gelmedi"
-
+    
     var id: String { rawValue }
-
+    
     var icon: String {
         switch self {
         case .upcoming:   return "clock"
@@ -156,7 +155,7 @@ enum AppointmentStatus: String, Codable, CaseIterable, Identifiable, Hashable {
         case .noShow:     return "person.fill.xmark"
         }
     }
-
+    
     var color: Color {
         switch self {
         case .upcoming:   return .blue

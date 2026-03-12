@@ -17,28 +17,28 @@ struct HealthInfoSection: View {
             KYSectionHeader(title: "Sağlık Bilgilerim") {
                 navState.navigate(to: .healthInfo)
             }
-
+            
             // Quick health summary
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-                HealthInfoTile(
+                HealthInfoStat(
                     icon: "drop.fill",
                     label: "Kan Grubu",
                     value: patient.bloodType?.rawValue ?? "—",
                     color: .kyDanger
                 )
-                HealthInfoTile(
+                HealthInfoStat(
                     icon: "person.fill",
                     label: "Cinsiyet",
                     value: patient.gender.rawValue,
                     color: .kyPurple
                 )
-                HealthInfoTile(
+                HealthInfoStat(
                     icon: "birthday.cake.fill",
                     label: "Yaş",
                     value: "\(patient.age)",
                     color: .kyAccent
                 )
-                HealthInfoTile(
+                HealthInfoStat(
                     icon: "waveform.path.ecg",
                     label: "Diş Hassasiyeti",
                     value: sensitivityLabel(1),
@@ -46,8 +46,7 @@ struct HealthInfoSection: View {
                 )
             }
             .padding(.horizontal, 20)
-
-            // Allergies card
+            
             Button {
                 navState.navigate(to: .allergiesDetail)
             } label: {
@@ -246,47 +245,6 @@ struct HealthInfoSection: View {
     }
 }
 
-// MARK: - Health Info Tile
-
-struct HealthInfoTile: View {
-    let icon: String
-    let label: String
-    let value: String
-    let color: Color
-
-    var body: some View {
-        HStack(spacing: 10) {
-            ZStack {
-                Circle()
-                    .fill(color.opacity(0.12))
-                    .frame(width: 36, height: 36)
-                Image(systemName: icon)
-                    .font(.system(size: 14))
-                    .foregroundColor(color)
-            }
-            VStack(alignment: .leading, spacing: 2) {
-                Text(label)
-                    .font(.kyMono(9, weight: .medium))
-                    .tracking(0.5)
-                    .foregroundColor(.kySubtext)
-                Text(value)
-                    .font(.kySans(15, weight: .bold))
-                    .foregroundColor(.kyText)
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(12)
-        .background(Color.kyCard)
-        .clipShape(RoundedRectangle(cornerRadius: 14))
-        .overlay(
-            RoundedRectangle(cornerRadius: 14)
-                .strokeBorder(Color.kyBorder, lineWidth: 1)
-        )
-    }
-}
-
-// MARK: - Health Info Detail View
-
 struct HealthInfoDetailView: View {
     @State var patient: Patient
     @EnvironmentObject private var vm: ProfileViewModel
@@ -308,112 +266,10 @@ struct HealthInfoDetailView: View {
     }
 }
 
-// MARK: - Allergies Detail
-
-struct AllergiesDetailView: View {
-    @State var patient: Patient
-    
-    var body: some View {
-        ZStack {
-            Color.kyBackground.ignoresSafeArea()
-            VStack(spacing: 0) {
-                KYDetailHeader(title: "Alerjiler")
-                ScrollView(showsIndicators: false) {
-                    VStack(spacing: 12) {
-                        if patient.allergies.isEmpty {
-                            KYEmptyState(icon: "checkmark.shield.fill", title: "Alerji Yok", message: "Kayıtlı alerji bilginiz bulunmuyor.")
-                        } else {
-                            ForEach(patient.allergies) { allergy in
-                                KYCard(glowColor: .gray) {
-                                    VStack(spacing: 10) {
-                                        HStack {
-                                            HStack(spacing: 8) {
-                                                Circle()
-                                                    .frame(width: 10, height: 10)
-                                                Text(allergy.name)
-                                                    .font(.kySans(16, weight: .bold))
-                                                    .foregroundColor(.kyText)
-                                            }
-                                            Spacer()
-                                            KYBadge(
-                                                text: allergy.severity.rawValue,
-                                                color: .gray
-                                            )
-                                        }
-                                        if let notes = allergy.notes {
-                                            Text(notes)
-                                                .font(.kySans(13))
-                                                .foregroundColor(.kySubtext)
-                                                .frame(maxWidth: .infinity, alignment: .leading)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 16)
-                    .padding(.bottom, 40)
-                }
-            }
-        }
-        .navigationBarHidden(true)
-    }
-}
-
-// MARK: - Medications Detail
-
-struct MedicationsDetailView: View {
-    @State var patient: Patient
-
-    var body: some View {
-        ZStack {
-            Color.kyBackground.ignoresSafeArea()
-            VStack(spacing: 0) {
-                KYDetailHeader(title: "Düzenli İlaçlar")
-                ScrollView(showsIndicators: false) {
-                    VStack(spacing: 10) {
-                        ForEach(patient.medications) { med in
-                            KYCard {
-                                VStack(spacing: 10) {
-                                    HStack(spacing: 12) {
-                                        ZStack {
-                                            RoundedRectangle(cornerRadius: 10)
-                                                .fill(Color.kyBlue.opacity(0.12))
-                                                .frame(width: 42, height: 42)
-                                            Image(systemName: "pills.fill")
-                                                .font(.system(size: 17))
-                                                .foregroundColor(.kyBlue)
-                                        }
-                                        VStack(alignment: .leading, spacing: 3) {
-                                            Text(med.name)
-                                                .font(.kySans(15, weight: .semibold))
-                                                .foregroundColor(.kyText)
-                                            Text("\(med.dosage) · \(med.frequency)")
-                                                .font(.kySans(13))
-                                                .foregroundColor(.kySubtext)
-                                        }
-                                        Spacer()
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 16)
-                    .padding(.bottom, 40)
-                }
-            }
-        }
-        .navigationBarHidden(true)
-    }
-}
-
-// MARK: - Emergency Contacts
 
 struct EmergencyContactsView: View {
     @State var patient: Patient
-
+    
     var body: some View {
         ZStack {
             Color.kyBackground.ignoresSafeArea()

@@ -22,6 +22,7 @@ struct Injected<T> {
 }
 
 struct ServiceFactory {
+    
     let scope: ServiceScope
     let factory: (DIContainer) -> Any
 }

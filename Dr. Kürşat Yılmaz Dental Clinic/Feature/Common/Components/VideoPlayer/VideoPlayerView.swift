@@ -28,6 +28,8 @@ struct VideoPlayerView: View {
             // Close Button
             VStack {
                 HStack {
+                    Spacer()
+                    
                     Button {
                         dismiss()
                     } label: {
@@ -40,10 +42,8 @@ struct VideoPlayerView: View {
                                 .foregroundColor(.white)
                         }
                     }
-                    .padding(.leading, 20)
+                    .padding(.trailing, 20)
                     .padding(.top, 60)
-                    
-                    Spacer()
                 }
                 Spacer()
             }

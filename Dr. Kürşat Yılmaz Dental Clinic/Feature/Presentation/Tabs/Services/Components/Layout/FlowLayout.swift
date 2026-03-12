@@ -12,7 +12,6 @@ struct FlowLayout: View {
     let accentColor: Color
     
     var body: some View {
-        // Simple wrapping tag layout
         var width = CGFloat.zero
         var height = CGFloat.zero
         

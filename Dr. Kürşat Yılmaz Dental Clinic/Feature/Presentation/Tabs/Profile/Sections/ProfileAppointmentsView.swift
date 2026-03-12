@@ -44,7 +44,7 @@ struct AppointmentListView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 10) {
                         ForEach(filteredAppointments) { apt in
-                            AppointmentRow(appointment: apt)
+                            AppointmentCard(appointment: apt)
                                 .onTapGesture {
                                     navState.navigate(to: .appointmentDetail(appointment: apt))
                                 }

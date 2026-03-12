@@ -36,6 +36,13 @@ class AppDIConfiguration {
             FirestoreService(firestore: c.resolve(Firestore.self))
         }
         
+        
+        container
+            .register(AppointmentRepositoryProtocol.self,scope: .singleton) { c in
+                AppointmentRepository(
+                    db: c.resolve(Firestore.self),
+                )
+            }
         container
             .register(DoctorsRepositoryProtocol.self, scope: .singleton) { c in
                 DoctorsRepository(

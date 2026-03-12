@@ -18,9 +18,8 @@ struct AuthFlowView: View {
     let initialSheet: AuthSheet
     @Environment(AppNavigationState.self) private var appNav
     
-    // Auth'un kendi internal path'i
     @State private var authPath = NavigationPath()
-
+    
     var body: some View {
         NavigationStack(path: $authPath) {
             Group {

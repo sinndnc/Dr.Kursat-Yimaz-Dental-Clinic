@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		99230D852F61AAD000BB4E0A /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 99230D842F61AAD000BB4E0A /* Storage */; };
 		99230D8B2F61B66900BB4E0A /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 99230D8A2F61B66900BB4E0A /* Supabase */; };
+		9978FE482F63023C00101247 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 99C6F5832F61F41600A22EEF /* Auth */; };
 		997AD4F92F5853E1007AC84B /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 997AD4F82F5853E1007AC84B /* FirebaseFirestore */; };
 		99E934A72F62C67400F5C7CE /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 997AD4F62F5853E1007AC84B /* FirebaseAuth */; };
 		99F4E6FE2F58A78500FEC6AA /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 99F4E6FD2F58A78500FEC6AA /* FirebaseMessaging */; };
@@ -61,6 +62,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9978FE482F63023C00101247 /* Auth in Frameworks */,
 				99E934A72F62C67400F5C7CE /* FirebaseAuth in Frameworks */,
 				99F4E6FE2F58A78500FEC6AA /* FirebaseMessaging in Frameworks */,
 				99F4E7002F58A7ED00FEC6AA /* FirebaseStorage in Frameworks */,

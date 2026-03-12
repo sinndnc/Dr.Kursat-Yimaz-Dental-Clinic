@@ -37,41 +37,10 @@ struct ServicesView: View {
                 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 0) {
-                        // MARK: Header
                         headerSection
-                        // MARK: Category Picker
                         categoryPicker
-                            .padding(.vertical)
-                        
-                        // MARK: Service Cards
-                        LazyVStack(spacing: 16) {
-                            ForEach(Array(vm.filteredServices.enumerated()), id: \.element.id) { index, service in
-                                Button{
-                                    navState.navigate(to: .serviceDetail(service: service))
-                                    withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
-                                        vm.showDetail = true
-                                    }
-                                } label: {
-                                    ServiceCard(service: service)
-                                }
-                                .transition(.asymmetric(
-                                    insertion: .move(edge: .bottom).combined(with: .opacity),
-                                    removal: .opacity
-                                ))
-                            }
-                        }
-                        .padding(.horizontal, 20)
-                        .padding(.bottom, 40)
-                        .animation(.spring(response: 0.45, dampingFraction: 0.82), value: vm.selectedCategory)
-                        
-                        // MARK: CTA Banner
-                        Button{
-                            vm.showAppointment.toggle()
-                        }label:{
-                            appointmentBanner
-                                .padding(.horizontal, 20)
-                                .padding(.bottom, 100)
-                        }
+                        cardSeection
+                        appointmentButtonSection
                     }
                     .safeAreaPadding(.vertical)
                 }
@@ -96,7 +65,38 @@ struct ServicesView: View {
         .environmentObject(vm)
     }
     
-    // MARK: Header Section
+    private var appointmentButtonSection: some View{
+        Button{
+            vm.showAppointment.toggle()
+        }label:{
+            appointmentBanner
+                .padding(.horizontal, 20)
+                .padding(.bottom, 100)
+        }
+    }
+    
+    private var cardSeection: some View{
+        LazyVStack(spacing: 15) {
+            ForEach(Array(vm.filteredServices.enumerated()), id: \.element.id) { index, service in
+                Button{
+                    navState.navigate(to: .serviceDetail(service: service))
+                    withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
+                        vm.showDetail = true
+                    }
+                } label: {
+                    ServiceCard(service: service)
+                }
+                .transition(.asymmetric(
+                    insertion: .move(edge: .bottom).combined(with: .opacity),
+                    removal: .opacity
+                ))
+            }
+        }
+        .padding()
+        .padding(.bottom, 40)
+        .animation(.spring(response: 0.45, dampingFraction: 0.82), value: vm.selectedCategory)
+    }
+    
     private var headerSection: some View {
         ZStack(alignment: .bottomLeading) {
             
@@ -138,7 +138,6 @@ struct ServicesView: View {
         }
     }
     
-    // MARK: Category Picker
     private var categoryPicker: some View {
         HStack(spacing: 0) {
             ForEach(ServiceCategory.allCases) { cat in
@@ -167,7 +166,6 @@ struct ServicesView: View {
                 .animation(.spring(response: 0.3), value: vm.selectedCategory)
             }
         }
-        .padding(.horizontal, 20)
         .background(
             Rectangle()
                 .fill(Color.kyBorder)

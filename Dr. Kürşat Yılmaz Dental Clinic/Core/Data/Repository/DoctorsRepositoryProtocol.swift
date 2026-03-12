@@ -21,21 +21,16 @@ import SwiftUI
 struct EnrichedDoctor: Identifiable, Equatable,Hashable {
     let doctor: Doctor
     
-    /// Resolved photo URLs (photo_0, photo_1 …). Empty = show initials.
     let photoURLs: [URL]
     
-    /// Convenience: primary profile photo
     var primaryPhotoURL: URL? { photoURLs.first }
     
-    // MARK: Identifiable
     var id: String { doctor.id ?? "" }
     
-    // MARK: Equatable
     static func == (lhs: EnrichedDoctor, rhs: EnrichedDoctor) -> Bool {
         lhs.id == rhs.id && lhs.photoURLs == rhs.photoURLs
     }
     
-    // MARK: Pass-through helpers (keeps call-sites clean)
     var name:             String      { doctor.name }
     var bio:             String      { doctor.bio }
     var education: [DoctorEducation] { doctor.education }
@@ -53,7 +48,6 @@ struct EnrichedDoctor: Identifiable, Equatable,Hashable {
     var avatarInitials:   String      { doctor.avatarInitials }
 }
 
-// MARK: - Protocol
 
 protocol DoctorsRepositoryProtocol: AnyObject {
     

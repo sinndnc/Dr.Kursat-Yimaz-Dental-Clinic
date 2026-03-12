@@ -7,85 +7,6 @@
 
 import SwiftUI
 
-// MARK: - Profile Tab
-
-enum ProfileTab: String, CaseIterable {
-    case appointments = "Randevular"
-    case treatments = "Tedaviler"
-    case payments = "Ödemeler"
-    case health = "Sağlık"
-    case documents = "Belgeler"
-    case settings = "Ayarlar"
-
-    var icon: String {
-        switch self {
-        case .appointments: return "calendar"
-        case .treatments: return "cross.case.fill"
-        case .payments: return "creditcard.fill"
-        case .health: return "heart.text.square.fill"
-        case .documents: return "folder.fill"
-        case .settings: return "gearshape.fill"
-        }
-    }
-}
-
-
-struct ProfileNavItem: View {
-    let icon: String
-    let title: String
-    var subtitle: String?
-    var iconColor: Color = .kyAccent
-    var badge: String? = nil
-    var progress: Double? = nil
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 14) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .fill(iconColor.opacity(0.14))
-                        .frame(width: 40, height: 40)
-                    Image(systemName: icon)
-                        .font(.system(size: 16))
-                        .foregroundColor(iconColor)
-                }
-
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(title)
-                        .font(.kySans(15, weight: .semibold))
-                        .foregroundColor(.kyText)
-                    if let subtitle {
-                        Text(subtitle)
-                            .font(.kySans(12))
-                            .foregroundColor(.kySubtext)
-                            .lineLimit(1)
-                    }
-                    if let progress {
-                        KYProgressBar(progress: progress, color: iconColor, height: 4)
-                            .padding(.top, 2)
-                    }
-                }
-
-                Spacer()
-
-                if let badge {
-                    KYBadge(text: badge, color: iconColor)
-                }
-
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundColor(.kySubtext.opacity(0.35))
-            }
-            .padding(.vertical, 12)
-            .padding(.horizontal, 16)
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-    }
-}
-
-
 struct ProfileView: View {
     
     @EnvironmentObject private var vm: ProfileViewModel
@@ -96,24 +17,26 @@ struct ProfileView: View {
             ZStack {
                 Color.kyBackground.ignoresSafeArea()
                 
-                if let patient = vm.patient{
-                    ScrollView(showsIndicators: false) {
-                        VStack(spacing: 0) {
-                            headerSection(patient: patient)
-                            nextAppointmentBanner
-                                .padding(.top, 14)
-                            allSectionsStack(patient: patient)
-                                .padding(.top, 28)
-                            footerNote(patient: patient)
-                                .padding(.top, 32)
+                Group{
+                    if let patient = vm.patient{
+                        ScrollView(showsIndicators: false) {
+                            VStack(spacing: 0) {
+                                headerSection(patient: patient)
+                                nextAppointmentBanner
+                                    .padding(.top, 14)
+                                allSectionsStack(patient: patient)
+                                    .padding(.top, 28)
+                                footerNote(patient: patient)
+                                    .padding(.top, 32)
+                            }
                         }
+                        .task {
+                            await vm.loadPatientImage(id: patient.id!)
+                        }
+                        .ignoresSafeArea(edges: .top)
+                    }else{
+                        GuestProfileView()
                     }
-                    .task {
-                        await vm.loadPatientImage(id: patient.id!)
-                    }
-                    .ignoresSafeArea(edges: .top)
-                }else{
-                    GuestProfileView()
                 }
             }
             .onAppear { withAnimation(.spring(response: 0.65, dampingFraction: 0.82)) { vm.appeared = true } }
@@ -127,105 +50,84 @@ struct ProfileView: View {
     @ViewBuilder
     func allSectionsStack(patient: Patient) -> some View{
         VStack(spacing: 24) {
-            
-            profileSectionBlock(title: "Genel", icon: "gearshape.fill") {
-                ProfileNavItem(
+            profileSectionBlock(title: "Genel") {
+                ProfileCard(
                     icon: "person.circle.fill",
                     title: "Bilgilerim",
                     subtitle: "Ad, iletişim bilgileri",
-                    iconColor: .kyAccent
                 ) { navState.navigate(to: .editProfile) }
                 
                 KYDivider()
                 
-                ProfileNavItem(
+                ProfileCard(
                     icon: "bell.badge.fill",
                     title: "Bildirimler",
                     subtitle: "Push, SMS, WhatsApp tercihleri",
-                    iconColor: .kyBlue
                 ) { navState.navigate(to: .notifications) }
                 
                 KYDivider()
                 
-                ProfileNavItem(
-                    icon: "creditcard.fill",
-                    title: "Ödeme Geçmişi",
-                    subtitle: "\(vm.payments.count) işlem · \(vm.totalPaid.formatted_TRY) ödendi",
-                    iconColor: .kyBlue
-                ) { navState.navigate(to: .payments) }
-                
-                KYDivider()
-                
-                ProfileNavItem(
+                ProfileCard(
                     icon: "star.circle.fill",
                     title: "Sadakat Puanları",
                     subtitle: "1250 puan",
-                    iconColor: .kyAccent
                 ) { navState.navigate(to: .loyaltyPoints) }
                 
             }
             
-            profileSectionBlock(title: "Sağlık", icon: "stethoscope") {
+            profileSectionBlock(title: "Sağlık") {
                 
-                ProfileNavItem(
+                ProfileCard(
                     icon: "calendar",
                     title: "Randevular",
                     subtitle: "\(vm.appointments.count) randevu · \(vm.upcomingAppointments.count) yaklaşan",
-                    iconColor: .kyBlue,
                     badge: vm.upcomingAppointments.isEmpty ? nil : "\(vm.upcomingAppointments.count)"
                 ) { navState.navigate(to: .appointments) }
                 
                 KYDivider()
                 
-                ProfileNavItem(
+                ProfileCard(
                     icon: "cross.case.fill",
                     title: "Tedaviler",
                     subtitle: "\(vm.treatments.count) tedavi",
-                    iconColor: .kyBlue
                 ) { navState.navigate(to: .treatments) }
                 
                 KYDivider()
                 
-                ProfileNavItem(
+                ProfileCard(
                     icon: "heart.text.square.fill",
                     title: "Sağlık Özeti",
                     subtitle: "Kan grubu, cinsiyet, yaş",
-                    iconColor: .kyDanger
                 ) { navState.navigate(to: .healthInfo) }
                 
                 KYDivider()
                 
-                ProfileNavItem(
+                ProfileCard(
                     icon: "folder.fill",
                     title: "Belgeler",
                     subtitle: "\(vm.documents.count) belge",
-                    iconColor: .kyAccent
                 ) { navState.navigate(to: .documents) }
                 
             }
             
-            profileSectionBlock(title: "Yardım & Gizlilik", icon: "hand.raised.fill") {
-                
-                ProfileNavItem(
+            profileSectionBlock(title: "Yardım & Gizlilik") {
+                ProfileCard(
                     icon: "doc.text.fill",
                     title: "Gizlilik Politikası",
                     subtitle: "KVKK",
-                    iconColor: .kySubtext
                 ) { navState.navigate(to: .privacyPolicy) }
                 
                 KYDivider()
                 
-                ProfileNavItem(
+                ProfileCard(
                     icon: "questionmark.circle.fill",
                     title: "Yardım & Destek",
                     subtitle: nil,
-                    iconColor: .kyBlue
                 ) { navState.navigate(to: .helpSupport) }
                 
                 KYDivider()
                 
                 
-                // Çıkış
                 Button { vm.signOut() } label: {
                     HStack(spacing: 14) {
                         ZStack {
@@ -253,22 +155,18 @@ struct ProfileView: View {
     @ViewBuilder
     private func profileSectionBlock<Content: View>(
         title: String,
-        icon: String,
         @ViewBuilder content: () -> Content
     ) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            // Başlık
+            
             HStack(spacing: 8) {
-                Image(systemName: icon)
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(.kyAccent)
                 Text(title.uppercased())
                     .font(.kyMono(10, weight: .bold))
                     .tracking(2)
                     .foregroundColor(.kySubtext)
             }
             .padding(.horizontal, 4)
-
+            
             // Kart
             VStack(spacing: 0) {
                 content()
@@ -298,7 +196,7 @@ struct ProfileView: View {
                 .ignoresSafeArea()
             }
             .frame(height: 280)
-
+            
             VStack(spacing: 0) {
                 // Top bar
                 HStack(alignment: .center) {
@@ -315,7 +213,7 @@ struct ProfileView: View {
                             .foregroundColor(.kyText)
                     }
                     Spacer()
-
+                    
                     // Loyalty badge
                     Button {
                         navState.navigate(to: .loyaltyPoints)
@@ -473,25 +371,21 @@ struct ProfileView: View {
         case .appointments:
             AppointmentListView()
         case .treatments:
-            TreatmentListView()
-        case .payments:
-            PaymentListView()
+            TreatmentsView()
         case .healthInfo:
             HealthInfoDetailView(patient: vm.patient!)
         case .documents:
-            DocumentsListView()
+            DocumentsView()
         case .appointmentDetail(let appointment):
             AppointmentDetailView(appointment: appointment)
         case .treatmentDetail(let id):
             TreatmentDetailView(treatmentId: id)
-        case .paymentDetail(let id):
-            PaymentDetailView(paymentId: id)
         case .documentDetail(let id):
             DocumentDetailView(documentId: id)
         case .editProfile:
             EditProfileView(patient: vm.patient!)
         case .notifications:
-            NotificationsDetailView()
+            NotificationSettingsView()
         case .allergiesDetail:
             AllergiesDetailView(patient: vm.patient!)
         case .medicationsDetail:

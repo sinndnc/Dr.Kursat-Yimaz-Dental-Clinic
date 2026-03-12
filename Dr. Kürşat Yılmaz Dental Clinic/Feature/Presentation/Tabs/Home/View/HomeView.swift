@@ -12,14 +12,16 @@ import MapKit
 struct HomeView: View {
     
     @StateObject private var vm = HomeViewModel()
-    @EnvironmentObject private var authVm: AuthViewModel
     @EnvironmentObject private var serVM: ServicesViewModel
+    @EnvironmentObject private var authVm: AuthViewModel
     @EnvironmentObject private var apptVM: AppointmentViewModel
+    
     @EnvironmentObject private var navState: HomeNavigationState
     
     @State private var heroScale: CGFloat = 0.97
     @State private var greetingOpacity: Double = 0
     @State private var showClinicVideo: Bool = false
+    @State private var showAppointment: Bool = false
     
     var body: some View {
         NavigationStack(path: $navState.path) {
@@ -55,6 +57,7 @@ struct HomeView: View {
                 .ignoresSafeArea()
             }
             .ignoresSafeArea()
+            .environmentObject(vm)
             .onAppear { withAnimation(.easeOut(duration: 0.8)) { greetingOpacity = 1 ; heroScale = 1.0 } }
             .navigationDestination(for: HomeDestination.self) { route in
                 switch route{
@@ -72,8 +75,10 @@ struct HomeView: View {
                 let url = URL(string: "https://framerusercontent.com/assets/abt50i9bj1pkM8Z69REgS1LLCo.mp4")!
                 VideoPlayerView(videoURL: url)
             }
+            .fullScreenCover(isPresented: $showAppointment) {
+                BookingWebView()
+            }
         }
-        .environmentObject(vm)
     }
     
     private var appointmentCardSection: some View{
@@ -84,15 +89,12 @@ struct HomeView: View {
             Group{
                 switch authVm.authState {
                 case .loading:
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(Color.kyCard)
-                        .frame(height: 200)
-                        .overlay(ProgressView())
+                    SkeletonAppointmentCard()
                 case .unauthenticated , .registrationPending:
                     NoAppointmentCard { navState.navigate(to: .newAppointment) }
                 case .authenticated:
-                    if let appointment = apptVM.appointments.next {
-                        AppointmentCard(appointment: appointment) {
+                    if let appointment = apptVM.nextAppointment {
+                        FeaturedAppointmentCard(appointment: appointment) {
                             navState.navigate(to: .appointmentDetail(apt: appointment))
                         }
                     }else{
@@ -172,7 +174,7 @@ struct HomeView: View {
                     
                     // CTA Row
                     HStack(spacing: 12) {
-                        Button { navState.navigate(to: .newAppointment) } label: {
+                        Button {  showAppointment = true} label: {
                             HStack(spacing: 8) {
                                 Text("Randevu Al")
                                     .font(.system(size: 14, weight: .bold))
@@ -231,7 +233,7 @@ struct HomeView: View {
                         Button {
                             navState.navigate(to: .serviceDetail(service: service))
                         } label: {
-                            FeaturedServicePill(
+                            FeaturedServiceCard(
                                 name: service.title,
                                 icon: service.sfSymbol,
                                 color: service.accentColor

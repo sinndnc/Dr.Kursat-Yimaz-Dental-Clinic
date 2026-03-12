@@ -31,11 +31,6 @@ class AppNavigationState {
         authSheet = .auth
     }
     
-    func presentSignUp() {
-        authSheet = .signUp
-    }
-    
-    // ✅ Auth bitince bunu çağır — her şeyi sıfırlar
     func completeAuth() {
         isAuthenticated = true
         authSheet = nil

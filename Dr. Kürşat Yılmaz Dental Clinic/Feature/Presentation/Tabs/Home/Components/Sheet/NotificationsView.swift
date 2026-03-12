@@ -199,50 +199,47 @@ final class DentalNotificationsViewModel: ObservableObject {
     }
 }
 
-// MARK: - Root View
 
 struct NotificationsView: View {
     @StateObject private var vm = DentalNotificationsViewModel()
     @State private var showClearAlert = false
-
+    
     var body: some View {
-        NavigationStack {
-            ZStack {
-                Color.kyBackground.ignoresSafeArea()
-
-                if vm.isLoading {
-                    skeletonView
-                } else {
-                    contentList
-                }
-            }
-            .navigationTitle("Bildirimler")
-            .navigationBarTitleDisplayMode(.large)
-            .toolbarBackground(Color.kyBackground, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
-            .toolbar { toolbarItems }
-            .alert("Tüm bildirimler silinsin mi?", isPresented: $showClearAlert) {
-                Button("Sil", role: .destructive) { vm.deleteAll() }
-                Button("Vazgeç", role: .cancel) {}
-            } message: {
-                Text("Bu işlem geri alınamaz.")
+        ZStack {
+            Color.kyBackground.ignoresSafeArea()
+            
+            if vm.isLoading {
+                skeletonView
+            } else {
+                contentList
             }
         }
-        .preferredColorScheme(.dark)
         .task { vm.load() }
+        .navigationTitle("Bildirimler")
+        .navigationBarTitleDisplayMode(.large)
+        .toolbarBackground(Color.kyBackground, for: .navigationBar)
+        .toolbarColorScheme(.dark, for: .navigationBar)
+        .toolbar { toolbarItems }
+        .alert("Tüm bildirimler silinsin mi?", isPresented: $showClearAlert) {
+            Button("Sil", role: .destructive) { vm.deleteAll() }
+            Button("Vazgeç", role: .cancel) {}
+        } message: {
+            Text("Bu işlem geri alınamaz.")
+        }
+        
     }
-
+    
     // MARK: Content List
-
+    
     private var contentList: some View {
         ScrollView {
             LazyVStack(spacing: 0, pinnedViews: .sectionHeaders) {
-
+                
                 filterBar
                     .padding(.horizontal, 16)
                     .padding(.top, 8)
                     .padding(.bottom, 6)
-
+                
                 if vm.unreadCount > 0 {
                     unreadBanner
                         .padding(.horizontal, 16)
@@ -274,9 +271,9 @@ struct NotificationsView: View {
         }
         .scrollIndicators(.hidden)
     }
-
+    
     // MARK: Filter Bar
-
+    
     private var filterBar: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
@@ -306,9 +303,9 @@ struct NotificationsView: View {
             .padding(.vertical, 2)
         }
     }
-
+    
     // MARK: Unread Banner
-
+    
     private var unreadBanner: some View {
         HStack(spacing: 10) {
             ZStack {
@@ -344,9 +341,9 @@ struct NotificationsView: View {
                 )
         )
     }
-
+    
     // MARK: Group Header
-
+    
     private func groupHeader(_ title: String) -> some View {
         HStack(spacing: 10) {
             Text(title.uppercased())
@@ -361,9 +358,9 @@ struct NotificationsView: View {
         .padding(.vertical, 10)
         .background(Color.kyBackground)
     }
-
+    
     // MARK: Skeleton
-
+    
     private var skeletonView: some View {
         ScrollView {
             VStack(spacing: 8) {
@@ -374,9 +371,9 @@ struct NotificationsView: View {
             .padding(.top, 16)
         }
     }
-
+    
     // MARK: Empty State
-
+    
     private var emptyStateView: some View {
         VStack(spacing: 24) {
             Spacer()
@@ -403,9 +400,9 @@ struct NotificationsView: View {
         }
         .padding()
     }
-
+    
     // MARK: Toolbar
-
+    
     @ToolbarContentBuilder
     private var toolbarItems: some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
@@ -416,9 +413,9 @@ struct NotificationsView: View {
                     Label("Tümünü Okundu İşaretle", systemImage: "checkmark.circle")
                 }
                 .disabled(vm.unreadCount == 0)
-
+                
                 Divider()
-
+                
                 Button(role: .destructive) {
                     showClearAlert = true
                 } label: {

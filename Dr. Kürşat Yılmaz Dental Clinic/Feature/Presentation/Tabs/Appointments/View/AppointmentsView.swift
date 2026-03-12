@@ -7,9 +7,6 @@
 
 import SwiftUI
 
-enum AppointmentFilter: String, CaseIterable {
-    case all = "Tümü"; case upcoming = "Yaklaşan"; case completed = "Geçmiş"
-}
 
 struct AppointmentsView: View {
     
@@ -135,9 +132,8 @@ struct AppointmentsView: View {
             .padding(.bottom, 14)
         }
     }
-
-    // MARK: - Search Bar
-
+    
+    
     private var searchBar: some View {
         HStack(spacing: 10) {
             Image(systemName: "magnifyingglass")
@@ -182,9 +178,9 @@ struct AppointmentsView: View {
         }
         .padding(.horizontal, 20)
     }
-
+    
     // MARK: - Calendar Section
-
+    
     private var calendarSection: some View {
         VStack(spacing: 0) {
             // Month Navigation
@@ -201,15 +197,15 @@ struct AppointmentsView: View {
                         .background(Color.kyCard)
                         .clipShape(Circle())
                 }
-
+                
                 Spacer()
-
+                
                 Text(vm.currentMonth.formatted(.dateTime.month(.wide).year()))
                     .font(.system(size: 15, weight: .bold, design: .serif))
                     .foregroundColor(Color.kyText)
-
+                
                 Spacer()
-
+                
                 Button {
                     withAnimation(.easeInOut(duration: 0.3)) {
                         vm.currentMonth = Calendar.current.date(byAdding: .month, value: 1, to: vm.currentMonth) ?? vm.currentMonth
@@ -226,7 +222,7 @@ struct AppointmentsView: View {
             .padding(.horizontal, 20)
             .padding(.top, 16)
             .padding(.bottom, 12)
-
+            
             // Weekday Headers
             HStack(spacing: 0) {
                 ForEach(["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"], id: \.self) { day in
@@ -238,7 +234,7 @@ struct AppointmentsView: View {
             }
             .padding(.horizontal, 12)
             .padding(.bottom, 6)
-
+            
             // Day Grid
             let days = generateDays(for: vm.currentMonth)
             LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 0), count: 7), spacing: 4) {
@@ -332,7 +328,7 @@ struct AppointmentsView: View {
                     emptyState
                 } else {
                     ForEach(vm.filteredAppointments) { appt in
-                        AppointmentRow(appointment: appt)
+                        AppointmentCard(appointment: appt)
                             .onTapGesture { navState.navigate(to: .appointmentDetail(apt: appt)) }
                             .transition(.asymmetric(
                                 insertion: .move(edge: .bottom).combined(with: .opacity),
@@ -366,9 +362,9 @@ struct AppointmentsView: View {
             Text(vm.selectedCalendarDate != nil
                  ? "Bu tarih için randevu kaydınız yok."
                  : "Seçili filtre için randevu bulunmuyor.")
-                .font(.system(size: 13))
-                .foregroundColor(Color.kySubtext)
-                .multilineTextAlignment(.center)
+            .font(.system(size: 13))
+            .foregroundColor(Color.kySubtext)
+            .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 48)
@@ -429,20 +425,18 @@ struct AppointmentsView: View {
         }
         .buttonStyle(ScaleButtonStyle())
     }
-
-    // MARK: - Calendar Helpers
-
+    
     private func generateDays(for month: Date) -> [Date?] {
         let calendar = Calendar.current
         guard
             let monthStart  = calendar.date(from: calendar.dateComponents([.year, .month], from: month)),
             let monthRange  = calendar.range(of: .day, in: .month, for: monthStart)
         else { return [] }
-
+        
         // Monday-based weekday offset (1=Mon … 7=Sun)
         let firstWeekday = calendar.component(.weekday, from: monthStart)
         let offset = (firstWeekday + 5) % 7  // Mon=0 … Sun=6
-
+        
         var days: [Date?] = Array(repeating: nil, count: offset)
         for day in monthRange {
             if let date = calendar.date(byAdding: .day, value: day - 1, to: monthStart) {
@@ -453,75 +447,12 @@ struct AppointmentsView: View {
         while days.count % 7 != 0 { days.append(nil) }
         return days
     }
-
+    
     private func dayKey(_ date: Date) -> String {
         let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"
         return f.string(from: date)
     }
 }
-
-// MARK: - CalendarDayCell
-
-struct CalendarDayCell: View {
-    let date: Date
-    let isToday: Bool
-    let isSelected: Bool
-    let hasAppointment: Bool
-    let onTap: () -> Void
-
-    var body: some View {
-        Button(action: onTap) {
-            VStack(spacing: 3) {
-                ZStack {
-                    if isSelected {
-                        Circle()
-                            .fill(
-                                LinearGradient(
-                                    colors: [Color.kyAccent, Color.kyAccentDark],
-                                    startPoint: .topLeading, endPoint: .bottomTrailing
-                                )
-                            )
-                            .frame(width: 30, height: 30)
-                    } else if isToday {
-                        Circle()
-                            .strokeBorder(Color.kyAccent, lineWidth: 1.5)
-                            .frame(width: 30, height: 30)
-                    }
-
-                    Text("\(Calendar.current.component(.day, from: date))")
-                        .font(.system(size: 13, weight: isToday || isSelected ? .bold : .regular))
-                        .foregroundColor(
-                            isSelected ? Color.kyBackground :
-                            isToday    ? Color.kyAccent :
-                                        Color.kyText
-                        )
-                }
-
-                // Appointment dot
-                Circle()
-                    .fill(hasAppointment ? Color.kyAccent : Color.clear)
-                    .frame(width: 4, height: 4)
-            }
-            .frame(height: 30)
-            .frame(maxWidth: .infinity)
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(ScaleButtonStyle())
-    }
-}
-
-
-struct FormLabel: View {
-    let text: String
-    var body: some View {
-        Text(text)
-            .font(.system(size: 10, weight: .bold, design: .monospaced))
-            .tracking(2)
-            .foregroundColor(Color.kySubtext)
-    }
-}
-
-// MARK: - Preview
 
 #Preview {
     AppointmentsView()

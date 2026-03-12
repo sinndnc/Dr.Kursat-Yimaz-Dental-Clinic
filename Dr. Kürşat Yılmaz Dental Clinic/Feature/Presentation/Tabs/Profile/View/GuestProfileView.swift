@@ -149,22 +149,6 @@ struct GuestProfileView: View {
                                     )
                                     .cornerRadius(10)
                             }
-                            
-                            Button {
-                                appNav.presentSignUp()
-                            } label: {
-                                Text("Kayıt Ol")
-                                    .font(.kySans(13, weight: .medium))
-                                    .foregroundColor(.kyAccent)
-                                    .padding(.horizontal, 14)
-                                    .padding(.vertical, 8)
-                                    .background(Color.kyAccent.opacity(0.1))
-                                    .cornerRadius(10)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 10)
-                                            .strokeBorder(Color.kyAccent.opacity(0.25), lineWidth: 1)
-                                    )
-                            }
                         }
                     }
                     
@@ -182,42 +166,40 @@ struct GuestProfileView: View {
         VStack(spacing: 24) {
             
             guestSectionBlock(title: "Genel", icon: "gearshape.fill") {
-                GuestLockedNavItem(icon: "person.circle.fill", title: "Bilgilerim",       subtitle: "Ad, iletişim bilgileri",         iconColor: .kyAccent)
+                GuestProfileCard(icon: "person.circle.fill", title: "Bilgilerim",       subtitle: "Ad, iletişim bilgileri",         iconColor: .kyAccent)
                 KYDivider()
-                GuestLockedNavItem(icon: "bell.badge.fill",    title: "Bildirimler",      subtitle: "Push, SMS, WhatsApp tercihleri", iconColor: .kyBlue)
+                GuestProfileCard(icon: "bell.badge.fill",    title: "Bildirimler",      subtitle: "Push, SMS, WhatsApp tercihleri", iconColor: .kyBlue)
                 KYDivider()
-                GuestLockedNavItem(icon: "creditcard.fill",    title: "Ödeme Geçmişi",    subtitle: "İşlem geçmişiniz burada görünür",iconColor: .kyBlue)
+                GuestProfileCard(icon: "creditcard.fill",    title: "Ödeme Geçmişi",    subtitle: "İşlem geçmişiniz burada görünür",iconColor: .kyBlue)
                 KYDivider()
-                GuestLockedNavItem(icon: "star.circle.fill",   title: "Sadakat Puanları", subtitle: "Puan kazanmaya başlayın",        iconColor: .kyAccent)
+                GuestProfileCard(icon: "star.circle.fill",   title: "Sadakat Puanları", subtitle: "Puan kazanmaya başlayın",        iconColor: .kyAccent)
             }
             
             guestSectionBlock(title: "Sağlık", icon: "stethoscope") {
-                GuestLockedNavItem(icon: "calendar",              title: "Randevular",   subtitle: "Randevularınızı görüntüleyin", iconColor: .kyBlue)
+                GuestProfileCard(icon: "calendar",              title: "Randevular",   subtitle: "Randevularınızı görüntüleyin", iconColor: .kyBlue)
                 KYDivider()
-                GuestLockedNavItem(icon: "cross.case.fill",       title: "Tedaviler",    subtitle: "Tedavi geçmişiniz",            iconColor: .kyBlue)
+                GuestProfileCard(icon: "cross.case.fill",       title: "Tedaviler",    subtitle: "Tedavi geçmişiniz",            iconColor: .kyBlue)
                 KYDivider()
-                GuestLockedNavItem(icon: "heart.text.square.fill",title: "Sağlık Özeti", subtitle: "Kan grubu, cinsiyet, yaş",     iconColor: .kyDanger)
+                GuestProfileCard(icon: "heart.text.square.fill",title: "Sağlık Özeti", subtitle: "Kan grubu, cinsiyet, yaş",     iconColor: .kyDanger)
                 KYDivider()
-                GuestLockedNavItem(icon: "folder.fill",           title: "Belgeler",     subtitle: "Röntgen, rapor ve reçeteler",  iconColor: .kyAccent)
+                GuestProfileCard(icon: "folder.fill",           title: "Belgeler",     subtitle: "Röntgen, rapor ve reçeteler",  iconColor: .kyAccent)
             }
             
             guestLoginCTACard
             
             guestSectionBlock(title: "Yardım & Gizlilik", icon: "hand.raised.fill") {
-                ProfileNavItem(
+                ProfileCard(
                     icon: "doc.text.fill",
                     title: "Gizlilik Politikası",
-                    subtitle: "KVKK",
-                    iconColor: .kySubtext
+                    subtitle: "KVKK"
                 ) { /* privacyPolicy */ }
                 
                 KYDivider()
                 
-                ProfileNavItem(
+                ProfileCard(
                     icon: "questionmark.circle.fill",
                     title: "Yardım & Destek",
-                    subtitle: nil,
-                    iconColor: .kyBlue
+                    subtitle: nil
                 ) { /* helpSupport */ }
             }
         }
@@ -257,22 +239,6 @@ struct GuestProfileView: View {
                         )
                         .cornerRadius(13)
                         .shadow(color: Color.kyAccent.opacity(0.3), radius: 12, y: 5)
-                }
-                
-                Button {
-                    appNav.presentSignUp()
-                } label: {
-                    Text("Hesabım yok, kayıt olayım")
-                        .font(.kySans(14, weight: .medium))
-                        .foregroundColor(.kyAccent)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 13)
-                        .background(Color.kyAccent.opacity(0.08))
-                        .cornerRadius(13)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 13)
-                                .strokeBorder(Color.kyAccent.opacity(0.2), lineWidth: 1)
-                        )
                 }
             }
         }
@@ -330,42 +296,3 @@ struct GuestProfileView: View {
     }
 }
 
-struct GuestLockedNavItem: View {
-    let icon: String
-    let title: String
-    var subtitle: String? = nil
-    var iconColor: Color = .kyAccent
-    
-    var body: some View {
-        HStack(spacing: 14) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(iconColor.opacity(0.07))
-                    .frame(width: 40, height: 40)
-                Image(systemName: icon)
-                    .font(.system(size: 16))
-                    .foregroundColor(iconColor.opacity(0.3))
-            }
-            
-            VStack(alignment: .leading, spacing: 3) {
-                Text(title)
-                    .font(.kySans(15, weight: .semibold))
-                    .foregroundColor(.kyText.opacity(0.35))
-                if let subtitle {
-                    Text(subtitle)
-                        .font(.kySans(12))
-                        .foregroundColor(.kySubtext.opacity(0.3))
-                        .lineLimit(1)
-                }
-            }
-            
-            Spacer()
-            
-            Image(systemName: "lock.fill")
-                .font(.system(size: 11))
-                .foregroundColor(.kySubtext.opacity(0.2))
-        }
-        .padding(.vertical, 12)
-        .padding(.horizontal, 16)
-    }
-}

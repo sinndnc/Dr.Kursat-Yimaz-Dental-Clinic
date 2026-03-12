@@ -17,51 +17,32 @@ struct MainTabView: View {
 
     var body: some View {
         TabView(selection: $navState.selectedTab) {
-            HomeView()
-                .tabItem {
-                    Image(systemName: navState.selectedTab == .home ? "house.fill" : "house")
-                    Text("Ana Sayfa")
-                }
-                .tag(AppTab.home)
-            
-            AppointmentsView()
-                .tabItem {
-                    Image(systemName: navState.selectedTab == .appointments ? "calendar.circle.fill" : "calendar.circle")
-                    Text("Randevular")
-                }
-                .tag(AppTab.appointments)
-            
-            ServicesView()
-                .tabItem {
-                    Image(systemName: navState.selectedTab == .services ? "cross.circle.fill" : "cross.circle")
-                    Text("Hizmetler")
-                }
-                .tag(AppTab.services)
-            
-            DoctorsView()
-                .tabItem {
-                    Image(systemName: navState.selectedTab == .doctors ? "person.2.fill" : "person.2")
-                    Text("Doktorlar")
-                }
-                .tag(AppTab.doctors)
-            
-            ProfileView()
-                .tabItem {
-                    Image(systemName: navState.selectedTab == .profile ? "person.fill" : "person")
-                    Text("Profil")
-                }
-                .tag(AppTab.profile)
+            Tab("Ana Sayfa",systemImage: "house.fill",value: AppTab.home) {
+                HomeView()
+                    .environmentObject(homeNavState)
+            }
+            Tab("Randevular",systemImage: "calendar.circle.fill",value: AppTab.home) {
+                AppointmentsView()
+                    .environmentObject(appointmentNavState)
+            }
+            Tab("Hizmetler",systemImage: "cross.circle.fill",value: AppTab.home) {
+                ServicesView()
+                    .environmentObject(servicesNavState)
+            }
+            Tab("Doktorlar",systemImage: "person.2.fill",value: AppTab.home) {
+                DoctorsView()
+                    .environmentObject(doctorsNavState)
+            }
+            Tab("Profil",systemImage: "person.fill",value: AppTab.home) {
+                ProfileView()
+                    .environmentObject(profileNavState)
+            }
         }
         .environment(navState)
         .environmentObject(aptVm)
         .environmentObject(serVm)
         .environmentObject(docVm)
         .environmentObject(profVm)
-        .environmentObject(homeNavState)
-        .environmentObject(doctorsNavState)
-        .environmentObject(profileNavState)
-        .environmentObject(servicesNavState)
-        .environmentObject(appointmentNavState)
         .fullScreenCover(item: $navState.authSheet) { sheet in
             AuthFlowView(initialSheet: sheet)
                 .environment(navState)

@@ -63,7 +63,7 @@ struct DoctorCard: View {
                     HStack(spacing: 6) {
                         Text(doctor.title)
                             .font(.system(size: 10, weight: .semibold))
-                            .foregroundColor(.white)
+                            .foregroundColor(Color.kySubtext)
                         
                         Circle()
                             .fill(Color.kyBorder)
@@ -126,10 +126,10 @@ struct DoctorCard: View {
                             Text(exp.title)
                                 .font(.system(size: 10, weight: .semibold))
                         }
-                        .foregroundColor(exp.color)
+                        .foregroundColor(Color.white)
                         .padding(.horizontal, 9)
                         .padding(.vertical, 5)
-                        .background(exp.color.opacity(0.10))
+                        .background(Color.kySurface)
                         .clipShape(Capsule())
                         .overlay(
                             Capsule()
@@ -137,7 +137,6 @@ struct DoctorCard: View {
                         )
                     }
                 }
-                .padding(.horizontal, 1)
             }
             .padding(.top, 12)
             
@@ -171,14 +170,13 @@ struct DoctorCard: View {
                         )
                 }
             }
-            .padding(.top, 10)
+            .padding(10)
         }
         .padding(16)
         .background(
             ZStack(alignment: .topTrailing) {
                 Color.kyCard
-
-                // Subtle accent glow top-right
+                
                 Circle()
                     .fill(doctor.accentColor.opacity(0.04))
                     .frame(width: 120, height: 120)
