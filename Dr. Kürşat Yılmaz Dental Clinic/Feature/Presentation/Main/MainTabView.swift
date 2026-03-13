@@ -8,6 +8,7 @@ struct MainTabView: View {
     @StateObject private var servicesNavState: ServiceNavigationState = ServiceNavigationState()
     @StateObject private var appointmentNavState: AppointmentNavigationState = AppointmentNavigationState()
     
+    
     @StateObject private var docVm = DoctorsViewModel()
     @StateObject private var serVm = ServicesViewModel()
     @StateObject private var profVm = ProfileViewModel()

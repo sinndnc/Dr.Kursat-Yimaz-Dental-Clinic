@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct LoyaltyPointsView: View {
+struct LoyaltySectionView: View {
     @State var patient: Patient
     
     var body: some View {

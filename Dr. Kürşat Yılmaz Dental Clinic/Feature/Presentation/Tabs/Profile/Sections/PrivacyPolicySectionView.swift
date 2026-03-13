@@ -6,7 +6,7 @@
 //
 import SwiftUI
 
-struct PrivacyPolicyView: View {
+struct PrivacyPolicySectionView: View {
     
     private let policyURL = URL(string: "https://indigo-egret-2c6.notion.site/Privacy-Policy-32101f2ea2468070a5d2eb6284a292ae")!
     

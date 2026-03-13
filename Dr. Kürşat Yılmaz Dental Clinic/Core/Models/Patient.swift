@@ -7,6 +7,7 @@
 
 import Foundation
 import FirebaseFirestore
+import SwiftUI
 
 struct Patient: Identifiable, Codable, Hashable {
     @DocumentID var id: String?
@@ -169,6 +170,17 @@ struct Allergy: Identifiable, Codable, Hashable {
     }
 }
 
+extension Allergy.AllergySeverity {
+    var uiColor: Color {
+        switch self {
+        case .mild:     return .kyGreen
+        case .moderate: return .kyOrange
+        case .severe:   return .kyDanger
+        }
+    }
+}
+
+
 struct ChronicDisease: Identifiable, Codable, Hashable {
     var id = UUID()
     var name: String
@@ -225,6 +237,19 @@ struct ToothTreatment: Identifiable, Codable, Hashable {
     var progressPercentage: Double {
         guard totalSessions > 0 else { return 0 }
         return Double(completedSessions) / Double(totalSessions)
+    }
+}
+
+
+
+extension TreatmentStatus {
+    var uiColor: Color {
+        switch self {
+        case .active:    return .kyGreen
+        case .planned:   return .kyBlue
+        case .completed: return .kyAccent
+        case .pending:   return .kyOrange
+        }
     }
 }
 

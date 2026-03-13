@@ -13,6 +13,7 @@ struct ProfileView: View {
     @EnvironmentObject private var apptvm: AppointmentViewModel
     @EnvironmentObject private var navState: ProfileNavigationState
     
+    
     var body: some View {
         NavigationStack(path: $navState.path) {
             ZStack {
@@ -380,11 +381,11 @@ struct ProfileView: View {
         case .appointments:
             AppointmentListView()
         case .treatments:
-            TreatmentsView()
+            TreatmentsSectionView()
         case .healthInfo:
-            HealthInfoDetailView(patient: vm.patient!)
+            HealthSectionlView(patient: vm.patient!)
         case .documents:
-            DocumentsView()
+            DocumentsSectionView()
         case .appointmentDetail(let appointment):
             AppointmentDetailView(appointment: appointment)
         case .treatmentDetail(let id):
@@ -392,7 +393,7 @@ struct ProfileView: View {
         case .documentDetail(let id):
             DocumentDetailView(documentId: id)
         case .editProfile:
-            EditProfileView(patient: vm.patient!)
+            ProfileSectionView(patient: vm.patient!)
         case .notifications:
             NotificationSettingsView()
         case .allergiesDetail:
@@ -400,13 +401,13 @@ struct ProfileView: View {
         case .medicationsDetail:
             MedicationsDetailView(patient: vm.patient!)
         case .emergencyContacts:
-            EmergencyContactsView(patient: vm.patient!)
+            EmergencyContactsDetailView(patient: vm.patient!)
         case .loyaltyPoints:
-            LoyaltyPointsView(patient: vm.patient!)
+            LoyaltySectionView(patient: vm.patient!)
         case .privacyPolicy:
-            PrivacyPolicyView()
+            PrivacyPolicySectionView()
         case .helpSupport:
-            HelpSupportView()
+            HelpSupportSectionView()
         }
     }
 }

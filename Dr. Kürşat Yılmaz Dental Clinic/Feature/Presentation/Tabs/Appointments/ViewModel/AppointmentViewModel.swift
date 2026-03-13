@@ -8,7 +8,7 @@ import FirebaseAuth
 final class AppointmentViewModel: ObservableObject {
     
     @Injected private var repository: AppointmentRepositoryProtocol
-    
+
     @Published var searchText: String = ""
     @Published var showSearch: Bool = false
     @Published var showCalendar: Bool = false
@@ -67,6 +67,26 @@ final class AppointmentViewModel: ObservableObject {
             .store(in: &cancellables)
     }
     
+    //
+    // Randevu oluşturulduğunda (AppointmentViewModel veya benzeri):
+    //
+    // func bookAppointment(...) async {
+    //     // 1. Firestore'a yaz
+    //     let appointment = try await appointmentService.create(...)
+    //
+    //     // 2. Local reminder zamanla + in-app bildirim oluştur
+    //     await notificationVM.onAppointmentConfirmed(appointment, patientId: currentUser.id)
+    // }
+    //
+    // func cancelAppointment(_ appointment: Appointment) async {
+    //     try await appointmentService.cancel(appointment)
+    //     await notificationVM.onAppointmentCancelled(appointment, patientId: currentUser.id)
+    // }
+    //
+    // func rescheduleAppointment(old: Appointment, new: Appointment) async {
+    //     try await appointmentService.reschedule(old: old, new: new)
+    //     await notificationVM.onAppointmentRescheduled(old: old, new: new, patientId: currentUser.id)
+    // }
     
     func create(_ appointment: Appointment) async {
         do {

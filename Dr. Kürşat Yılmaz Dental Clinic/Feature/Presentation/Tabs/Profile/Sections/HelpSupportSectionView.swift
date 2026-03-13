@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct HelpSupportView: View {
+struct HelpSupportSectionView: View {
     var body: some View {
         ZStack {
             Color.kyBackground.ignoresSafeArea()

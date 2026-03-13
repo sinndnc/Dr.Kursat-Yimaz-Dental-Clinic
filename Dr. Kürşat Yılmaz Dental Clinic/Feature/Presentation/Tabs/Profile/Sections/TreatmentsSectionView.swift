@@ -6,7 +6,7 @@
 //
 import SwiftUI
 
-struct TreatmentsView: View {
+struct TreatmentsSectionView: View {
     @EnvironmentObject private var vm: ProfileViewModel
     @EnvironmentObject private var navState: ProfileNavigationState
     
@@ -18,9 +18,17 @@ struct TreatmentsView: View {
                 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 10) {
-                        ForEach(vm.treatments) { treatment in
-                            TreatmentRow(treatment: treatment) {
-                                navState.navigate(to: .treatmentDetail(id: treatment.id.uuidString))
+                        if (vm.treatments.isEmpty){
+                            KYEmptyState(
+                                icon: "cross.case",
+                                title: "Tedavi Kaydı Yok",
+                                message: "Bu hastaya ait henüz\nbir tedavi kaydı bulunmuyor."
+                            )
+                        }else{
+                            ForEach(vm.treatments) { treatment in
+                                TreatmentRow(treatment: treatment) {
+                                    navState.navigate(to: .treatmentDetail(id: treatment.id.uuidString))
+                                }
                             }
                         }
                     }

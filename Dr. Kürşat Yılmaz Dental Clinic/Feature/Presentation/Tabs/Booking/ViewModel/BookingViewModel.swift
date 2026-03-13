@@ -84,14 +84,14 @@ struct BookingForm {
 
 @MainActor
 final class BookingViewModel: ObservableObject {
-
+    
     // MARK: Step management
     enum Step: Int, CaseIterable {
         case service = 0
         case doctor  = 1
         case date    = 2
         case confirm = 3
-
+        
         var title: String {
             switch self {
             case .service: return "Hizmet"
@@ -132,7 +132,6 @@ final class BookingViewModel: ObservableObject {
     @Published var validationErrors: [String] = []
     
     @Injected private var authService: AuthServiceProtocol
-    
     
     // MARK: Private
     private let db = Firestore.firestore()
@@ -186,7 +185,7 @@ final class BookingViewModel: ObservableObject {
         }
         filteredServices = r
     }
-
+    
     private func filterDoctors() {
         var r = doctors
         // Filter by service specialty if a service is selected
@@ -199,11 +198,11 @@ final class BookingViewModel: ObservableObject {
         }
         filteredDoctors = r
     }
-
+    
     // =========================================================================
     // MARK: - Step Navigation
     // =========================================================================
-
+    
     func canAdvance() -> Bool {
         switch currentStep {
         case .service: return form.service != nil
@@ -212,7 +211,7 @@ final class BookingViewModel: ObservableObject {
         case .confirm: return true
         }
     }
-
+    
     func advance() {
         guard canAdvance() else { return }
         withAnimation(.spring(response: 0.4, dampingFraction: 0.82)) {
@@ -224,7 +223,7 @@ final class BookingViewModel: ObservableObject {
             }
         }
     }
-
+    
     func goBack() {
         withAnimation(.spring(response: 0.4, dampingFraction: 0.82)) {
             switch currentStep {
@@ -235,18 +234,18 @@ final class BookingViewModel: ObservableObject {
             }
         }
     }
-
+    
     func selectStep(_ step: Step) {
         guard step.rawValue < currentStep.rawValue else { return }
         withAnimation(.spring(response: 0.4, dampingFraction: 0.82)) {
             currentStep = step
         }
     }
-
+    
     // =========================================================================
     // MARK: - Calendar
     // =========================================================================
-
+    
     struct CalendarDay: Identifiable {
         let id: String
         let date: Date
@@ -257,7 +256,7 @@ final class BookingViewModel: ObservableObject {
         var isSelected: Bool
         var isDoctorAvailable: Bool
     }
-
+    
     func buildCalendar(for month: Date) {
         calendarDisplayMonth = month
         let cal = Calendar.current
@@ -266,11 +265,11 @@ final class BookingViewModel: ObservableObject {
               let monthEnd   = cal.date(byAdding: DateComponents(month: 1, day: -1), to: monthStart),
               let gridStart  = cal.date(from: cal.dateComponents([.yearForWeekOfYear, .weekOfYear], from: monthStart))
         else { return }
-
+        
         let selectedDate = cal.startOfDay(for: form.date)
         var days: [CalendarDay] = []
         var cursor = gridStart
-
+        
         while cursor <= monthEnd || days.count % 7 != 0 {
             let isCurrentMonth = cal.component(.month, from: cursor) == cal.component(.month, from: month)
             let isToday = cal.isDateInToday(cursor)
@@ -282,7 +281,7 @@ final class BookingViewModel: ObservableObject {
                 fmt.dateFormat = "EEEE"
                 return !isPast && doctor.availableDays.contains(fmt.string(from: cursor).capitalized)
             }()
-
+            
             days.append(CalendarDay(
                 id: ISO8601DateFormatter().string(from: cursor),
                 date: cursor,
@@ -298,7 +297,7 @@ final class BookingViewModel: ObservableObject {
         }
         calendarDays = days
     }
-
+    
     func selectDate(_ day: CalendarDay) {
         guard !day.isPast, day.isCurrentMonth else { return }
         form.date = day.date
@@ -306,40 +305,40 @@ final class BookingViewModel: ObservableObject {
         buildCalendar(for: calendarDisplayMonth)
         Task { await loadAvailableSlots() }
     }
-
+    
     func prevMonth() {
         guard let prev = Calendar.current.date(byAdding: .month, value: -1, to: calendarDisplayMonth) else { return }
         buildCalendar(for: prev)
     }
-
+    
     func nextMonth() {
         guard let next = Calendar.current.date(byAdding: .month, value: 1, to: calendarDisplayMonth) else { return }
         buildCalendar(for: next)
     }
-
+    
     // =========================================================================
     // MARK: - Available Slots
     // =========================================================================
-
+    
     func loadAvailableSlots() async {
         guard let doctor = form.doctor else { return }
         isLoadingSlots = true
         defer { isLoadingSlots = false }
-
+        
         let dayStart = Calendar.current.startOfDay(for: form.date)
         let dayEnd   = Calendar.current.date(byAdding: .day, value: 1, to: dayStart) ?? dayStart
-
+        
         do {
             let snap = try await db.collection("appointments")
                 .whereField("doctor_id", isEqualTo: doctor.id ?? "")
                 .whereField("date", isGreaterThanOrEqualTo: Timestamp(date: dayStart))
                 .whereField("date", isLessThan:             Timestamp(date: dayEnd))
                 .getDocuments()
-
+            
             let booked = try snap.documents
                 .compactMap { try $0.data(as: Appointment.self) }
                 .filter { $0.status != .cancelled }
-
+            
             availableSlots = generateSlots(for: form.date).map { slot in
                 var s = slot
                 s.isAvailable = !booked.contains { appt in
@@ -352,7 +351,7 @@ final class BookingViewModel: ObservableObject {
             availableSlots = generateSlots(for: form.date)
         }
     }
-
+    
     private func generateSlots(for date: Date) -> [TimeSlot] {
         var slots: [TimeSlot] = []
         let cal = Calendar.current
@@ -366,17 +365,17 @@ final class BookingViewModel: ObservableObject {
         }
         return slots
     }
-
+    
     private func slotsOverlap(a: String, aDur: Int, b: String, bDur: Int) -> Bool {
         func m(_ t: String) -> Int? { let p = t.split(separator:":").compactMap{Int($0)}; return p.count==2 ? p[0]*60+p[1] : nil }
         guard let ai = m(a), let bi = m(b) else { return false }
         return ai < bi + bDur && ai + aDur > bi
     }
-
+    
     // =========================================================================
     // MARK: - Book Appointment
     // =========================================================================
-
+    
     func confirmBooking() async {
         guard let patient = authService.currentPatient,
               let uid = authService.currentUID else {
@@ -384,14 +383,15 @@ final class BookingViewModel: ObservableObject {
         }
         form.patientId   = uid
         form.patientName = patient.fullName
-
+        
         let errors = form.validate()
         guard errors.isEmpty else { validationErrors = errors; return }
-
+        
         isSaving = true
         defer { isSaving = false }
-
+        
         let appointment = form.toAppointment()
+        
         do {
             let ref = db.collection("appointments").document()
             try ref.setData(from: appointment)
@@ -400,7 +400,7 @@ final class BookingViewModel: ObservableObject {
             errorMessage = error.localizedDescription
         }
     }
-
+    
     func reset() {
         form = BookingForm()
         currentStep = .service

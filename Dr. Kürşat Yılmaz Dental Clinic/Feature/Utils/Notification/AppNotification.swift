@@ -8,11 +8,10 @@
 import Foundation
 import FirebaseFirestore
 
-// MARK: - AppNotification
 struct AppNotification: Identifiable, Codable, Hashable {
-
+    
     @DocumentID var id: String?
-
+    
     var recipientId: String          // Patient UID
     var title: String
     var body: String
@@ -20,7 +19,7 @@ struct AppNotification: Identifiable, Codable, Hashable {
     var relatedId: String?           // appointmentId, serviceId, etc.
     var isRead: Bool
     var createdAt: Date
-
+    
     // MARK: Init
     init(
         id: String? = nil,
@@ -41,7 +40,7 @@ struct AppNotification: Identifiable, Codable, Hashable {
         self.isRead = isRead
         self.createdAt = createdAt
     }
-
+    
     // MARK: - NotificationType
     enum NotificationType: String, Codable, CaseIterable, Identifiable {
         case appointmentReminder  = "appointment_reminder"
@@ -52,9 +51,9 @@ struct AppNotification: Identifiable, Codable, Hashable {
         case invoiceReady         = "invoice_ready"
         case generalInfo          = "general_info"
         case promotionOffer       = "promotion_offer"
-
+        
         var id: String { rawValue }
-
+        
         var icon: String {
             switch self {
             case .appointmentReminder:    return "bell.fill"
@@ -67,7 +66,7 @@ struct AppNotification: Identifiable, Codable, Hashable {
             case .promotionOffer:         return "tag.fill"
             }
         }
-
+        
         var colorName: String {
             switch self {
             case .appointmentReminder:    return "orange"
@@ -81,7 +80,7 @@ struct AppNotification: Identifiable, Codable, Hashable {
             }
         }
     }
-
+    
     enum CodingKeys: String, CodingKey {
         case id
         case recipientId  = "recipient_id"

@@ -15,7 +15,6 @@ struct HomeView: View {
     @EnvironmentObject private var serVM: ServicesViewModel
     @EnvironmentObject private var authVm: AuthViewModel
     @EnvironmentObject private var apptVM: AppointmentViewModel
-    
     @EnvironmentObject private var navState: HomeNavigationState
     
     @State private var heroScale: CGFloat = 0.97
@@ -133,12 +132,14 @@ struct HomeView: View {
                                     Circle().strokeBorder(Color.kyBorder, lineWidth: 1)
                                 )
                         }
-                        if vm.showAppointmentBadge {
-                            Circle()
-                                .fill(Color.kyAccent)
-                                .frame(width: 9, height: 9)
-                                .offset(x: 2, y: -1)
-                        }
+                        
+//                        let hasNotification = notificationAdapter.grouped(from: notificationVm.notifications)
+//                        if !hasNotification.isEmpty {
+//                            Circle()
+//                                .fill(Color.kyAccent)
+//                                .frame(width: 9, height: 9)
+//                                .offset(x: 2, y: -1)
+//                        }
                     }
                 }
                 .padding(.horizontal, 24)

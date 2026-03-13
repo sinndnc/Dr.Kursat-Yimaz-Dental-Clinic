@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct EditProfileView: View {
+struct ProfileSectionView: View {
     @State var patient: Patient
     
     @State private var firstName: String = ""

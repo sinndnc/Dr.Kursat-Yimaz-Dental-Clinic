@@ -878,31 +878,27 @@ private struct BookingNavigationBar: View {
     }
 }
 
-// =========================================================================
-// MARK: - Success Screen
-// =========================================================================
-
 private struct BookingSuccessView: View {
     @ObservedObject var vm: BookingViewModel
     let dismiss: DismissAction
     @State private var animate = false
-
+    
     var body: some View {
         VStack(spacing: 28) {
             Spacer()
-
+            
             // Animated checkmark
             ZStack {
                 Circle()
                     .fill(Color.kyAccent.opacity(0.08))
                     .frame(width: 140, height: 140)
                     .scaleEffect(animate ? 1.0 : 0.3)
-
+                
                 Circle()
                     .fill(Color.kyAccent.opacity(0.15))
                     .frame(width: 100, height: 100)
                     .scaleEffect(animate ? 1.0 : 0.3)
-
+                
                 Image(systemName: "checkmark.circle.fill")
                     .font(.system(size: 60))
                     .foregroundColor(.kyAccent)
@@ -910,7 +906,7 @@ private struct BookingSuccessView: View {
                     .opacity(animate ? 1.0 : 0.0)
             }
             .animation(.spring(response: 0.6, dampingFraction: 0.65).delay(0.1), value: animate)
-
+            
             VStack(spacing: 10) {
                 Text("Randevunuz Alındı!")
                     .font(.custom("Georgia", size: 26))
@@ -919,7 +915,7 @@ private struct BookingSuccessView: View {
                     .opacity(animate ? 1 : 0)
                     .offset(y: animate ? 0 : 20)
                     .animation(.spring(response: 0.5).delay(0.35), value: animate)
-
+                
                 Text("Kliniğimiz randevunuzu onayladıktan sonra bildirim alacaksınız.")
                     .font(.system(size: 14))
                     .foregroundColor(.kySubtext)
@@ -929,7 +925,7 @@ private struct BookingSuccessView: View {
                     .offset(y: animate ? 0 : 10)
                     .animation(.spring(response: 0.5).delay(0.5), value: animate)
             }
-
+            
             // Summary pill
             if let slot = vm.form.selectedSlot, let doctor = vm.form.doctor {
                 HStack(spacing: 12) {
@@ -954,9 +950,9 @@ private struct BookingSuccessView: View {
                 .offset(y: animate ? 0 : 15)
                 .animation(.spring(response: 0.5).delay(0.65), value: animate)
             }
-
+            
             Spacer()
-
+            
             VStack(spacing: 12) {
                 Button(action: { vm.reset(); dismiss() }) {
                     Text("Ana Sayfaya Dön")
@@ -967,7 +963,7 @@ private struct BookingSuccessView: View {
                         .background(Color.kyAccent)
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                 }
-
+                
                 Button(action: { vm.reset() }) {
                     Text("Yeni Randevu Al")
                         .font(.system(size: 14, weight: .medium))
@@ -982,7 +978,7 @@ private struct BookingSuccessView: View {
         .background(Color.kyBackground.ignoresSafeArea())
         .onAppear { animate = true }
     }
-
+    
     private func formattedDate(_ date: Date) -> String {
         let fmt = DateFormatter()
         fmt.locale = Locale(identifier: "tr_TR")

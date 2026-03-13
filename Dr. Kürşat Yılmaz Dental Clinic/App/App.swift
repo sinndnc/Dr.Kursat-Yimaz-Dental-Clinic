@@ -10,7 +10,7 @@ import SwiftUI
 @main
 struct DrKursatYilmazDentalClinicApp: App {
     
-    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegateü
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
     var body: some Scene {
         WindowGroup {
