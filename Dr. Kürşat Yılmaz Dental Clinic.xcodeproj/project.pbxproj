@@ -42,6 +42,11 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		991199E32F6499E3000EB980 /* screenshots */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = screenshots;
+			sourceTree = "<group>";
+		};
 		997AD4BF2F585222007AC84B /* Dr. Kürşat Yılmaz Dental Clinic */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "Dr. Kürşat Yılmaz Dental Clinic";
@@ -116,6 +121,7 @@
 			isa = PBXGroup;
 			children = (
 				991199C12F649633000EB980 /* README.md */,
+				991199E32F6499E3000EB980 /* screenshots */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -136,6 +142,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				991199E32F6499E3000EB980 /* screenshots */,
 				997AD4BF2F585222007AC84B /* Dr. Kürşat Yılmaz Dental Clinic */,
 			);
 			name = "Dr. Kürşat Yılmaz Dental Clinic";
