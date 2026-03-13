@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+//TODO: make here
 struct NotificationSettingsView: View {
     @EnvironmentObject private var vm: ProfileViewModel
     
@@ -23,12 +24,12 @@ struct NotificationSettingsView: View {
                             ("bubble.left.and.bubble.right.fill", "WhatsApp", $vm.whatsappEnabled, Color(red: 0.24, green: 0.72, blue: 0.44)),
                             ("envelope.fill", "E-posta", $vm.emailNotifications, Color.kyAccent),
                         ])
-
+                        
                         notifGroup(title: "Randevu Hatırlatıcılar", items: [
                             ("clock.badge.fill", "24 Saat Önce", $vm.appointmentReminder24h, Color.kyBlue),
                             ("clock.badge.fill", "1 Saat Önce", $vm.appointmentReminder1h, Color.kyOrange),
                         ])
-
+                        
                         notifGroup(title: "Diğer", items: [
                             ("gift.fill", "Kampanyalar", $vm.campaignNotifications, Color.kyPurple),
                             ("birthday.cake.fill", "Doğum Günü Mesajı", $vm.birthdayMessages, Color.kyAccent),
@@ -42,7 +43,7 @@ struct NotificationSettingsView: View {
         }
         .navigationBarHidden(true)
     }
-
+    
     @ViewBuilder
     func notifGroup(title: String, items: [(String, String, Binding<Bool>, Color)]) -> some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -50,7 +51,7 @@ struct NotificationSettingsView: View {
                 .font(.kyMono(9, weight: .bold))
                 .tracking(2)
                 .foregroundColor(.kySubtext)
-
+            
             VStack(spacing: 2) {
                 ForEach(Array(items.enumerated()), id: \.offset) { index, item in
                     HStack(spacing: 14) {
@@ -72,7 +73,7 @@ struct NotificationSettingsView: View {
                     }
                     .padding(.vertical, 10)
                     .padding(.horizontal, 14)
-
+                    
                     if index < items.count - 1 {
                         KYDivider()
                     }

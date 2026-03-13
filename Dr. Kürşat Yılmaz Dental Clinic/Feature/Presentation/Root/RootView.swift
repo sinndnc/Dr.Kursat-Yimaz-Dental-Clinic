@@ -9,20 +9,22 @@ import SwiftUI
 
 struct RootView: View {
     
+    @State private var navState = AppNavigationState()
     @StateObject private var authVM: AuthViewModel = AuthViewModel()
     
     var body: some View {
         ZStack {
             Color.kyBackground.ignoresSafeArea()
-            Group {
-                if authVM.isLoading {
-                    SplashView()
-                }else{
-                    MainTabView()
-                }
+            
+            switch authVM.authState {
+            case .loading:
+                SplashView()
+            case .authenticated, .unauthenticated, .registrationPending:
+                MainTabView()
             }
-            .environmentObject(authVM)
-            .animation(.easeInOut(duration: 0.4), value: authVM.isLoading)
         }
+        .environment(navState)
+        .environmentObject(authVM)
+        .animation(.easeInOut(duration: 0.4), value: authVM.authState)
     }
 }

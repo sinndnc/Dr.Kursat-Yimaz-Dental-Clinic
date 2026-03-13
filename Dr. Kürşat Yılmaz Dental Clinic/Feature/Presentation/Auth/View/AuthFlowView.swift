@@ -37,5 +37,7 @@ struct AuthFlowView: View {
                 }
             }
         }
+        .toastContainer() 
+        .alertContainer()
     }
 }

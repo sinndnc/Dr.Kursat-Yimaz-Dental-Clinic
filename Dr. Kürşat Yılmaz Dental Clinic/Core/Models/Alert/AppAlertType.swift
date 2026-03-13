@@ -1,0 +1,36 @@
+//
+//  AppAlertType.swift
+//  Dr. Kürşat Yılmaz Dental Clinic
+//
+//  Created by Sinan Dinç on 3/13/26.
+//
+
+import SwiftUI
+
+public enum AppAlertType {
+    case success
+    case error
+    case warning
+    case info
+    case destructive
+
+    var icon: String {
+        switch self {
+        case .success:     return "checkmark.circle.fill"
+        case .error:       return "xmark.circle.fill"
+        case .warning:     return "exclamationmark.triangle.fill"
+        case .info:        return "info.circle.fill"
+        case .destructive: return "trash.fill"
+        }
+    }
+
+    var accentColor: Color {
+        switch self {
+        case .success:     return Color(hex: "22C55E")
+        case .error:       return Color(hex: "EF4444")
+        case .warning:     return Color(hex: "F59E0B")
+        case .info:        return Color(hex: "3B82F6")
+        case .destructive: return Color(hex: "EF4444")
+        }
+    }
+}

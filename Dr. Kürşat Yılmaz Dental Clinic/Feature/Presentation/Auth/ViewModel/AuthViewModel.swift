@@ -39,25 +39,11 @@ final class AuthViewModel: ObservableObject {
         authService.authStatePublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] state in
-                guard let self else { self?.isLoading = false ; return }
-                switch state {
-                case .authenticated:
-                    if let currentPatient, let patientId = currentPatient.id{
-                        self.authState = .authenticated
-                        self.firestoreService.startAuthenticatedListeners(
-                            patientId: patientId,
-                            clinicId: currentClinicId
-                        )
-                    }
-                    isLoading = false
-                case .unauthenticated:
-                    self.authState = .unauthenticated
-                    self.firestoreService.removeAuthenticatedListeners()
-                    isLoading = false
-                case .loading, .registrationPending:
-                    self.authState = .registrationPending
-                    isLoading = false
-                }
+                guard let self else { return }
+                // AuthService zaten tüm state yönetimini yapıyor (attachPatientListener vs.)
+                // Burada sadece ViewModel'in kendi authState'ini mirror'la, yan etki yok
+                self.authState = state
+                self.isLoading = false
             }
             .store(in: &cancellables)
         
@@ -68,18 +54,47 @@ final class AuthViewModel: ObservableObject {
             .assign(to: &$isLoading)
         
         authService.errorMessagePublisher
-            .assign(to: &$errorMessage)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] message in
+                guard let self else { return }
+                self.errorMessage = message
+            }
+            .store(in: &cancellables)
     }
     
     var isAuthenticated: Bool { authState == .authenticated }
     
-    // MARK: - Actions
     
     func signIn(email: String, password: String) async {
+        errorMessage = nil
         do {
             try await authService.signIn(email: email, password: password)
+            await waitForAuthenticated()
         } catch {
-            errorMessage = error.localizedDescription
+            showError(error)
+        }
+    }
+    
+    /// authState .authenticated olana kadar bekler (max 10 saniye)
+    private func waitForAuthenticated() async {
+        guard authState != .authenticated else { return }
+        await withCheckedContinuation { continuation in
+            var resumed = false
+            var cancellable: AnyCancellable?
+            cancellable = authService.authStatePublisher
+                .filter { $0 == .authenticated || $0 == .unauthenticated }
+                .first()
+                .timeout(.seconds(10), scheduler: DispatchQueue.main)
+                .sink(
+                    receiveCompletion: { _ in
+                        if !resumed { resumed = true; continuation.resume() }
+                        cancellable?.cancel()
+                    },
+                    receiveValue: { _ in
+                        if !resumed { resumed = true; continuation.resume() }
+                        cancellable?.cancel()
+                    }
+                )
         }
     }
     
@@ -92,6 +107,7 @@ final class AuthViewModel: ObservableObject {
         birthDate: Date?   = nil,
         gender:    Gender? = nil
     ) async {
+        errorMessage = nil
         do {
             try await authService.register(
                 email:     email,
@@ -102,40 +118,67 @@ final class AuthViewModel: ObservableObject {
                 birthDate: birthDate,
                 gender:    gender
             )
+            // Firestore'a yazıldı, şimdi patientListener authenticated yapana kadar bekle
+            await waitForAuthenticated()
+            if authState == .authenticated {
+                ToastManager.shared.success("Hoş geldiniz!", message: "Hesabınız başarıyla oluşturuldu.")
+            }
         } catch {
-            errorMessage = error.localizedDescription
+            showError(error)
         }
     }
     
     func signOut() {
-        do {
-            try authService.signOut()
-        } catch {
-            errorMessage = error.localizedDescription
+        AlertManager.shared.confirmDestructive(
+            title: "Çıkış Yapmak İstediğinize Emin Misiniz?",
+            message: "Oturumunuz kapatılacak. Tekrar giriş yapmanız gerekecek.",
+            confirmLabel: "Evet, Çıkış Yap"
+        ) { [weak self] in
+            guard let self else { return }
+            do {
+                try self.authService.signOut()
+                ToastManager.shared.info("Çıkış yapıldı", message: "Görüşmek üzere!")
+            } catch {
+                self.showError(error)
+            }
         }
     }
     
     func sendPasswordReset(to email: String) async {
         do {
             try await authService.sendPasswordReset(to: email)
+            ToastManager.shared.success(
+                "E-posta Gönderildi",
+                message: "Şifre sıfırlama bağlantısı e-posta adresinize gönderildi."
+            )
         } catch {
-            errorMessage = error.localizedDescription
+            showError(error)
         }
     }
     
     func updateCurrentPatient(_ patient: Patient) async {
         do {
             try await authService.updateCurrentPatient(patient)
+            ToastManager.shared.success("Kaydedildi", message: "Bilgileriniz güncellendi.")
         } catch {
-            errorMessage = error.localizedDescription
+            showError(error)
         }
     }
     
-    func deleteAccount() async {
-        do {
-            try await authService.deleteAccount()
-        } catch {
-            errorMessage = error.localizedDescription
+    func deleteAccount() {
+        AlertManager.shared.confirmDestructive(
+            title: "Hesabı Kalıcı Olarak Sil",
+            message: "Bu işlem geri alınamaz. Tüm verileriniz ve randevularınız silinecektir.",
+            confirmLabel: "Evet, Hesabı Sil"
+        ) { [weak self] in
+            guard let self else { return }
+            Task {
+                do {
+                    try await self.authService.deleteAccount()
+                } catch {
+                    self.showError(error)
+                }
+            }
         }
     }
     
@@ -145,12 +188,21 @@ final class AuthViewModel: ObservableObject {
                 currentPassword: currentPassword,
                 newPassword:     newPassword
             )
+            ToastManager.shared.success("Şifre Değiştirildi", message: "Yeni şifreniz aktif.")
         } catch {
-            errorMessage = error.localizedDescription
+            showError(error)
         }
     }
     
     func clearError() {
         errorMessage = nil
+    }
+    
+    // MARK: - Private Helpers
+    
+    private func showError(_ error: Error) {
+        let message = error.localizedDescription
+        errorMessage = message
+        ToastManager.shared.error("Bir hata oluştu", message: message, duration: 4.0)
     }
 }

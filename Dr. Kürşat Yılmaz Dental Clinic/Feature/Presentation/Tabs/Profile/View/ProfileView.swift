@@ -128,7 +128,15 @@ struct ProfileView: View {
                 KYDivider()
                 
                 
-                Button { vm.signOut() } label: {
+                Button {
+                    AlertManager.shared.confirmDestructive(
+                        title: "Çıkış Yapmak İstediğinize Emin Misiniz?",
+                        message: "Oturumunuz kapatılacak. Tekrar giriş yapmanız gerekecek.",
+                        confirmLabel: "Evet, Çıkış Yap"
+                    ) {
+                        vm.signOut()
+                    }
+                } label: {
                     HStack(spacing: 14) {
                         ZStack {
                             RoundedRectangle(cornerRadius: 10, style: .continuous)
@@ -313,7 +321,7 @@ struct ProfileView: View {
                             .font(.system(size: 22))
                             .foregroundColor(.kyGreen)
                     }
-
+                    
                     VStack(alignment: .leading, spacing: 3) {
                         Text("YAKLAŞAN RANDEVU")
                             .font(.kyMono(10, weight: .bold))
@@ -333,9 +341,9 @@ struct ProfileView: View {
                                 .foregroundColor(.kySubtext)
                         }
                     }
-
+                    
                     Spacer()
-
+                    
                     Image(systemName: "chevron.right")
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundColor(.kySubtext.opacity(0.4))
@@ -395,9 +403,7 @@ struct ProfileView: View {
         case .loyaltyPoints:
             LoyaltyPointsView(patient: vm.patient!)
         case .privacyPolicy:
-            ConsentView{
-                
-            }
+            PrivacyPolicyView()
         case .helpSupport:
             HelpSupportView()
         }

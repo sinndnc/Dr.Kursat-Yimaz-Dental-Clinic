@@ -15,6 +15,8 @@ struct DrKursatYilmazDentalClinicApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
+                .alertContainer()
+                .toastContainer()
         }
     }
 }

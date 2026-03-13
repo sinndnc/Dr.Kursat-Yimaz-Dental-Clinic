@@ -1,6 +1,6 @@
 //
 //  LoginView.swift
-//  Dr. Kürşat Yılmaz Dental Clinic
+//  Dr. Kürşat Yılmaz Dental Clinic
 //
 //  Created by Sinan Dinç on 3/5/26.
 //
@@ -10,8 +10,6 @@ import SwiftUI
 // MARK: - Login View
 struct LoginView: View {
     
-    @Environment(\.dismiss) private var dismiss
-    @Environment(AppNavigationState.self) private var appNav
     
     @State private var email = ""
     @State private var password = ""
@@ -19,10 +17,9 @@ struct LoginView: View {
     @State private var isLoading = false
     @State private var animateIn = false
     @State private var shakeOffset: CGFloat = 0
-    @State private var emailFocused = false
-    @State private var passwordFocused = false
     @FocusState private var focusedField: Field?
     
+    @Environment(AppNavigationState.self) private var appNav
     @EnvironmentObject private var auth: AuthViewModel
     
     enum Field { case email, password }
@@ -58,7 +55,6 @@ struct LoginView: View {
 
                     // Form
                     VStack(spacing: 16) {
-                        // Email Field
                         KyTextField(
                             label: "Email",
                             placeholder: "you@example.com",
@@ -71,7 +67,6 @@ struct LoginView: View {
                         .submitLabel(.next)
                         .onSubmit { focusedField = .password }
 
-                        // Password Field
                         KySecureField(
                             label: "Password",
                             placeholder: "••••••••",
@@ -90,9 +85,11 @@ struct LoginView: View {
                     // Forgot Password
                     HStack {
                         Spacer()
-                        Button("Forgot password?") {}
-                            .font(.kySans(13))
-                            .foregroundColor(.kyAccent)
+                        Button("Forgot password?") {
+                            handleForgotPassword()
+                        }
+                        .font(.kySans(13))
+                        .foregroundColor(.kyAccent)
                     }
                     .padding(.top, 12)
                     .opacity(animateIn ? 1 : 0)
@@ -184,7 +181,7 @@ struct LoginView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button {
-                    dismiss()
+                    appNav.authSheet = nil
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "chevron.left")
@@ -203,132 +200,60 @@ struct LoginView: View {
         }
     }
 
+    // MARK: - Computed
+
     private var isFormValid: Bool {
         email.contains("@") && password.count >= 6
     }
 
+    // MARK: - Actions
+
     private func handleLogin() {
         guard isFormValid else {
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.3)) {
-                shakeOffset = 10
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                withAnimation(.spring()) { shakeOffset = 0 }
-            }
+            triggerShake()
+            ToastManager.shared.warning(
+                "Eksik Bilgi",
+                message: "Lütfen geçerli bir e-posta ve şifre giriniz."
+            )
             return
         }
         focusedField = nil
-        Task{
+        Task {
             withAnimation { isLoading = true }
             await auth.signIn(email: email, password: password)
-            dismiss()
-            appNav.completeAuth()
             withAnimation { isLoading = false }
+            guard auth.errorMessage == nil else { return }
+            appNav.authSheet = nil
         }
     }
-    
-    
-}
 
-// MARK: - KyTextField
-struct KyTextField: View {
-    let label: String
-    let placeholder: String
-    @Binding var text: String
-    let icon: String
-    var keyboardType: UIKeyboardType = .default
-    var isFocused: Bool = false
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(label)
-                .font(.kySans(12, weight: .medium))
-                .foregroundColor(isFocused ? .kyAccent : .kySubtext)
-
-            HStack(spacing: 12) {
-                Image(systemName: icon)
-                    .font(.system(size: 15))
-                    .foregroundColor(isFocused ? .kyAccent : .kySubtext)
-                    .frame(width: 20)
-
-                TextField(placeholder, text: $text)
-                    .font(.kySans(15))
-                    .foregroundColor(.kyText)
-                    .keyboardType(keyboardType)
-                    .autocapitalization(.none)
-                    .autocorrectionDisabled()
-                    .tint(.kyAccent)
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 15)
-            .background(Color.kyCard)
-            .cornerRadius(12)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .strokeBorder(
-                        isFocused ? Color.kyAccent.opacity(0.5) : Color.kyBorder,
-                        lineWidth: isFocused ? 1.5 : 1
-                    )
+    private func handleForgotPassword() {
+        guard email.contains("@") else {
+            ToastManager.shared.warning(
+                "E-posta Gerekli",
+                message: "Şifre sıfırlama için önce e-posta adresinizi girin."
             )
-            .animation(.easeInOut(duration: 0.2), value: isFocused)
+            focusedField = .email
+            return
         }
-    }
-}
-
-// MARK: - KySecureField
-struct KySecureField: View {
-    let label: String
-    let placeholder: String
-    @Binding var text: String
-    @Binding var showPassword: Bool
-    var isFocused: Bool = false
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(label)
-                .font(.kySans(12, weight: .medium))
-                .foregroundColor(isFocused ? .kyAccent : .kySubtext)
-
-            HStack(spacing: 12) {
-                Image(systemName: "lock")
-                    .font(.system(size: 15))
-                    .foregroundColor(isFocused ? .kyAccent : .kySubtext)
-                    .frame(width: 20)
-
-                Group {
-                    if showPassword {
-                        TextField(placeholder, text: $text)
-                    } else {
-                        SecureField(placeholder, text: $text)
-                    }
-                }
-                .font(.kySans(15))
-                .foregroundColor(.kyText)
-                .tint(.kyAccent)
-
-                Button {
-                    withAnimation(.easeInOut(duration: 0.15)) {
-                        showPassword.toggle()
-                    }
-                } label: {
-                    Image(systemName: showPassword ? "eye.slash" : "eye")
-                        .font(.system(size: 15))
-                        .foregroundColor(.kySubtext)
-                }
+        AlertManager.shared.show(AppAlertData(
+            type: .info,
+            title: "Şifre Sıfırlama",
+            message: "\(email) adresine sıfırlama bağlantısı gönderilecek.",
+            confirmLabel: "Gönder",
+            cancelLabel: "İptal",
+            onConfirm: {
+                Task { await auth.sendPasswordReset(to: email) }
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 15)
-            .background(Color.kyCard)
-            .cornerRadius(12)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .strokeBorder(
-                        isFocused ? Color.kyAccent.opacity(0.5) : Color.kyBorder,
-                        lineWidth: isFocused ? 1.5 : 1
-                    )
-            )
-            .animation(.easeInOut(duration: 0.2), value: isFocused)
+        ))
+    }
+
+    private func triggerShake() {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.3)) {
+            shakeOffset = 10
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            withAnimation(.spring()) { shakeOffset = 0 }
         }
     }
 }
