@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		991199C22F649633000EB980 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 991199C12F649633000EB980 /* README.md */; };
 		99230D852F61AAD000BB4E0A /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 99230D842F61AAD000BB4E0A /* Storage */; };
 		99230D8B2F61B66900BB4E0A /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 99230D8A2F61B66900BB4E0A /* Supabase */; };
 		9978FE482F63023C00101247 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 99C6F5832F61F41600A22EEF /* Auth */; };
@@ -34,6 +35,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		991199C12F649633000EB980 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		997AD4BD2F585222007AC84B /* Dr. Kürşat Yılmaz Dental Clinic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Dr. Kürşat Yılmaz Dental Clinic.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		997AD4CA2F585224007AC84B /* Dr. Kürşat Yılmaz Dental ClinicTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Dr. Kürşat Yılmaz Dental ClinicTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		997AD4D42F585224007AC84B /* Dr. Kürşat Yılmaz Dental ClinicUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Dr. Kürşat Yılmaz Dental ClinicUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -113,6 +115,7 @@
 		99F4E6FC2F58A78500FEC6AA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				991199C12F649633000EB980 /* README.md */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -248,6 +251,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				991199C22F649633000EB980 /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
