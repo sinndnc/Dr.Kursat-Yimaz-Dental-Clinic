@@ -8,13 +8,8 @@
 import Foundation
 import FirebaseFirestore
 
-
-
 struct Patient: Identifiable, Codable, Hashable {
-
-    // MARK: Firestore document ID
     @DocumentID var id: String?
-
     var firstName: String
     var lastName: String
     var birthDate: Date
@@ -230,38 +225,6 @@ struct ToothTreatment: Identifiable, Codable, Hashable {
     var progressPercentage: Double {
         guard totalSessions > 0 else { return 0 }
         return Double(completedSessions) / Double(totalSessions)
-    }
-}
-
-
-struct Payment: Identifiable, Codable, Hashable {
-    var id = UUID()
-    var date: Date
-    var amount: Double
-    var method: PaymentMethod
-    var status: PaymentStatus
-    var description: String
-    var invoiceNumber: String?
-}
-
-struct PaymentPlan: Identifiable, Codable, Hashable {
-    var id = UUID()
-    var title: String
-    var totalAmount: Double
-    var paidAmount: Double
-    var installments: [Installment]
-    
-    var remainingAmount: Double { totalAmount - paidAmount }
-    var progressPercentage: Double {
-        guard totalAmount > 0 else { return 0 }
-        return paidAmount / totalAmount
-    }
-    
-    struct Installment: Identifiable, Codable, Hashable {
-        var id = UUID()
-        var dueDate: Date
-        var amount: Double
-        var isPaid: Bool
     }
 }
 

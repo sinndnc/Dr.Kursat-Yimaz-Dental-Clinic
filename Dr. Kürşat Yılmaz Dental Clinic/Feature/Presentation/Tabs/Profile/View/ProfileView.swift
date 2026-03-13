@@ -10,6 +10,7 @@ import SwiftUI
 struct ProfileView: View {
     
     @EnvironmentObject private var vm: ProfileViewModel
+    @EnvironmentObject private var apptvm: AppointmentViewModel
     @EnvironmentObject private var navState: ProfileNavigationState
     
     var body: some View {
@@ -80,8 +81,8 @@ struct ProfileView: View {
                 ProfileCard(
                     icon: "calendar",
                     title: "Randevular",
-                    subtitle: "\(vm.appointments.count) randevu · \(vm.upcomingAppointments.count) yaklaşan",
-                    badge: vm.upcomingAppointments.isEmpty ? nil : "\(vm.upcomingAppointments.count)"
+                    subtitle: "\(vm.appointments.count) randevu · \(apptvm.upcoming.count) yaklaşan",
+                    badge: apptvm.upcoming.isEmpty ? nil : "\(apptvm.upcoming.count)"
                 ) { navState.navigate(to: .appointments) }
                 
                 KYDivider()
@@ -308,7 +309,7 @@ struct ProfileView: View {
     
     @ViewBuilder
     private var nextAppointmentBanner: some View {
-        if let next = vm.nextAppointment {
+        if let next = apptvm.nextAppointment {
             Button {
                 navState.navigate(to: .appointmentDetail(appointment: next))
             } label: {

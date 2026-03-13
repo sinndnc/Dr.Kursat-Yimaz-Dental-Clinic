@@ -9,16 +9,8 @@ import SwiftUI
 
 struct AppointmentListView: View {
     @EnvironmentObject private var vm: ProfileViewModel
+    @EnvironmentObject private var apptvm: AppointmentViewModel
     @EnvironmentObject private var navState: ProfileNavigationState
-    @State private var filter: AppointmentFilter = .all
-    
-    var filteredAppointments: [Appointment] {
-        switch filter {
-        case .all: return vm.appointments.sorted { $0.date > $1.date }
-        case .upcoming: return vm.upcomingAppointments
-        case .completed: return vm.completedAppointments
-        }
-    }
     
     var body: some View {
         ZStack {
@@ -30,9 +22,12 @@ struct AppointmentListView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
                         ForEach(AppointmentFilter.allCases, id: \.self) { f in
-                            FilterChip(label: f.rawValue, isSelected: filter == f) {
+                            FilterChip(
+                                label: f.rawValue,
+                                isSelected: apptvm.selectedFilter == f
+                            ) {
                                 withAnimation(.default) {
-                                    filter = f
+                                    apptvm.selectedFilter = f
                                 }
                             }
                         }
@@ -43,13 +38,13 @@ struct AppointmentListView: View {
                 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 10) {
-                        ForEach(filteredAppointments) { apt in
+                        ForEach(apptvm.filteredAppointments) { apt in
                             AppointmentCard(appointment: apt)
                                 .onTapGesture {
                                     navState.navigate(to: .appointmentDetail(appointment: apt))
                                 }
                         }
-                        if filteredAppointments.isEmpty {
+                        if apptvm.filteredAppointments.isEmpty {
                             KYEmptyState(
                                 icon: "calendar.badge.clock",
                                 title: "Randevu Yok",

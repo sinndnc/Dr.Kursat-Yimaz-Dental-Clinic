@@ -11,27 +11,24 @@ import FirebaseFirestore
 
 struct Appointment: Identifiable, Codable, Hashable {
     
-    // MARK: Firestore document ID
     @DocumentID var id: String?
     
     var patientId: String
-    var patientName: String       // denormalized for quick display
+    var patientName: String
     var doctorId: String
     var doctorName: String
     var doctorSpecialty: String
     var clinicId: String
     var date: Date
-    var time: String              // "09:30" – human readable slot
-    var durationMinutes: Int      // appointment length in minutes
+    var time: String
+    var durationMinutes: Int
     var type: AppointmentType
-    var status: AppointmentStatus
     var notes: String
     var roomNumber: String
-    var serviceId: String?        // linked DentalService
+    var serviceId: String?
     var createdAt: Date
     var updatedAt: Date
     
-    var isUpcoming: Bool { status == .upcoming && date > Date() }
     var isPast: Bool { date < Date() }
     var month: String { self.date.formatted(.dateTime.month(.wide)) }
     var dayOfMonth: Int { Calendar.current.component(.day, from: self.date) }
@@ -66,7 +63,6 @@ struct Appointment: Identifiable, Codable, Hashable {
         self.time = time
         self.durationMinutes = durationMinutes
         self.type = type
-        self.status = status
         self.notes = notes
         self.roomNumber = roomNumber
         self.serviceId = serviceId
@@ -128,12 +124,22 @@ struct Appointment: Identifiable, Codable, Hashable {
         case time
         case durationMinutes = "duration_minutes"
         case type
-        case status
         case notes
         case roomNumber      = "room_number"
         case serviceId       = "service_id"
         case createdAt       = "created_at"
         case updatedAt       = "updated_at"
+    }
+}
+
+extension Appointment {
+    var status: AppointmentStatus {
+        let now = Date()
+        let end = date.addingTimeInterval(TimeInterval(durationMinutes * 60))
+        
+        if date <= now && end >= now { return .inProgress }
+        if date > now               { return .upcoming }
+        return .completed
     }
 }
 
@@ -164,24 +170,5 @@ enum AppointmentStatus: String, Codable, CaseIterable, Identifiable, Hashable {
         case .cancelled:  return .red
         case .noShow:     return .gray
         }
-    }
-}
-
-extension Array where Element == Appointment {
-    var upcoming: [Appointment] {
-        filter { $0.status == .upcoming && $0.date >= Date() }
-            .sorted { $0.date < $1.date }
-    }
-    
-    var past: [Appointment] {
-        filter { $0.status == .completed || $0.status == .cancelled ||
-                 $0.status == .noShow || ($0.status == .upcoming && $0.date < Date()) }
-            .sorted { $0.date > $1.date }
-    }
-    
-    var next: Appointment? { upcoming.first }
-    
-    var cancelled: [Appointment] {
-        filter { $0.status == .cancelled }.sorted { $0.date > $1.date }
     }
 }

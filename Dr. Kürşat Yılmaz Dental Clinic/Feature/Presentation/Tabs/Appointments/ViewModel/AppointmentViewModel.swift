@@ -9,17 +9,17 @@ final class AppointmentViewModel: ObservableObject {
     
     @Injected private var repository: AppointmentRepositoryProtocol
     
-    @Published var selectedFilter: AppointmentFilter = .all
-    @Published var showCalendar = false
-    @Published var headerAppeared = false
-    @Published var currentMonth: Date = Date()
-    @Published var selectedCalendarDate: Date? = nil
     @Published var searchText: String = ""
     @Published var showSearch: Bool = false
+    @Published var showCalendar: Bool = false
+    @Published var headerAppeared: Bool = false
+    @Published var currentMonth: Date = Date()
+    @Published var selectedCalendarDate: Date? = nil
     @Published var selectedAppointment: Appointment?
+    @Published var selectedFilter: AppointmentFilter = .all
     
-    @Published private(set) var appointments: [Appointment] = []
     @Published private(set) var isLoading: Bool = true
+    @Published private(set) var appointments: [Appointment] = []
     @Published private(set) var error: AppointmentRepositoryError? = nil
     
     
@@ -31,6 +31,19 @@ final class AppointmentViewModel: ObservableObject {
         startObserving()
     }
     
+    var nextAppointment: Appointment? { upcoming.first }
+    
+    var upcoming: [Appointment] {
+        appointments.filter { $0.date >= Date() }
+            .sorted { $0.date < $1.date }
+    }
+    
+    var past: [Appointment] {
+        appointments.filter { $0.date < Date() }
+            .sorted { $0.date > $1.date }
+    }
+    
+    var next: Appointment? { upcoming.first }
     
     private func startObserving() {
         guard let patientId = currentUserId else {
@@ -106,8 +119,8 @@ final class AppointmentViewModel: ObservableObject {
         var base: [Appointment]
         
         switch selectedFilter {
-        case .upcoming:  base = appointments.filter { $0.status == .upcoming }
-        case .completed: base = appointments.filter { $0.status == .completed }
+        case .completed: base = past
+        case .upcoming:  base = upcoming
         case .all:       base = appointments
         }
         
@@ -125,7 +138,6 @@ final class AppointmentViewModel: ObservableObject {
         
         return base
     }
-    
     
     var appointmentDatesInMonth: Set<String> {
         let formatter = DateFormatter()
@@ -145,5 +157,4 @@ final class AppointmentViewModel: ObservableObject {
             .sorted { $0.time < $1.time }
     }
     
-    var nextAppointment: Appointment? { appointments.upcoming.first }
 }

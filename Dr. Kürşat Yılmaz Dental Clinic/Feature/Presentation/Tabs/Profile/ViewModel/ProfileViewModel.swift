@@ -19,7 +19,6 @@ class ProfileViewModel: ObservableObject {
     
     @Published var patient: Patient? = nil
     @Published var appointments: [Appointment] = []
-    @Published var payments: [Payment] = []
     @Published var treatments: [ToothTreatment] = []
     @Published var documents: [PatientDocument] = []
     @Published var isLoading = false
@@ -84,28 +83,11 @@ class ProfileViewModel: ObservableObject {
             Logger.log("\(error)")
         }
     }
-    
-    var totalDebt: Double {
-        payments.filter { $0.status == .pending || $0.status == .overdue }
-            .reduce(0) { $0 + $1.amount }
-    }
-    
-    var totalPaid: Double {
-        payments.filter { $0.status == .paid }
-            .reduce(0) { $0 + $1.amount }
-    }
-    
+   
     var activeTreatments: [ToothTreatment] {
         treatments.filter { $0.status == .active }
     }
     
-    var upcomingAppointments: [Appointment] {
-        appointments.upcoming
-    }
-    
-    var nextAppointment: Appointment? {
-        appointments.next
-    }
     
     var completedAppointments: [Appointment] {
         appointments.filter { $0.status == .completed }
