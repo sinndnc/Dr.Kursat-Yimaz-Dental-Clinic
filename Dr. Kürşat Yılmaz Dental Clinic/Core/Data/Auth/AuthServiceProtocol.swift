@@ -26,6 +26,7 @@ protocol AuthServiceProtocol: AnyObject {
     func deleteAccount() async throws
     func sendPasswordReset(to email: String) async throws
     func signIn(email: String, password: String) async throws
+    func updateCurrentPatient(patientId: String,firstName: String,lastName: String,phone: String,email: String) throws 
     func register(email:String,password:String,firstName:String,lastName:String,phone:String?,birthDate: Date?,gender:Gender?) async throws
     func updateCurrentPatient(_ updated: Patient) async throws
     func reauthenticate(email: String, password: String) async throws

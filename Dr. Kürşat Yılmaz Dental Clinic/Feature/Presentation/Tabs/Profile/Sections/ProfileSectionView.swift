@@ -14,7 +14,9 @@ struct ProfileSectionView: View {
     @State private var lastName: String = ""
     @State private var phone: String = ""
     @State private var email: String = ""
-
+    
+    @EnvironmentObject private var authVm: AuthViewModel
+    
     var body: some View {
         ZStack {
             Color.kyBackground.ignoresSafeArea()
@@ -42,7 +44,7 @@ struct ProfileSectionView: View {
                             }
                         }
                         .frame(maxWidth: .infinity)
-
+                        
                         // Form fields
                         KYCard {
                             VStack(spacing: 16) {
@@ -55,8 +57,7 @@ struct ProfileSectionView: View {
                                 ProfileTextField(label: "E-posta", placeholder: patient.email ?? "", text: $email, icon: "envelope.fill")
                             }
                         }
-
-                        // Non-editable info
+                        
                         KYCard {
                             VStack(spacing: 14) {
                                 KYDetailRow(icon: "number", label: "TC Kimlik No", value: patient.tcKimlikNo ?? "", iconColor: .kySubtext)
@@ -66,8 +67,10 @@ struct ProfileSectionView: View {
                                 KYDetailRow(icon: "person.2.fill", label: "Cinsiyet", value: patient.gender.rawValue, iconColor: .kySubtext)
                             }
                         }
-
-                        ActionButton(title: "Değişiklikleri Kaydet", icon: "checkmark.circle.fill", color: .kyAccent, style: .filled) {}
+                        
+                        ActionButton(title: "Değişiklikleri Kaydet", icon: "checkmark.circle.fill", color: .kyAccent, style: .filled) {
+                            authVm.updatePatient(patientId: patient.id!,firstName: firstName,lastName: lastName,phone: phone,email: email)
+                        }
                     }
                     .padding(.horizontal, 20)
                     .padding(.top, 16)

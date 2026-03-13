@@ -165,6 +165,27 @@ final class AuthViewModel: ObservableObject {
         }
     }
     
+    func updatePatient(
+        patientId: String,
+        firstName: String,
+        lastName: String,
+        phone: String,
+        email: String
+    ) {
+        do {
+            try authService.updateCurrentPatient(
+                patientId: patientId,
+                firstName: firstName,
+                lastName: lastName,
+                phone: phone,
+                email: email
+            )
+            ToastManager.shared.success("Kaydedildi", message: "Bilgileriniz güncellendi.")
+        } catch {
+            showError(error)
+        }
+    }
+    
     func deleteAccount() {
         AlertManager.shared.confirmDestructive(
             title: "Hesabı Kalıcı Olarak Sil",

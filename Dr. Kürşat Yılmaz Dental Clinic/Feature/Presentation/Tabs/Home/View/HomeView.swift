@@ -16,6 +16,7 @@ struct HomeView: View {
     @EnvironmentObject private var authVm: AuthViewModel
     @EnvironmentObject private var apptVM: AppointmentViewModel
     @EnvironmentObject private var navState: HomeNavigationState
+    @EnvironmentObject private var notificationVm: NotificationViewModel
     
     @State private var heroScale: CGFloat = 0.97
     @State private var greetingOpacity: Double = 0
@@ -133,13 +134,12 @@ struct HomeView: View {
                                 )
                         }
                         
-//                        let hasNotification = notificationAdapter.grouped(from: notificationVm.notifications)
-//                        if !hasNotification.isEmpty {
-//                            Circle()
-//                                .fill(Color.kyAccent)
-//                                .frame(width: 9, height: 9)
-//                                .offset(x: 2, y: -1)
-//                        }
+                        if !notificationVm.grouped.isEmpty {
+                            Circle()
+                                .fill(Color.kyAccent)
+                                .frame(width: 9, height: 9)
+                                .offset(x: 2, y: -1)
+                        }
                     }
                 }
                 .padding(.horizontal, 24)

@@ -11,12 +11,14 @@ import SwiftUI
 struct DrKursatYilmazDentalClinicApp: App {
     
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @StateObject private var notificationVm: NotificationViewModel = NotificationViewModel()
     
     var body: some Scene {
         WindowGroup {
             RootView()
                 .alertContainer()
                 .toastContainer()
+                .environmentObject(notificationVm)
         }
     }
 }

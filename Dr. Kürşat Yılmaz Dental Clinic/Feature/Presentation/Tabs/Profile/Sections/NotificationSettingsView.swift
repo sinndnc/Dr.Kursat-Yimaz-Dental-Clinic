@@ -7,7 +7,6 @@ import SwiftUI
 
 struct NotificationSettingsView: View {
     
-//    @EnvironmentObject private var notificationVM: NotificationViewModel
     
     @AppStorage("pref_sms_enabled")         private var smsEnabled             = true
     @AppStorage("pref_whatsapp_enabled")    private var whatsappEnabled        = false
@@ -18,6 +17,7 @@ struct NotificationSettingsView: View {
     @AppStorage("pref_birthday_messages")   private var birthdayMessages       = true
     
     @State private var showSettingsAlert = false
+    @EnvironmentObject private var notificationVM: NotificationViewModel
     
     var body: some View {
         ZStack {
@@ -27,14 +27,14 @@ struct NotificationSettingsView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 20) {
                         
-//                        if !notificationVM.isPushAuthorized {
-//                            permissionBanner
-//                                .padding(.horizontal, 20)
-//                                .padding(.top, 8)
-//                        }
+                        if !notificationVM.isAuthorized {
+                            permissionBanner
+                                .padding(.horizontal, 20)
+                                .padding(.top, 8)
+                        }
                         
-//                        channelsGroup
-//                        remindersGroup
+                        channelsGroup
+                        remindersGroup
                         otherGroup
                     }
                     .padding(.horizontal, 20)
@@ -57,32 +57,32 @@ struct NotificationSettingsView: View {
     }
     
     
-//    private var channelsGroup: some View {
-//        NotifGroupView(title: "Kanallar") {
-//            NotifRowView(
-//                icon: "bell.badge.fill",
-//                label: "Push Bildirimleri",
-//                subtitle: notificationVM.isPushAuthorized ? "Açık" : "Kapalı — Ayarlardan açın",
-//                isOn: pushBinding
-//            )
-//            KYDivider()
-//            NotifRowView(icon: "message.fill",label: "SMS Bildirimleri",isOn: $smsEnabled)
-//            KYDivider()
-//            NotifRowView(icon: "bubble.left.and.bubble.right.fill", label: "WhatsApp",isOn: $whatsappEnabled)
-//            KYDivider()
-//            NotifRowView(icon: "envelope.fill",label: "E-posta", isOn: $emailNotifications)
-//        }
-//        .disabled(!notificationVM.isPushAuthorized)
-//    }
+    private var channelsGroup: some View {
+        NotifGroupView(title: "Kanallar") {
+            NotifRowView(
+                icon: "bell.badge.fill",
+                label: "Push Bildirimleri",
+                subtitle: notificationVM.isAuthorized ? "Açık" : "Kapalı — Ayarlardan açın",
+                isOn: pushBinding
+            )
+            KYDivider()
+            NotifRowView(icon: "message.fill",label: "SMS Bildirimleri",isOn: $smsEnabled)
+            KYDivider()
+            NotifRowView(icon: "bubble.left.and.bubble.right.fill", label: "WhatsApp",isOn: $whatsappEnabled)
+            KYDivider()
+            NotifRowView(icon: "envelope.fill",label: "E-posta", isOn: $emailNotifications)
+        }
+        .disabled(!notificationVM.isAuthorized)
+    }
     
-//    private var remindersGroup: some View {
-//        NotifGroupView(title: "Randevu Hatırlatıcılar") {
-//            NotifRowView(icon: "clock.badge.fill", label: "24 Saat Önce",isOn: reminder24hBinding)
-//            KYDivider()
-//            NotifRowView(icon: "clock.badge.fill", label: "1 Saat Önce",isOn: reminder1hBinding)
-//        }
-//        .disabled(!notificationVM.isPushAuthorized)
-//    }
+    private var remindersGroup: some View {
+        NotifGroupView(title: "Randevu Hatırlatıcılar") {
+            NotifRowView(icon: "clock.badge.fill", label: "24 Saat Önce",isOn: reminder24hBinding)
+            KYDivider()
+            NotifRowView(icon: "clock.badge.fill", label: "1 Saat Önce",isOn: reminder1hBinding)
+        }
+        .disabled(!notificationVM.isAuthorized)
+    }
     
     private var otherGroup: some View {
         NotifGroupView(title: "Diğer") {
@@ -90,41 +90,40 @@ struct NotificationSettingsView: View {
             KYDivider()
             NotifRowView(icon: "birthday.cake.fill", label: "Doğum Günü Mesajı", isOn: $birthdayMessages)
         }
-//        .disabled(!notificationVM.isPushAuthorized)
+        .disabled(!notificationVM.isAuthorized)
     }
     
-    // MARK: - Bindings
-//    
-//    private var pushBinding: Binding<Bool> {
-//        Binding(
-//            get: { notificationVM.isPushAuthorized },
-//            set: { newValue in
-//                if newValue { Task { await notificationVM.requestPermission() } }
-//                else        { showSettingsAlert = true }
-//            }
-//        )
-//    }
-//    
-//    private var reminder24hBinding: Binding<Bool> {
-//        Binding(
-//            get: { appointmentReminder24h },
-//            set: {
-//                appointmentReminder24h = $0
-//                Task { await notificationVM.onReminderPreferencesChanged() }
-//            }
-//        )
-//    }
-//    
-//    private var reminder1hBinding: Binding<Bool> {
-//        Binding(
-//            get: { appointmentReminder1h },
-//            set: {
-//                appointmentReminder1h = $0
-//                Task { await notificationVM.onReminderPreferencesChanged() }
-//            }
-//        )
-//    }
-//    
+    
+    private var pushBinding: Binding<Bool> {
+        Binding(
+            get: { notificationVM.isAuthorized },
+            set: { newValue in
+                if newValue { Task { await notificationVM.requestPermission() } }
+                else        { showSettingsAlert = true }
+            }
+        )
+    }
+    
+    private var reminder24hBinding: Binding<Bool> {
+        Binding(
+            get: { appointmentReminder24h },
+            set: {
+                appointmentReminder24h = $0
+                Task { await notificationVM.onReminderPrefsChanged() }
+            }
+        )
+    }
+    
+    private var reminder1hBinding: Binding<Bool> {
+        Binding(
+            get: { appointmentReminder1h },
+            set: {
+                appointmentReminder1h = $0
+                Task { await notificationVM.onReminderPrefsChanged() }
+            }
+        )
+    }
+    
     
     private var permissionBanner: some View {
         HStack(spacing: 14) {
@@ -167,21 +166,17 @@ struct NotificationSettingsView: View {
     }
 }
 
-// MARK: - NotifGroupView
-// ForEach + Binding sorununu tamamen ortadan kaldırmak için
-// grup içeriği @ViewBuilder ile doğrudan geçiliyor.
-
 private struct NotifGroupView<Content: View>: View {
     let title: String
     @ViewBuilder let content: Content
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title.uppercased())
                 .font(.kyMono(9, weight: .bold))
                 .tracking(2)
                 .foregroundColor(.kySubtext)
-
+            
             VStack(spacing: 0) {
                 content
             }

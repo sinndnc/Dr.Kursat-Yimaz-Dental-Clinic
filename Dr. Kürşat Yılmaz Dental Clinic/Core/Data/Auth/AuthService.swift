@@ -191,6 +191,30 @@ final class AuthService: AuthServiceProtocol {
             throw AuthError.passwordResetFailed(message)
         }
     }
+    
+    func updateCurrentPatient(
+        patientId: String,
+        firstName: String,
+        lastName: String,
+        phone: String,
+        email: String
+    ) throws {
+        guard let uid = currentUID else { throw AuthError.userNotFound }
+        db.collection("patients").document(patientId).updateData([
+            "first_name": firstName,
+            "last_name": lastName,
+            "phone": phone,
+            "email": email,
+            "updated_at": Date()
+        ]) { error in
+            
+            if let error = error {
+                print("Profil güncellenemedi:", error.localizedDescription)
+            } else {
+                print("Profil başarıyla güncellendi")
+            }
+        }
+    }
 
     func updateCurrentPatient(_ updated: Patient) async throws {
         guard let uid = currentUID else { throw AuthError.userNotFound }

@@ -17,7 +17,6 @@ struct RootView: View {
     var body: some View {
         ZStack {
             Color.kyBackground.ignoresSafeArea()
-            
             switch authVM.authState {
             case .loading:
                 SplashView()
@@ -28,6 +27,5 @@ struct RootView: View {
         .environment(navState)
         .environmentObject(authVM)
         .animation(.easeInOut(duration: 0.4), value: authVM.authState)
-       
     }
 }
