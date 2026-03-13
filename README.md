@@ -23,27 +23,27 @@ appointments in seconds.
 
 ### Home Screen
 
-![Home](screenshots/home.png)
+![Home](screenshots/ios_1_1.png)
 
 ### Appointments
 
-![Appointments](screenshots/appointments.png)
+![Appointments](screenshots/ios_1_2.png)
 
 ### Treatments
 
-![Treatments](screenshots/treatments.png)
+![Services](screenshots/ios_1_3.png)
 
 ### Doctors
 
-![Doctors](screenshots/doctors.png)
+![Doctors](screenshots/ios_1_4.png)
 
 ### Booking Appointment
 
-![Booking](screenshots/booking.png)
+![Booking](screenshots/ios_1_5.png)
 
 ### Select Service
 
-![Service](screenshots/service-selection.png)
+![Service](screenshots/ios_1_6.png)
 
 ------------------------------------------------------------------------
 
